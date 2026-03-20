@@ -1,0 +1,13 @@
+node_modules/
+__pycache__/
+*.pyc
+*.db
+*.pth
+*.pkl
+memory/
+project/
+vineths_wardrobe/vineths_wardrobe/
+vineths_wardrobe/settings.json
+vineths_wardrobe/settings.local.json
+vineths_wardrobe/frontend/static_docs/
+.claude/
