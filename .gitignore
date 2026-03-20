@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Large data files
+data/raw/images/
+backend/uploads/
+test_images/
+
+# Model weights (large binary files)
+*.h5
+*.pkl
+*.pt
+*.pth
+*.onnx
+
+# Node / Expo
+node_modules/
+.expo/
+dist/
+web-build/
+.DS_Store
+*.local
+
+# VS Code
+.vscode/
+
+# Push script (contains credentials)
+push_commits.ps1
