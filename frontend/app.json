@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Smart Wardrobe",
+    "slug": "smart-wardrobe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#5C4033"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#5C4033"
+      },
+      "package": "com.smartwardrobe.app"
+    },
+    "ios": {
+      "bundleIdentifier": "com.smartwardrobe.app"
+    }
+  }
+}
