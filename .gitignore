@@ -11,3 +11,5 @@ vineths_wardrobe/settings.json
 vineths_wardrobe/settings.local.json
 vineths_wardrobe/frontend/static_docs/
 .claude/
+
+ewardrobe-app/.expo/
