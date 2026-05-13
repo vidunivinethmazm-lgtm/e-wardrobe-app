@@ -113,6 +113,47 @@ Combines an **NLP classifier** with a **Graph Neural Network (GNN)** to recommen
 │   ├── nlp_model.pkl           # Trained NLP classifier
 │   └── vectorizer.pkl          # TF-IDF vectorizer
 └── SmartWardrobeApp/           # Expo React Native mobile app
+    ├── app/
+    │   ├── _layout.tsx
+    │   ├── modal.tsx
+    │   └── (tabs)/
+    │       ├── _layout.tsx
+    │       ├── index.tsx
+    │       └── explore.tsx
+    ├── assets/images/
+    │   ├── android-icon-background.png
+    │   ├── android-icon-foreground.png
+    │   ├── android-icon-monochrome.png
+    │   ├── favicon.png
+    │   ├── icon.png
+    │   ├── partial-react-logo.png
+    │   ├── react-logo.png
+    │   ├── react-logo@2x.png
+    │   ├── react-logo@3x.png
+    │   └── splash-icon.png
+    ├── components/
+    │   ├── external-link.tsx
+    │   ├── haptic-tab.tsx
+    │   ├── hello-wave.tsx
+    │   ├── parallax-scroll-view.tsx
+    │   ├── themed-text.tsx
+    │   ├── themed-view.tsx
+    │   └── ui/
+    │       ├── collapsible.tsx
+    │       ├── icon-symbol.tsx
+    │       └── icon-symbol.ios.tsx
+    ├── constants/theme.ts
+    ├── hooks/
+    │   ├── use-color-scheme.ts
+    │   ├── use-color-scheme.web.ts
+    │   └── use-theme-color.ts
+    ├── scripts/reset-project.js
+    ├── app.json
+    ├── eslint.config.js
+    ├── package.json
+    ├── package-lock.json
+    ├── tsconfig.json
+    └── README.md
 ```
 
 ### How It Works
