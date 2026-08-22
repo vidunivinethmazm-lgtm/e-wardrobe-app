@@ -15,8 +15,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- THE MODEL LOADER ---
-# This pulls the NLP and GNN intelligence from your training phase
+# ── Colour harmony scores per event type ─────────────────────────────────────
+COLOR_EVENT_SCORES = {
+    'Wedding': {
+        'white': 0.10, 'gold': 0.10, 'red': 0.08, 'pink': 0.08,
+        'multicolor': 0.03, 'olive': -0.08, 'black': -0.03, 'brown': -0.03,
+    },
+    'Funeral': {
+        'white': 0.08, 'black': 0.08, 'navy': 0.06, 'beige': 0.04,
+        'red': -0.10, 'pink': -0.08, 'gold': -0.06, 'multicolor': -0.08,
+    },
+    'Party': {
+        'red': 0.10, 'gold': 0.10, 'pink': 0.08, 'blue': 0.06,
+        'purple': 0.06, 'teal': 0.06, 'multicolor': 0.08,
+        'beige': -0.04, 'brown': -0.04,
+    },
+    'Formal': {
+        'navy': 0.10, 'black': 0.08, 'beige': 0.06, 'white': 0.06,
+        'multicolor': -0.08, 'olive': -0.06, 'pink': -0.04,
+    },
+    'ColdOutdoor': {
+        'brown': 0.08, 'beige': 0.06, 'olive': 0.06, 'navy': 0.04,
+        'white': -0.04,
+    },
+}
+
 def load_trained_intelligence():
     try:
         with open('nlp_model.pkl', 'rb') as f: nlp = pickle.load(f)
@@ -54,15 +77,15 @@ async def recommend(
 
     def detect_event_type(text: str) -> str:
         text = text.lower()
-        if any(keyword in text for keyword in ['wedding', 'marriage', 'bride', 'groom', 'reception']):
+        if any(k in text for k in ['wedding', 'marriage', 'bride', 'groom', 'reception']):
             return 'Wedding'
-        if any(keyword in text for keyword in ['funeral', 'mourning', 'memorial', 'wake']):
+        if any(k in text for k in ['funeral', 'mourning', 'memorial', 'wake']):
             return 'Funeral'
-        if any(keyword in text for keyword in ['party', 'birthday', 'festival', 'celebration', 'dinner']):
+        if any(k in text for k in ['party', 'birthday', 'festival', 'celebration', 'dinner']):
             return 'Party'
-        if any(keyword in text for keyword in ['corporate', 'office', 'meeting', 'interview', 'temple', 'formal']):
+        if any(k in text for k in ['corporate', 'office', 'meeting', 'interview', 'temple', 'formal']):
             return 'Formal'
-        if any(keyword in text for keyword in [
+        if any(k in text for k in [
             'trip', 'travel', 'tour', 'hike', 'hiking', 'trekking', 'trek',
             'mountain', 'hill', 'nuwara', 'ella', 'horton', 'knuckles',
             'cold', 'cool', 'outdoor', 'nature', 'picnic', 'camp'
@@ -70,16 +93,9 @@ async def recommend(
             return 'ColdOutdoor'
         return 'Casual'
 
-    # NLP model predicts outfit-event suitability (Suitable / Unsuitable)
-    # trained on Event + Fabric + Micro_Climate features
     def item_nlp_suitability(event: str, fabric: str) -> bool:
         text = event + ' ' + fabric
         return nlp.predict(vec.transform([text]))[0] == 'Suitable'
-
-    event_type = detect_event_type(user_input)
-    predicted_intent = 'Formal' if event_type in ['Wedding', 'Formal'] else 'Casual'
-    if event_type == 'ColdOutdoor':
-        predicted_intent = 'Casual'
 
     def event_preference_score(item_name: str, fabric: str, event_type: str) -> float:
         name = item_name.lower()
@@ -87,52 +103,79 @@ async def recommend(
         score = 0.0
 
         if event_type == 'Wedding':
-            if any(keyword in name for keyword in ['saree', 'gown', 'blazer', 'silk', 'chiffon', 'georgette']):
+            if any(k in name for k in ['saree', 'gown', 'blazer', 'silk', 'chiffon', 'georgette']):
                 score += 0.35
-            elif any(keyword in name for keyword in ['dress', 'jumpsuit']):
+            elif any(k in name for k in ['dress', 'jumpsuit']):
                 score += 0.2
             else:
                 score += 0.1
         elif event_type == 'Funeral':
-            if any(keyword in name for keyword in ['cotton', 'kurti', 'pashmina', 'shawl', 'linen', 'wool']):
+            if any(k in name for k in ['cotton', 'kurti', 'pashmina', 'shawl', 'linen', 'wool']):
                 score += 0.35
-            elif any(keyword in name for keyword in ['silk', 'chiffon', 'georgette']):
+            elif any(k in name for k in ['silk', 'chiffon', 'georgette']):
                 score += 0.15
             else:
                 score += 0.05
         elif event_type == 'Party':
-            if any(keyword in name for keyword in ['gown', 'saree', 'blazer', 'jumpsuit', 'silk', 'chiffon', 'georgette']):
+            if any(k in name for k in ['gown', 'saree', 'blazer', 'jumpsuit', 'silk', 'chiffon', 'georgette']):
                 score += 0.35
             else:
                 score += 0.15
         elif event_type == 'Formal':
-            if any(keyword in name for keyword in ['saree', 'gown', 'blazer', 'silk', 'georgette']):
+            if any(k in name for k in ['saree', 'gown', 'blazer', 'silk', 'georgette']):
                 score += 0.3
             else:
                 score += 0.1
         elif event_type == 'ColdOutdoor':
-            # Prioritise warm, layerable fabrics for hill country / outdoor trips
-            if any(keyword in fabric for keyword in ['wool', 'linen', 'cotton']):
+            if any(k in fabric for k in ['wool', 'linen', 'cotton']):
                 score += 0.40
-            elif any(keyword in name for keyword in ['shawl', 'pashmina', 'suit', 'blazer', 'trouser']):
+            elif any(k in name for k in ['shawl', 'pashmina', 'suit', 'blazer', 'trouser']):
                 score += 0.35
-            elif any(keyword in fabric for keyword in ['polyester', 'viscose', 'rayon']):
+            elif any(k in fabric for k in ['polyester', 'viscose', 'rayon']):
                 score += 0.20
             else:
                 score += 0.05
-            # Penalise thin, delicate fabrics — wrong for cold weather
-            if any(keyword in fabric for keyword in ['silk', 'chiffon', 'georgette']):
+            if any(k in fabric for k in ['silk', 'chiffon', 'georgette']):
                 score -= 0.15
         else:
-            if any(keyword in name for keyword in ['jumpsuit', 'kurti', 'linen', 'cotton']):
+            if any(k in name for k in ['jumpsuit', 'kurti', 'linen', 'cotton']):
                 score += 0.3
             else:
                 score += 0.1
 
-        if event_type == 'Funeral' and any(keyword in fabric for keyword in ['linen', 'cotton', 'wool']):
+        if event_type == 'Funeral' and any(k in fabric for k in ['linen', 'cotton', 'wool']):
             score += 0.05
 
         return score
+
+    def colour_score(color: str, event_type: str) -> float:
+        c = color.lower() if color else ''
+        return COLOR_EVENT_SCORES.get(event_type, {}).get(c, 0.0)
+
+    def suggest_combination(item: dict, wardrobe: list, event_type: str) -> str:
+        category = item.get('category', '').lower()
+        item_name = item.get('name', '')
+
+        if category in ['saree', 'dress', 'jumpsuit']:
+            accessories = [w for w in wardrobe if w.get('category') == 'accessory' and w.get('name') != item_name]
+            if accessories:
+                return f"Complete the look with {accessories[0]['name']}"
+        elif category in ['top', 'blazer']:
+            suits = [w for w in wardrobe if w.get('category') == 'suit' and w.get('name') != item_name]
+            if suits:
+                return f"Pair with {suits[0]['name']} for a polished finish"
+        elif category == 'suit':
+            return "Pair with a formal blouse and pointed-toe heels"
+
+        fallbacks = {
+            'Wedding': 'Add gold jewellery and matching heels to complete the look',
+            'Party': 'Accessorise with a statement clutch and strappy heels',
+            'Formal': 'Complete with formal shoes and keep accessories minimal',
+            'ColdOutdoor': 'Layer with the Woolen Pashmina Shawl for added warmth',
+            'Funeral': 'Keep accessories understated and respectful',
+            'Casual': 'Style with comfortable flats and a tote bag',
+        }
+        return fallbacks.get(event_type, 'Style with matching accessories')
 
     def build_intent_center(embeddings, categories, target_intent):
         indices = [idx for idx, label in enumerate(categories) if label == target_intent]
@@ -140,55 +183,50 @@ async def recommend(
             return embeddings[indices].mean(dim=0)
         return embeddings.mean(dim=0)
 
-    _, _, gnn, x, edge_index = AI
-    with torch.no_grad():
-        item_embeddings = gnn.encode(x, edge_index)[:len(wardrobe)]
-
-    # NLP suitability label per item — used to build the GNN intent centre
-    nlp_labels = ['Suitable' if item_nlp_suitability(event_type, item.get('fabric', ''))
-                  else 'Unsuitable' for item in wardrobe]
-    intent_center = build_intent_center(item_embeddings, nlp_labels, 'Suitable')
-
-    similarity_scores = torch.nn.functional.cosine_similarity(
-        item_embeddings,
-        intent_center.unsqueeze(0),
-        dim=1
-    )
-    similarity_scores = ((similarity_scores + 1) / 2).tolist()
-
     def temperature_score(fabric: str) -> float:
         f = fabric.lower() if fabric else ''
-        if temperature < 18:                          # cold — hill country
+        if temperature < 18:
             if f in ['wool', 'polyester']:   return  0.15
             if f in ['linen', 'cotton']:     return  0.05
             if f in ['silk', 'chiffon', 'georgette', 'rayon', 'viscose']: return -0.10
-        elif temperature < 25:                        # mild — comfortable
-            return 0.05                               # all fabrics acceptable
-        else:                                         # hot — tropical Sri Lanka
+        elif temperature < 25:
+            return 0.05
+        else:
             if f in ['linen', 'cotton', 'viscose', 'rayon']: return  0.10
             if f in ['wool', 'polyester']:   return -0.10
         return 0.0
 
-    def explain(outfit_name: str, fabric: str, is_suitable: bool, similarity: float) -> str:
+    def explain(outfit_name: str, fabric: str, color: str, is_suitable: bool, similarity: float, event_type: str) -> str:
         f = fabric.lower() if fabric else ''
+        c = color.lower() if color else ''
         name = outfit_name.lower()
         parts = []
 
-        # Event-based explanation
         if event_type == 'Wedding':
             if any(k in name or k in f for k in ['saree', 'silk', 'georgette', 'chiffon']):
                 parts.append("Traditional choice for Sri Lankan weddings")
             elif any(k in name for k in ['gown', 'blazer']):
                 parts.append("Elegant and ceremonially appropriate")
+            colour_note = COLOR_EVENT_SCORES.get('Wedding', {}).get(c, 0)
+            if colour_note > 0.05:
+                parts.append(f"{c.capitalize()} is an auspicious colour for weddings")
+            elif colour_note < -0.02:
+                parts.append(f"{c.capitalize()} is an unconventional colour for weddings")
         elif event_type == 'Funeral':
             if f in ['cotton', 'wool', 'linen']:
                 parts.append("Modest, respectful fabric for solemn occasions")
+            if c in ['white', 'black', 'navy', 'beige']:
+                parts.append(f"{c.capitalize()} is appropriate for funeral dress")
         elif event_type == 'Party':
             if any(k in name or k in f for k in ['gown', 'saree', 'georgette', 'chiffon']):
                 parts.append("Festive and celebratory style")
+            if COLOR_EVENT_SCORES.get('Party', {}).get(c, 0) > 0.05:
+                parts.append(f"{c.capitalize()} adds vibrancy for a party look")
         elif event_type == 'Formal':
             if any(k in name for k in ['blazer', 'saree', 'gown']):
                 parts.append("Professional and formal silhouette")
+            if COLOR_EVENT_SCORES.get('Formal', {}).get(c, 0) > 0.05:
+                parts.append(f"{c.capitalize()} projects a professional image")
         elif event_type == 'ColdOutdoor':
             if f == 'wool':
                 parts.append("Wool retains heat — ideal for hill country")
@@ -197,7 +235,6 @@ async def recommend(
             elif f in ['silk', 'chiffon', 'georgette']:
                 parts.append("Too lightweight for cold outdoor conditions")
 
-        # Temperature-based explanation
         if temperature < 18:
             if f in ['wool', 'polyester']:
                 parts.append(f"Warm fabric suits {temperature:.0f}°C cool weather")
@@ -209,13 +246,11 @@ async def recommend(
             elif f == 'wool':
                 parts.append(f"Heavy fabric — may be too warm at {temperature:.0f}°C")
 
-        # NLP model decision
         if is_suitable:
             parts.append(f"NLP model: {fabric} suits this event type")
         else:
             parts.append(f"NLP model: {fabric} is a non-typical choice here")
 
-        # GNN similarity
         if similarity > 0.75:
             parts.append("GNN: high style compatibility")
         elif similarity > 0.55:
@@ -225,36 +260,68 @@ async def recommend(
 
         return " · ".join(parts) if parts else "Matches your event and climate profile"
 
+    event_type = detect_event_type(user_input)
+    predicted_intent = 'Formal' if event_type in ['Wedding', 'Formal'] else 'Casual'
+    if event_type == 'ColdOutdoor':
+        predicted_intent = 'Casual'
+
+    _, _, gnn, x, edge_index = AI
+    with torch.no_grad():
+        item_embeddings = gnn.encode(x, edge_index)[:len(wardrobe)]
+
+    nlp_labels = ['Suitable' if item_nlp_suitability(event_type, item.get('fabric', ''))
+                  else 'Unsuitable' for item in wardrobe]
+    intent_center = build_intent_center(item_embeddings, nlp_labels, 'Suitable')
+
+    similarity_scores = torch.nn.functional.cosine_similarity(
+        item_embeddings,
+        intent_center.unsqueeze(0),
+        dim=1
+    )
+    similarity_scores = ((similarity_scores + 1) / 2).tolist()
+
     results = []
     for idx, item in enumerate(wardrobe):
         outfit_name = item.get('name', 'Unknown Outfit')
-        is_suitable = nlp_labels[idx] == 'Suitable'
+        fabric      = item.get('fabric', '')
+        color       = item.get('color', '')
+        price       = item.get('price', 0)
+        category    = item.get('category', '')
+
+        is_suitable    = nlp_labels[idx] == 'Suitable'
         category_match = 1.0 if is_suitable else 0.7
-        similarity = similarity_scores[idx]
-        event_score = event_preference_score(outfit_name, item.get('fabric', ''), event_type)
-        temp_score  = temperature_score(item.get('fabric', ''))
-        score = float(0.3 * category_match + 0.55 * similarity + 0.15 * event_score + temp_score)
-        confidence = f"{min(100, max(0, int(score * 100)))}%"
-        reason = explain(outfit_name, item.get('fabric', ''), is_suitable, similarity)
+        similarity     = similarity_scores[idx]
+        event_score    = event_preference_score(outfit_name, fabric, event_type)
+        temp_score     = temperature_score(fabric)
+        color_s        = colour_score(color, event_type)
+
+        score = float(0.3 * category_match + 0.55 * similarity + 0.15 * event_score + temp_score + color_s)
+        confidence  = f"{min(100, max(0, int(score * 100)))}%"
+        reason      = explain(outfit_name, fabric, color, is_suitable, similarity, event_type)
+        combination = suggest_combination(item, wardrobe, event_type)
 
         results.append({
-            'outfit': outfit_name,
-            'fabric': item.get('fabric'),
-            'image_url': item.get('image_url'),
-            'confidence': confidence,
-            'reason': reason,
-            'score': score,
+            'outfit':      outfit_name,
+            'fabric':      fabric,
+            'color':       color,
+            'price':       price,
+            'category':    category,
+            'image_url':   item.get('image_url'),
+            'confidence':  confidence,
+            'reason':      reason,
+            'combination': combination,
+            'score':       score,
         })
 
     results = sorted(results, key=lambda x: x['score'], reverse=True)
 
     event_class = event_type if event_type in ['Wedding', 'Funeral', 'Party', 'ColdOutdoor'] else predicted_intent
     return {
-        'event_class': event_class,
+        'event_class':       event_class,
         'location_detected': city,
-        'weather': weather,
-        'logic_summary': f'Combined NLP intent and GNN wardrobe ranking for {event_class}.',
-        'recommendations': results[:3]
+        'weather':           weather,
+        'logic_summary':     f'Combined NLP intent, GNN wardrobe ranking, and colour harmony for {event_class}.',
+        'recommendations':   results[:3],
     }
 
 if __name__ == "__main__":
