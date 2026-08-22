@@ -1,4 +1,5 @@
 // Run `ipconfig` (Windows) or `ifconfig` (Mac/Linux) and use your IPv4 address.
-const BASE_URL = 'http://10.123.244.242:8000';
+// Backend runs on port 8090 in this workspace.
+const BASE_URL = 'http://localhost:8090';
 
 export default BASE_URL;

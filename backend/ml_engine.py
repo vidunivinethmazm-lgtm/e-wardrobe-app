@@ -9,6 +9,30 @@ from sklearn.metrics import accuracy_score, r2_score
 from sklearn.model_selection import cross_val_score
 
 
+# ── Wardrobe physical layout configuration ────────────────────────────────────
+
+# Occasion priority: higher = worn more daily = deserves more accessible position
+_OCCASION_PRIORITY = {
+    'Home': 1.0, 'Casual': 0.8, 'Office': 0.6, 'Religious': 0.3, 'Wedding': 0.1
+}
+
+# Four physical sections ranked by accessibility (A = easiest to reach)
+WARDROBE_SECTIONS = {
+    'A': {'label': 'Prime Zone',   'location': 'Hanging Rail · Front', 'pct': 0.15},
+    'B': {'label': 'Regular Zone', 'location': 'Hanging Rail · Back',  'pct': 0.25},
+    'C': {'label': 'Shelf Zone',   'location': 'Upper Shelf',          'pct': 0.30},
+    'D': {'label': 'Deep Storage', 'location': 'Lower Shelf · Drawer', 'pct': 0.30},
+}
+
+# Cumulative percentile cutoffs for section boundaries
+_SECTION_CUTOFFS = [
+    ('A', 0.15),
+    ('B', 0.40),
+    ('C', 0.70),
+    ('D', 1.01),   # catch-all
+]
+
+
 # ── Live-inference models (called per API request) ────────────────────────────
 
 class SmartWardrobeEngine:
@@ -43,6 +67,64 @@ class SmartWardrobeEngine:
         underused = [item.id for item in items if item.total_wear_count < mean - std]
         overused  = [item.id for item in items if item.total_wear_count > mean + std]
         return {"underused": underused, "overused": overused}
+
+    @staticmethod
+    def assign_wardrobe_positions(items):
+        """
+        Assign each item a physical wardrobe position based on:
+          - Usage frequency (55 %): items worn more often go to the most accessible spots
+          - Occasion priority (25 %): daily-wear occasions rank higher than special-event ones
+          - Cleanliness status (20 %): dirty items are deprioritised (no point easy-reaching them)
+
+        Sections (A → D) represent decreasing accessibility inside the wardrobe.
+        Slot numbers are sequential within each section (Slot 1 = closest to the front).
+        """
+        if not items:
+            return {}
+
+        n = len(items)
+        max_wear = max((item.total_wear_count for item in items), default=1) or 1
+
+        # Compute priority score for every item
+        scores = []
+        for item in items:
+            wear_norm      = item.total_wear_count / max_wear
+            occasion_score = _OCCASION_PRIORITY.get(item.occasion, 0.5)
+            status_score   = 1.0 if item.status == 'Clean' else 0.2
+            priority = wear_norm * 0.55 + occasion_score * 0.25 + status_score * 0.20
+            scores.append(priority)
+
+        # Rank items: highest score = most accessible position (Section A, Slot 1)
+        ranked_indices = sorted(range(n), key=lambda i: scores[i], reverse=True)
+
+        result          = {}
+        section_counter = {k: 0 for k in WARDROBE_SECTIONS}
+
+        for rank, idx in enumerate(ranked_indices):
+            item = items[idx]
+            frac = rank / n
+
+            # Determine section from cumulative percentile cutoffs
+            section = 'D'
+            for sec, cutoff in _SECTION_CUTOFFS:
+                if frac < cutoff:
+                    section = sec
+                    break
+
+            section_counter[section] += 1
+            slot     = section_counter[section]
+            sec_info = WARDROBE_SECTIONS[section]
+
+            result[item.id] = {
+                'wardrobe_section':   section,
+                'wardrobe_slot':      slot,
+                'section_label':      sec_info['label'],
+                'section_location':   sec_info['location'],
+                'position_label':     f"Section {section} · Slot {slot}",
+                'priority_score':     round(scores[idx], 3),
+            }
+
+        return result
 
 
 # ── Startup accuracy report ───────────────────────────────────────────────────

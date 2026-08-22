@@ -22,3 +22,8 @@ export const washItem = async (itemIdStr) => {
     const res = await api.post(`/items/wash/${itemIdStr}`);
     return res.data;
 };
+
+export const fetchWardrobeLayout = async () => {
+    const res = await api.get('/wardrobe/layout');
+    return res.data; // { total_items, sections: { A, B, C, D } }
+};

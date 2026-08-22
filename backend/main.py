@@ -76,15 +76,40 @@ def _run_accuracy_report():
 
 @app.get("/items/organized")
 def get_organized_items(db: Session = Depends(get_db)):
-    items = crud.get_items(db)
-    clusters = ml_engine.SmartWardrobeEngine.get_clusters(items)
+    items     = crud.get_items(db)
+    clusters  = ml_engine.SmartWardrobeEngine.get_clusters(items)
+    positions = ml_engine.SmartWardrobeEngine.assign_wardrobe_positions(items)
 
     result = []
     for item in items:
         item_dict = {c.name: getattr(item, c.name) for c in item.__table__.columns}
         item_dict['layout_group'] = clusters.get(item.id, 0)
+        item_dict.update(positions.get(item.id, {}))
         result.append(item_dict)
     return result
+
+
+@app.get("/wardrobe/layout")
+def get_wardrobe_layout(db: Session = Depends(get_db)):
+    items     = crud.get_items(db)
+    positions = ml_engine.SmartWardrobeEngine.assign_wardrobe_positions(items)
+
+    section_counts = {k: 0 for k in ml_engine.WARDROBE_SECTIONS}
+    for pos in positions.values():
+        section_counts[pos['wardrobe_section']] += 1
+
+    total = len(items)
+    return {
+        'total_items': total,
+        'sections': {
+            k: {
+                **ml_engine.WARDROBE_SECTIONS[k],
+                'item_count':       section_counts[k],
+                'utilization_pct':  round(section_counts[k] / total * 100) if total else 0,
+            }
+            for k in ml_engine.WARDROBE_SECTIONS
+        },
+    }
 
 
 @app.post("/items/wear/{item_id_str}")
