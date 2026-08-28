@@ -40,3 +40,11 @@ web-build/
 
 # Push script (contains credentials)
 push_commits.ps1
+
+# Archives
+*.rar
+*.zip
+
+# Derived data (only data/raw/styles.csv is tracked)
+data/processed/
+data/splits/
