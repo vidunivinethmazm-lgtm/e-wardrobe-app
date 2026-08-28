@@ -54,6 +54,16 @@ export default function App() {
     material: "",
   });
 
+  const [editEventId, setEditEventId] = useState<string | null>(null);
+  const [delEventId, setDelEventId] = useState<string | null>(null);
+  const [eventRowBusy, setEventRowBusy] = useState<string | null>(null);
+  const [eventForm, setEventForm] = useState({
+    eventName: "",
+    eventDate: "",
+    eventTime: "",
+    notes: "",
+  });
+
   const pickImage = async () => {
     setPrediction(null);
     setTrendAnalysis(null);
@@ -397,6 +407,63 @@ export default function App() {
     } catch (error) {
       console.log("Load events error:", error);
       Alert.alert("Error", "Could not load scheduled events.");
+    }
+  };
+
+  const startEditEvent = (ev: any) => {
+    setEditEventId(ev.id);
+    setEventForm({
+      eventName: ev.eventName ?? "",
+      eventDate: ev.eventDate ?? "",
+      eventTime: ev.eventTime ?? "",
+      notes: ev.notes ?? "",
+    });
+  };
+
+  const cancelEditEvent = () => setEditEventId(null);
+
+  const saveEditEvent = async (id: string) => {
+    try {
+      setEventRowBusy(id);
+      await axios.patch(`${WARDROBE_URL}/schedule/${id}`, {
+        event_name: eventForm.eventName,
+        event_date: eventForm.eventDate,
+        event_time: eventForm.eventTime,
+        notes: eventForm.notes,
+      });
+      setScheduledEvents((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, ...eventForm } : e))
+      );
+      setEditEventId(null);
+      Alert.alert("Updated", "Dressing event updated.");
+    } catch (error) {
+      console.log("Update event error:", error);
+      Alert.alert("Update failed", "Could not update this event.");
+    } finally {
+      setEventRowBusy(null);
+    }
+  };
+
+  const requestDeleteEvent = (id: string) => setDelEventId(id);
+  const cancelDeleteEvent = () => setDelEventId(null);
+
+  const deleteEvent = async (id: string) => {
+    try {
+      setEventRowBusy(id);
+      await axios.delete(`${WARDROBE_URL}/schedule/${id}`);
+      setScheduledEvents((prev) => prev.filter((e) => e.id !== id));
+      setDelEventId(null);
+      if (editEventId === id) setEditEventId(null);
+    } catch (error: any) {
+      console.log("Delete event error:", error);
+      const msg = error?.message || "Could not delete this event.";
+      if (Platform.OS === "web" && typeof window !== "undefined") {
+        window.alert("Delete failed: " + msg);
+      } else {
+        Alert.alert("Delete failed", msg);
+      }
+    } finally {
+      setEventRowBusy(null);
     }
   };
 
@@ -786,25 +853,146 @@ export default function App() {
             </Text>
           </TouchableOpacity>
 
-          {scheduledEvents.map((event) => (
-            <View key={event.id} style={styles.savedCard}>
-              {event.processedImageUrl && (
-                <Image source={{ uri: event.processedImageUrl }} style={styles.smallImage} />
-              )}
+          {scheduledEvents.map((event) => {
+            const isEditing = editEventId === event.id;
+            const isBusy = eventRowBusy === event.id;
 
-              <Text style={styles.savedTitle}>{event.eventName}</Text>
-              <Text style={styles.savedInfo}>Date: {event.eventDate}</Text>
-              <Text style={styles.savedInfo}>Time: {event.eventTime}</Text>
-              <Text style={styles.savedInfo}>Dress: {event.clothingType}</Text>
-              <Text style={styles.savedInfo}>Color: {event.clothingColor}</Text>
-              <Text style={styles.savedInfo}>Notes: {event.notes}</Text>
-              {event.trendSuggestion?.suggestion && (
-                <Text style={styles.savedInfo}>
-                  Suggestion: {event.trendSuggestion.suggestion}
-                </Text>
-              )}
-            </View>
-          ))}
+            return (
+              <View key={event.id} style={styles.savedCard}>
+                {event.processedImageUrl && (
+                  <Image source={{ uri: event.processedImageUrl }} style={styles.smallImage} />
+                )}
+
+                {isEditing ? (
+                  <>
+                    <Text style={styles.editLabel}>Event name</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={eventForm.eventName}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, eventName: t }))}
+                      placeholder="Event name"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Date</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={eventForm.eventDate}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, eventDate: t }))}
+                      placeholder="Date: 2026-05-20"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Time</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={eventForm.eventTime}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, eventTime: t }))}
+                      placeholder="Time: 18:30"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Notes</Text>
+                    <TextInput
+                      style={[styles.input, styles.notesInput]}
+                      value={eventForm.notes}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, notes: t }))}
+                      placeholder="Notes"
+                      placeholderTextColor="#94a3b8"
+                      multiline
+                    />
+
+                    <View style={styles.cardActions}>
+                      <TouchableOpacity
+                        style={[
+                          styles.saveButton,
+                          styles.cardActionButton,
+                          isBusy && styles.disabledButton,
+                        ]}
+                        onPress={() => saveEditEvent(event.id)}
+                        disabled={isBusy}
+                      >
+                        <Text style={styles.buttonText}>
+                          {isBusy ? "Saving..." : "Save Changes"}
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.secondaryButton, styles.cardActionButton]}
+                        onPress={cancelEditEvent}
+                        disabled={isBusy}
+                      >
+                        <Text style={styles.buttonText}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.savedTitle}>{event.eventName}</Text>
+                    <Text style={styles.savedInfo}>Date: {event.eventDate}</Text>
+                    <Text style={styles.savedInfo}>Time: {event.eventTime}</Text>
+                    <Text style={styles.savedInfo}>Dress: {event.clothingType}</Text>
+                    <Text style={styles.savedInfo}>Color: {event.clothingColor}</Text>
+                    <Text style={styles.savedInfo}>Notes: {event.notes}</Text>
+                    {event.trendSuggestion?.suggestion && (
+                      <Text style={styles.savedInfo}>
+                        Suggestion: {event.trendSuggestion.suggestion}
+                      </Text>
+                    )}
+
+                    {delEventId === event.id ? (
+                      <>
+                        <Text style={styles.confirmText}>
+                          Delete this event permanently?
+                        </Text>
+                        <View style={styles.cardActions}>
+                          <TouchableOpacity
+                            style={[
+                              styles.deleteButton,
+                              styles.cardActionButton,
+                              isBusy && styles.disabledButton,
+                            ]}
+                            onPress={() => deleteEvent(event.id)}
+                            disabled={isBusy}
+                          >
+                            <Text style={styles.buttonText}>
+                              {isBusy ? "Deleting..." : "Confirm Delete"}
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={[styles.secondaryButton, styles.cardActionButton]}
+                            onPress={cancelDeleteEvent}
+                            disabled={isBusy}
+                          >
+                            <Text style={styles.buttonText}>Keep</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
+                    ) : (
+                      <View style={styles.cardActions}>
+                        <TouchableOpacity
+                          style={[styles.editButton, styles.cardActionButton]}
+                          onPress={() => startEditEvent(event)}
+                          disabled={isBusy}
+                        >
+                          <Text style={styles.buttonText}>Edit</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[styles.deleteButton, styles.cardActionButton]}
+                          onPress={() => requestDeleteEvent(event.id)}
+                          disabled={isBusy}
+                        >
+                          <Text style={styles.buttonText}>Delete</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </>
+                )}
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>

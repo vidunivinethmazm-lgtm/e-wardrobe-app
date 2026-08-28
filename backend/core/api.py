@@ -53,6 +53,13 @@ class ScheduleEvent(BaseModel):
     trend_suggestion: dict | None = None
 
 
+class EditEvent(BaseModel):
+    event_name: str | None = None
+    event_date: str | None = None
+    event_time: str | None = None
+    notes: str | None = None
+
+
 @app.get("/")
 def list_wardrobe():
     return store.list_items()
@@ -76,6 +83,14 @@ def list_schedule():
 @app.post("/schedule")
 def create_schedule(body: ScheduleEvent):
     return store.add_event(body.model_dump())
+
+
+@app.patch("/schedule/{event_id}")
+def edit_schedule(event_id: str, body: EditEvent):
+    event = store.update_event(event_id, body.model_dump(exclude_none=True))
+    if event is None:
+        raise HTTPException(404, "Event not found")
+    return event
 
 
 @app.delete("/schedule/{event_id}")

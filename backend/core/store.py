@@ -97,6 +97,21 @@ def list_events() -> list[dict]:
         return sorted(_events.values(), key=lambda d: d["created_at"], reverse=True)
 
 
+_EDITABLE_EVENT_FIELDS = {"event_name", "event_date", "event_time", "notes"}
+
+
+def update_event(event_id: str, changes: dict) -> dict | None:
+    with _lock:
+        event = _events.get(event_id)
+        if event is None:
+            return None
+        for key, value in changes.items():
+            if key in _EDITABLE_EVENT_FIELDS and value is not None:
+                event[key] = value
+        event["updated_at"] = datetime.now(timezone.utc).isoformat()
+        return event
+
+
 def delete_event(event_id: str) -> bool:
     with _lock:
         return _events.pop(event_id, None) is not None
