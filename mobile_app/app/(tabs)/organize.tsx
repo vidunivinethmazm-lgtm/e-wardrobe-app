@@ -81,23 +81,23 @@ const ItemCard = ({ item, onWear }: any) => {
       activeOpacity={0.8}
     >
       <View style={styles.cardHeader}>
-        <Text style={styles.itemCategory} numberOfLines={1}>{item.category}</Text>
+        <Text style={styles.itemCategory} numberOfLines={2}>{item.name ?? item.category}</Text>
         <View style={[styles.statusBadge, { backgroundColor: item.status === 'Clean' ? COLORS.clean : COLORS.dirty }]}>
           <Text style={[styles.statusText, { color: item.status === 'Clean' ? COLORS.cleanText : COLORS.dirtyText }]}>
-            {item.status}
+            {item.status === 'Clean' ? '✓ Ready' : '⚠ Wash'}
           </Text>
         </View>
       </View>
 
-      <Text style={styles.cardDetail}>{item.fabric} · {item.color}</Text>
+      <Text style={styles.cardDetail}>{item.fabric} · {item.color} · {item.category}</Text>
 
       <View style={styles.wearRow}>
-        <Text style={styles.wearLabel}>Cycle</Text>
-        <Text style={styles.wearCount}>{item.current_cycle_wears}/{item.max_wears_before_wash}</Text>
+        <Text style={styles.wearLabel}>Worn since last wash</Text>
+        <Text style={styles.wearCount}>{item.current_cycle_wears} / {item.max_wears_before_wash}</Text>
       </View>
 
       <View style={styles.scoreRow}>
-        <Text style={styles.scoreLabel}>Health</Text>
+        <Text style={styles.scoreLabel}>Eco score</Text>
         <View style={styles.scoreBarBg}>
           <View style={[styles.scoreBarFill, { width: `${score}%`, backgroundColor: scoreColor(score) }]} />
         </View>
@@ -106,10 +106,12 @@ const ItemCard = ({ item, onWear }: any) => {
 
       <View style={[styles.positionBadge, { backgroundColor: secColor.bg, borderColor: secColor.border }]}>
         <Text style={[styles.positionText, { color: secColor.text }]}>
-          {item.section_label ?? `Section ${section}`}  ·  Slot {item.wardrobe_slot ?? '–'}
+          Keep it in: {item.section_label ?? `Section ${section}`} · Slot {item.wardrobe_slot ?? '–'}
         </Text>
         <Text style={[styles.positionSub, { color: secColor.text }]}>{item.section_location ?? ''}</Text>
       </View>
+
+      <Text style={styles.tapHint}>Tap this card when you wear the item</Text>
     </TouchableOpacity>
   );
 };
@@ -140,7 +142,7 @@ const WardrobeCapacityBar = ({ layout }: any) => {
               <Text style={styles.capacityIcon}>{icon}</Text>
               <Text style={[styles.capacitySectionLabel, { color: color.text }]}>{sec.label}</Text>
               <Text style={[styles.capacitySectionCount, { color: color.text }]}>{sec.item_count}</Text>
-              <Text style={styles.capacitySectionLoc} numberOfLines={1}>{sec.location}</Text>
+              <Text style={styles.capacitySectionLoc}>{sec.location}</Text>
             </View>
           );
         })}
@@ -154,6 +156,7 @@ const WardrobeCapacityBar = ({ layout }: any) => {
 const WardrobeScreen = ({ items, layout, refreshing, onRefresh, onWear }: any) => (
   <ScrollView
     style={styles.screen}
+    contentContainerStyle={styles.screenContent}
     refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
   >
     <Text style={styles.screenTitle}>My Wardrobe</Text>
@@ -178,11 +181,11 @@ const WardrobeScreen = ({ items, layout, refreshing, onRefresh, onWear }: any) =
             <Text style={styles.zoneTitle}>{zone.label}</Text>
             <Text style={styles.zoneCount}>{zoneItems.length} items</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.zoneList}>
             {zoneItems.map((item: any) => (
               <ItemCard key={itemId(item)} item={item} onWear={onWear} />
             ))}
-          </ScrollView>
+          </View>
         </View>
       );
     })}
@@ -200,6 +203,7 @@ const InsightsScreen = ({ items, insights, refreshing, onRefresh }: any) => {
   return (
     <ScrollView
       style={styles.screen}
+      contentContainerStyle={styles.screenContent}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
     >
       <Text style={styles.screenTitle}>Smart Insights</Text>
@@ -268,6 +272,7 @@ const LaundryScreen = ({ items, refreshing, onRefresh, onWash }: any) => {
   return (
     <ScrollView
       style={styles.screen}
+      contentContainerStyle={styles.screenContent}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
     >
       <Text style={styles.screenTitle}>Laundry Queue</Text>
@@ -439,50 +444,53 @@ const styles = StyleSheet.create({
   appTitle:       { color: '#FFF', fontSize: 22, fontWeight: 'bold' },
   appSubtitle:    { color: COLORS.topBarSub, fontSize: 12 },
 
-  screen:         { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
-  screenTitle:    { fontSize: 22, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 2 },
-  screenSub:      { fontSize: 13, color: COLORS.primaryLight, marginBottom: 16 },
+  screen:         { flex: 1 },
+  screenContent:  { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 24, width: '100%', maxWidth: 560, alignSelf: 'center' },
+  screenTitle:    { fontSize: 24, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 2 },
+  screenSub:      { fontSize: 14, color: COLORS.textSecondary, marginBottom: 16 },
 
-  zone:           { borderRadius: 14, padding: 14, marginBottom: 16 },
-  zoneHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  zoneTitle:      { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
-  zoneCount:      { fontSize: 12, color: COLORS.textSecondary },
+  zone:           { borderRadius: 16, padding: 14, marginBottom: 16 },
+  zoneHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  zoneTitle:      { fontSize: 16, fontWeight: '800', color: COLORS.textPrimary },
+  zoneCount:      { fontSize: 13, fontWeight: '600', color: COLORS.textSecondary },
+  zoneList:       { gap: 10 },
 
   card: {
-    backgroundColor: COLORS.surface, padding: 14, borderRadius: 12,
-    marginRight: 12, width: 165, elevation: 3,
-    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
+    backgroundColor: COLORS.surface, padding: 16, borderRadius: 14,
+    width: '100%', elevation: 3,
+    shadowColor: '#6D28D9', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 3 },
   },
-  dirtyCard:      { backgroundColor: COLORS.dirtyBg },
-  cardHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  itemCategory:   { fontSize: 14, fontWeight: 'bold', color: COLORS.textPrimary, flex: 1, marginRight: 4 },
-  statusBadge:    { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 },
-  statusText:     { fontSize: 9, fontWeight: '700' },
-  cardDetail:     { fontSize: 11, color: COLORS.primaryLight, marginBottom: 8 },
-  wearRow:        { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  wearLabel:      { fontSize: 11, color: COLORS.textMuted },
-  wearCount:      { fontSize: 11, fontWeight: '600', color: COLORS.primary },
+  dirtyCard:      { backgroundColor: COLORS.dirtyBg, borderWidth: 1, borderColor: '#FECACA' },
+  cardHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 8 },
+  itemCategory:   { fontSize: 16, fontWeight: '800', color: COLORS.textPrimary, flex: 1, lineHeight: 21 },
+  statusBadge:    { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  statusText:     { fontSize: 11, fontWeight: '800' },
+  cardDetail:     { fontSize: 13, color: COLORS.textSecondary, marginBottom: 12, textTransform: 'capitalize' },
+  wearRow:        { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  wearLabel:      { fontSize: 12, color: COLORS.textMuted, fontWeight: '500' },
+  wearCount:      { fontSize: 13, fontWeight: '800', color: COLORS.primary },
   scoreRow:       { flexDirection: 'row', alignItems: 'center' },
-  scoreLabel:     { fontSize: 10, color: COLORS.textMuted, width: 34 },
-  scoreBarBg:     { flex: 1, height: 6, backgroundColor: '#EDE9FE', borderRadius: 3, marginHorizontal: 4 },
-  scoreBarFill:   { height: 6, borderRadius: 3 },
-  scoreNum:       { fontSize: 10, fontWeight: '700', width: 30, textAlign: 'right' },
-  positionBadge:  { marginTop: 8, borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 4 },
-  positionText:   { fontSize: 9, fontWeight: '700' },
-  positionSub:    { fontSize: 8, marginTop: 1, opacity: 0.8 },
+  scoreLabel:     { fontSize: 12, color: COLORS.textMuted, fontWeight: '500', width: 62 },
+  scoreBarBg:     { flex: 1, height: 8, backgroundColor: '#EDE9FE', borderRadius: 999, marginHorizontal: 8 },
+  scoreBarFill:   { height: 8, borderRadius: 999 },
+  scoreNum:       { fontSize: 12, fontWeight: '800', width: 38, textAlign: 'right' },
+  positionBadge:  { marginTop: 12, borderRadius: 10, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 8 },
+  positionText:   { fontSize: 12, fontWeight: '800' },
+  positionSub:    { fontSize: 11, marginTop: 2, opacity: 0.85 },
+  tapHint:        { fontSize: 11, color: COLORS.textMuted, marginTop: 10, textAlign: 'center', fontStyle: 'italic' },
 
   capacityCard: {
-    backgroundColor: COLORS.surface, borderRadius: 14, padding: 14,
-    marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4,
+    backgroundColor: COLORS.surface, borderRadius: 16, padding: 16,
+    marginBottom: 16, elevation: 2, shadowColor: '#6D28D9', shadowOpacity: 0.08, shadowRadius: 8,
   },
-  capacityTitle:  { fontSize: 14, fontWeight: '700', color: COLORS.textPrimary, marginBottom: 2 },
-  capacitySub:    { fontSize: 11, color: COLORS.primaryLight, marginBottom: 10 },
+  capacityTitle:  { fontSize: 16, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 2 },
+  capacitySub:    { fontSize: 12, color: COLORS.textSecondary, marginBottom: 12 },
   capacityRow:    { flexDirection: 'row', gap: 8 },
-  capacitySection:{ flex: 1, borderRadius: 10, borderWidth: 1, padding: 8, alignItems: 'center' },
-  capacityIcon:         { fontSize: 16, marginBottom: 3 },
-  capacitySectionLabel: { fontSize: 9, fontWeight: '700', textAlign: 'center' },
-  capacitySectionCount: { fontSize: 18, fontWeight: 'bold', marginTop: 2 },
-  capacitySectionLoc:   { fontSize: 8, color: '#888', marginTop: 2, textAlign: 'center' },
+  capacitySection:{ flex: 1, borderRadius: 12, borderWidth: 1, paddingVertical: 12, paddingHorizontal: 6, alignItems: 'center' },
+  capacityIcon:         { fontSize: 18, marginBottom: 4 },
+  capacitySectionLabel: { fontSize: 11, fontWeight: '800', textAlign: 'center', lineHeight: 14 },
+  capacitySectionCount: { fontSize: 24, fontWeight: '900', marginTop: 4 },
+  capacitySectionLoc:   { fontSize: 10, color: COLORS.textMuted, marginTop: 3, textAlign: 'center' },
 
   statsRow:       { flexDirection: 'row', gap: 10, marginBottom: 16 },
   statCard:       { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
