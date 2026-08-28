@@ -22,6 +22,7 @@ os.environ.setdefault("U2NET_HOME", str(PROJECT_DIR / "models" / "rembg"))
 from rembg import new_session, remove
 from torchvision import transforms
 
+from backend.classification.color_analyzer import dominant_color
 from backend.classification.material_detector import predict_garment_type, predict_material
 
 from backend.classification.models_loader import (
@@ -317,6 +318,16 @@ def predict_clothing(image_path: str):
 
     predicted_type = type_result["label"]
     cloth_only = extract_cloth_only(input_image, predicted_type)
+
+    # The 17-class colour model confuses neighbours (pink->red, coral->orange).
+    # Read the dominant colour straight off the isolated garment; keep the
+    # model's answer only when the garment has no clear single colour.
+    try:
+        px_color = dominant_color(cloth_only)
+        if px_color["label"] and px_color["confidence"] >= 0.35:
+            color_result = {"label": px_color["label"], "confidence": px_color["confidence"]}
+    except Exception as exc:
+        print(f"Colour analysis unavailable: {exc}")
 
     processed_dir = Path(image_path).parent / "processed"
     processed_dir.mkdir(parents=True, exist_ok=True)
