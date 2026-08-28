@@ -2,8 +2,8 @@
 
 Each team feature is its own FastAPI app, kept in its own package under
 ``backend/`` and mounted here under a path prefix. A feature's own
-``main.py`` is never edited during integration - only the mount line below
-is added.
+``main.py`` is never edited during integration - only a mount entry is
+added to ``FEATURES`` below.
 
 Run from the repository root:
 
@@ -11,32 +11,46 @@ Run from the repository root:
 
 Feature routes are then served under their prefix, e.g. the classification
 predict endpoint is ``POST /classification/predict``.
+
+Mounting is defensive: if one feature fails to import (e.g. its extra
+dependencies aren't installed yet), it is skipped with a logged warning
+and the other features still come up. ``GET /`` reports what mounted.
 """
+
+import importlib
+import traceback
 
 from fastapi import FastAPI
 
-from backend.classification.main import app as classification_app
-
 app = FastAPI(title="E-Wardrobe AI")
+
+# prefix  ->  "package.module:attribute" of that feature's FastAPI app
+FEATURES = {
+    "/classification": "backend.classification.main:app",
+    "/recommendation": "backend.recommendation.main:app",
+    # "/visualization": "backend.visualization.main:app",
+    # "/organization":  "backend.organization.main:app",
+}
+
+_mounted: list[str] = []
+_failed: dict[str, str] = {}
+
+for prefix, target in FEATURES.items():
+    module_name, _, attr = target.partition(":")
+    try:
+        feature_app = getattr(importlib.import_module(module_name), attr or "app")
+        app.mount(prefix, feature_app)
+        _mounted.append(prefix)
+    except Exception as exc:  # noqa: BLE001 - one bad feature must not sink the rest
+        _failed[prefix] = f"{type(exc).__name__}: {exc}"
+        print(f"[startup] feature {prefix} not mounted -> {_failed[prefix]}")
+        traceback.print_exc()
 
 
 @app.get("/")
 def root():
     return {
         "service": "E-Wardrobe AI",
-        "features": ["/classification"],
+        "mounted": _mounted,
+        "failed": _failed,
     }
-
-
-app.mount("/classification", classification_app)
-
-# As the other features are integrated, add them here (no other change):
-#
-# from backend.recommendation.main import app as recommendation_app
-# app.mount("/recommendation", recommendation_app)
-#
-# from backend.visualization.main import app as visualization_app
-# app.mount("/visualization", visualization_app)
-#
-# from backend.organization.main import app as organization_app
-# app.mount("/organization", organization_app)

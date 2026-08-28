@@ -1,9 +1,18 @@
+# Shared
 fastapi
 uvicorn
 python-multipart
 torch
+
+# classification
 torchvision
 pillow
 rembg
 pytrends
 transformers
+scipy
+
+# recommendation
+torch-geometric
+scikit-learn
+pandas

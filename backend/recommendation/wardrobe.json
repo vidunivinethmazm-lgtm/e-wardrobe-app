@@ -1,0 +1,119 @@
+[
+  {
+    "id": 0,
+    "name": "White Linen Summer Dress",
+    "fabric": "Linen",
+    "color": "white",
+    "price": 3500,
+    "category": "dress",
+    "image_url": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=500"
+  },
+  {
+    "id": 1,
+    "name": "Silk Banarasi Saree",
+    "fabric": "Silk",
+    "color": "red",
+    "price": 12000,
+    "category": "saree",
+    "image_url": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=500"
+  },
+  {
+    "id": 2,
+    "name": "Cotton Embroidered Kurti",
+    "fabric": "Cotton",
+    "color": "blue",
+    "price": 2500,
+    "category": "top",
+    "image_url": "https://images.unsplash.com/photo-1581044777550-4cfa60707c03?q=80&w=500"
+  },
+  {
+    "id": 3,
+    "name": "Georgette Evening Gown",
+    "fabric": "Georgette",
+    "color": "black",
+    "price": 8000,
+    "category": "dress",
+    "image_url": "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?q=80&w=500"
+  },
+  {
+    "id": 4,
+    "name": "Polyester Formal Blazer",
+    "fabric": "Polyester",
+    "color": "navy",
+    "price": 6500,
+    "category": "blazer",
+    "image_url": "https://images.unsplash.com/photo-1548624313-0396c75e4b1a?q=80&w=500"
+  },
+  {
+    "id": 5,
+    "name": "Chiffon Floral Saree",
+    "fabric": "Chiffon",
+    "color": "pink",
+    "price": 7500,
+    "category": "saree",
+    "image_url": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=500"
+  },
+  {
+    "id": 6,
+    "name": "Woolen Pashmina Shawl",
+    "fabric": "Wool",
+    "color": "brown",
+    "price": 4500,
+    "category": "accessory",
+    "image_url": "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=500"
+  },
+  {
+    "id": 7,
+    "name": "Rayon Casual Jumpsuit",
+    "fabric": "Rayon",
+    "color": "olive",
+    "price": 3000,
+    "category": "jumpsuit",
+    "image_url": "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?q=80&w=500"
+  },
+  {
+    "id": 8,
+    "name": "Batik Cotton Wrap Dress",
+    "fabric": "Cotton",
+    "color": "multicolor",
+    "price": 2800,
+    "category": "dress",
+    "image_url": "https://images.unsplash.com/photo-1565593797124-4e318b97024d?q=80&w=500"
+  },
+  {
+    "id": 9,
+    "name": "Kandyan Silk Osariya",
+    "fabric": "Silk",
+    "color": "gold",
+    "price": 15000,
+    "category": "saree",
+    "image_url": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?q=80&w=500"
+  },
+  {
+    "id": 10,
+    "name": "Viscose Printed Maxi Dress",
+    "fabric": "Viscose",
+    "color": "purple",
+    "price": 3200,
+    "category": "dress",
+    "image_url": "https://images.unsplash.com/photo-1515372602672-8a7d567b36c5?q=80&w=500"
+  },
+  {
+    "id": 11,
+    "name": "Chiffon Embroidered Anarkali",
+    "fabric": "Chiffon",
+    "color": "teal",
+    "price": 5500,
+    "category": "dress",
+    "image_url": "https://images.unsplash.com/photo-1614886137799-2e8e57e4c9c2?q=80&w=500"
+  },
+  {
+    "id": 12,
+    "name": "Linen Tailored Trouser Suit",
+    "fabric": "Linen",
+    "color": "beige",
+    "price": 7000,
+    "category": "suit",
+    "image_url": "https://images.unsplash.com/photo-1594938298737-1b27be0c85b0?q=80&w=500"
+  }
+]
