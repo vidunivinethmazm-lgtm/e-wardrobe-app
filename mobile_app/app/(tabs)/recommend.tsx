@@ -41,6 +41,7 @@ const SL_CITIES = [
 function toApiResponse(parsed: any, intent: string, city: string, weatherMain: string): ApiResponse {
   const recommendations: RecommendationDetail[] = (parsed?.recommendations ?? []).map((r: any) => ({
     outfit: r.outfit,
+    item_id: r.item_id,
     confidence: typeof r.confidence === 'string'
       ? r.confidence
       : `${Math.round(Number(r.confidence ?? r.score ?? 0) * 100)}%`,
@@ -401,7 +402,7 @@ export default function HomeScreen() {
 
             {data.recommendations.map((item, index) => (
               <AnimatedCard
-                key={item.outfit}
+                key={item.item_id ?? `${item.outfit}-${index}`}
                 onLike={() => handleFeedback(item.outfit, 'liked')}
                 onSkip={() => handleFeedback(item.outfit, 'skipped')}
                 feedback={feedback[item.outfit]}

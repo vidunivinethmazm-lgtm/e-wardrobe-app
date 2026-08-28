@@ -1,5 +1,6 @@
 export interface RecommendationDetail {
   outfit: string;
+  item_id?: string;
   confidence: string;
   fabric: string;
   color?: string;

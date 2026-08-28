@@ -85,10 +85,11 @@ async def recommend(
         return {"error": "Models not loaded"}
     nlp, vec, gnn, _x0, _e0 = AI
 
-    # Recommend from the user's saved wardrobe (shared store). Fall back to the
-    # bundled demo wardrobe when there aren't enough real items yet.
+    # Recommend from every item in the user's saved wardrobe (shared store),
+    # each carrying its own uploaded / background-removed photo. Only fall back
+    # to the bundled demo wardrobe when the user hasn't saved anything yet.
     saved = store.list_items()
-    if len(saved) >= 3:
+    if saved:
         wardrobe = [to_recommendation_item(d, i) for i, d in enumerate(saved)]
         wardrobe_source = "user_wardrobe"
     else:
@@ -373,6 +374,7 @@ async def recommend(
 
         results.append({
             'outfit':      outfit_name,
+            'item_id':     item.get('item_id'),
             'fabric':      fabric,
             'color':       color,
             'price':       price,
@@ -384,6 +386,8 @@ async def recommend(
             'score':       score,
         })
 
+    # Every wardrobe item is returned, best fit first - the screen shows the
+    # user's whole wardrobe ranked for this occasion, each with its photo.
     results = sorted(results, key=lambda x: x['score'], reverse=True)
 
     event_class = event_type if event_type in ['Wedding', 'Funeral', 'Party', 'ColdOutdoor'] else predicted_intent
@@ -396,11 +400,11 @@ async def recommend(
         'wardrobe_source':   wardrobe_source,
         'items_considered':  len(wardrobe),
         'logic_summary': (
-            f'Ranked your wardrobe for {event_class} in {city} — '
+            f'Ranked all {len(results)} wardrobe items for {event_class} in {city} — '
             f'{weather}, {temperature:.0f}°C, {humidity}% humidity — '
             f'via NLP intent, GNN style match, and fabric/colour fit.'
         ),
-        'recommendations':   results[:3],
+        'recommendations':   results,
     }
 
 if __name__ == "__main__":
