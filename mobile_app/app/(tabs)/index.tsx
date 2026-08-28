@@ -35,6 +35,9 @@ export default function App() {
   const [saving, setSaving] = useState(false);
 
   const [savedItemId, setSavedItemId] = useState<string | null>(null);
+  // snapshot of the just-saved item, kept for the schedule step after the
+  // prediction result is collapsed
+  const [lastSaved, setLastSaved] = useState<any>(null);
 
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState("");
@@ -64,6 +67,7 @@ export default function App() {
     setBackImage(null);
     setBackImageUrl(null);
     setSavedItemId(null);
+    setLastSaved(null);
 
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -196,6 +200,25 @@ export default function App() {
       });
 
       setSavedItemId(response.data.item_id);
+      setLastSaved({
+        id: response.data.item_id,
+        type: prediction.type,
+        color: prediction.color,
+        gender: prediction.gender,
+        season: prediction.season,
+        material: prediction.material,
+        processedImageUrl,
+      });
+
+      // Collapse the prediction result now that it's saved - the upload box
+      // and the "Schedule Dressing Event" step (gated on savedItemId) remain.
+      setPrediction(null);
+      setTrendAnalysis(null);
+      setProcessedImageUrl(null);
+      setOriginalImageUrl(null);
+      setBackImageUrl(null);
+      setImage(null);
+      setBackImage(null);
 
       Alert.alert("Saved", "Added to your wardrobe.");
     } catch (error: any) {
@@ -220,6 +243,8 @@ export default function App() {
       return;
     }
 
+    const item = lastSaved ?? prediction ?? {};
+
     try {
       let scheduleSuggestion = null;
 
@@ -227,12 +252,12 @@ export default function App() {
         const suggestionResponse = await axios.post(`${API_URL}/schedule/suggestion`, {
           items: [{
             id: savedItemId,
-            type: prediction?.type,
-            color: prediction?.color,
-            gender: prediction?.gender,
-            season: prediction?.season,
-            material: prediction?.material,
-            processedImageUrl,
+            type: item.type,
+            color: item.color,
+            gender: item.gender,
+            season: item.season,
+            material: item.material,
+            processedImageUrl: item.processedImageUrl,
           }],
           event: {
             eventName,
@@ -251,19 +276,26 @@ export default function App() {
         event_date: eventDate,
         event_time: eventTime,
         notes: eventNotes,
-        clothing_type: prediction?.type,
-        clothing_color: prediction?.color,
-        processed_image_url: processedImageUrl,
+        clothing_type: item.type,
+        clothing_color: item.color,
+        processed_image_url: item.processedImageUrl,
         trend_suggestion: scheduleSuggestion,
       });
 
-      setEventSuggestion(scheduleSuggestion);
       setEventName("");
       setEventDate("");
       setEventTime("");
       setEventNotes("");
 
-      Alert.alert("Scheduled", "Dressing event saved.");
+      // Collapse the schedule section once the event is saved.
+      setEventSuggestion(null);
+      setSavedItemId(null);
+      setLastSaved(null);
+
+      const tip = scheduleSuggestion?.suggestion
+        ? `\n\nBest for this date: ${scheduleSuggestion.suggestion}`
+        : "";
+      Alert.alert("Scheduled", `Dressing event saved.${tip}`);
     } catch (error) {
       console.log("Schedule error:", error);
       Alert.alert("Schedule failed", "Could not save event.");
