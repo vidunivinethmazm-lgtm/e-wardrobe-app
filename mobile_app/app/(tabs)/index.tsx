@@ -1,0 +1,1251 @@
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
+
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
+
+import { db } from "../../firebaseConfig";
+
+const API_BASE = Platform.OS === "web" ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+const API_URL = `${API_BASE}/classification`;
+
+export default function App() {
+  const [image, setImage] = useState<any>(null);
+  const [backImage, setBackImage] = useState<any>(null);
+  const [prediction, setPrediction] = useState<any>(null);
+  const [trendAnalysis, setTrendAnalysis] = useState<any>(null);
+
+  const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
+  const [originalImageUrl, setOriginalImageUrl] = useState<string | null>(null);
+  const [backImageUrl, setBackImageUrl] = useState<string | null>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [savedItemId, setSavedItemId] = useState<string | null>(null);
+
+  const [eventName, setEventName] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventTime, setEventTime] = useState("");
+  const [eventNotes, setEventNotes] = useState("");
+  const [eventSuggestion, setEventSuggestion] = useState<any>(null);
+
+  const [wardrobeItems, setWardrobeItems] = useState<any[]>([]);
+  const [scheduledEvents, setScheduledEvents] = useState<any[]>([]);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [rowBusyId, setRowBusyId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({
+    type: "",
+    color: "",
+    gender: "",
+    season: "",
+    material: "",
+  });
+
+  const pickImage = async () => {
+    setPrediction(null);
+    setTrendAnalysis(null);
+    setProcessedImageUrl(null);
+    setOriginalImageUrl(null);
+    setBackImage(null);
+    setBackImageUrl(null);
+    setSavedItemId(null);
+
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Please allow gallery access.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0]);
+    }
+  };
+
+  const pickBackImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert("Permission required", "Please allow gallery access.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setBackImage(result.assets[0]);
+      setPrediction(null);
+      setTrendAnalysis(null);
+      setProcessedImageUrl(null);
+      setOriginalImageUrl(null);
+      setBackImageUrl(null);
+      setSavedItemId(null);
+    }
+  };
+
+  const predictImage = async () => {
+    if (!image) {
+      Alert.alert("No image", "Please select an image first.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const formData = new FormData();
+
+      if (Platform.OS === "web") {
+        const frontBlob = await (await fetch(image.uri)).blob();
+        formData.append("file", frontBlob, "wardrobe_image.jpg");
+
+        if (backImage) {
+          const backBlob = await (await fetch(backImage.uri)).blob();
+          formData.append("back_file", backBlob, "wardrobe_back_image.jpg");
+        }
+      } else {
+        formData.append("file", {
+          uri: image.uri,
+          name: "wardrobe_image.jpg",
+          type: "image/jpeg",
+        } as any);
+
+        if (backImage) {
+          formData.append("back_file", {
+            uri: backImage.uri,
+            name: "wardrobe_back_image.jpg",
+            type: "image/jpeg",
+          } as any);
+        }
+      }
+
+      const response = await axios.post(
+        `${API_URL}/predict`,
+        formData,
+        Platform.OS === "web"
+          ? undefined
+          : { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      setPrediction(response.data.prediction);
+      setTrendAnalysis(response.data.trend_analysis);
+
+      if (response.data.original_image_url) {
+        setOriginalImageUrl(`${API_URL}${response.data.original_image_url}`);
+      }
+
+      if (response.data.back_processed_image_url) {
+        setBackImageUrl(`${API_URL}${response.data.back_processed_image_url}`);
+      }
+
+      if (response.data.processed_image_url) {
+        setProcessedImageUrl(`${API_URL}${response.data.processed_image_url}`);
+      }
+    } catch (error) {
+      console.log("Prediction error:", error);
+      Alert.alert(
+        "Prediction failed",
+        "Check backend server, IP address, and WiFi connection."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveWardrobeItem = async () => {
+    if (!prediction) {
+      Alert.alert("No prediction", "Please predict clothing first.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const savePromise = addDoc(collection(db, "wardrobe_items"), {
+        type: prediction.type,
+        typeConfidence: prediction.type_confidence,
+        color: prediction.color,
+        colorConfidence: prediction.color_confidence,
+        gender: prediction.gender,
+        genderConfidence: prediction.gender_confidence,
+        season: prediction.season,
+        seasonConfidence: prediction.season_confidence,
+        material: prediction.material,
+        materialConfidence: prediction.material_confidence,
+        originalImageUrl,
+        backImageUrl,
+        processedImageUrl,
+        trendAnalysis,
+        createdAt: serverTimestamp(),
+      });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Firebase save timeout")), 15000)
+      );
+
+      const docRef: any = await Promise.race([savePromise, timeoutPromise]);
+
+      setSavedItemId(docRef.id);
+
+      Alert.alert("Saved", "Wardrobe item saved to Firebase.");
+    } catch (error: any) {
+      console.log("Firebase save error:", error);
+      Alert.alert("Save failed", error.message || "Could not save item.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveScheduleEvent = async () => {
+    if (!savedItemId) {
+      Alert.alert(
+        "Save item first",
+        "Please save the wardrobe item before scheduling."
+      );
+      return;
+    }
+
+    if (!eventName || !eventDate || !eventTime) {
+      Alert.alert("Missing details", "Enter event name, date, and time.");
+      return;
+    }
+
+    try {
+      let scheduleSuggestion = null;
+
+      try {
+        const suggestionResponse = await axios.post(`${API_URL}/schedule/suggestion`, {
+          items: [{
+            id: savedItemId,
+            type: prediction?.type,
+            color: prediction?.color,
+            gender: prediction?.gender,
+            season: prediction?.season,
+            material: prediction?.material,
+            processedImageUrl,
+          }],
+          event: {
+            eventName,
+            eventDate,
+            eventTime,
+          },
+        });
+        scheduleSuggestion = suggestionResponse.data;
+      } catch (suggestionError) {
+        console.log("Schedule suggestion error:", suggestionError);
+      }
+
+      await addDoc(collection(db, "scheduled_events"), {
+        wardrobeItemId: savedItemId,
+        eventName,
+        eventDate,
+        eventTime,
+        notes: eventNotes,
+        clothingType: prediction?.type,
+        clothingColor: prediction?.color,
+        clothingGender: prediction?.gender,
+        clothingSeason: prediction?.season,
+        clothingMaterial: prediction?.material,
+        processedImageUrl,
+        trendSuggestion: scheduleSuggestion,
+        createdAt: serverTimestamp(),
+      });
+
+      setEventSuggestion(scheduleSuggestion);
+      setEventName("");
+      setEventDate("");
+      setEventTime("");
+      setEventNotes("");
+
+      Alert.alert("Scheduled", "Dressing event saved to Firebase.");
+    } catch (error) {
+      console.log("Schedule error:", error);
+      Alert.alert("Schedule failed", "Could not save event.");
+    }
+  };
+
+  const loadSavedDetails = async () => {
+    try {
+      const q = query(
+        collection(db, "wardrobe_items"),
+        orderBy("createdAt", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+
+      const items = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setWardrobeItems(items);
+    } catch (error) {
+      console.log("Load wardrobe error:", error);
+      Alert.alert("Error", "Could not load saved wardrobe details.");
+    }
+  };
+
+  const startEditItem = (item: any) => {
+    setEditingId(item.id);
+    setEditForm({
+      type: item.type ?? "",
+      color: item.color ?? "",
+      gender: item.gender ?? "",
+      season: item.season ?? "",
+      material: item.material ?? "",
+    });
+  };
+
+  const cancelEditItem = () => {
+    setEditingId(null);
+  };
+
+  const saveEditItem = async (itemId: string) => {
+    try {
+      setRowBusyId(itemId);
+
+      await updateDoc(doc(db, "wardrobe_items", itemId), {
+        type: editForm.type,
+        color: editForm.color,
+        gender: editForm.gender,
+        season: editForm.season,
+        material: editForm.material,
+      });
+
+      setWardrobeItems((prev) =>
+        prev.map((it) => (it.id === itemId ? { ...it, ...editForm } : it))
+      );
+
+      setEditingId(null);
+      Alert.alert("Updated", "Wardrobe item updated.");
+    } catch (error) {
+      console.log("Update wardrobe error:", error);
+      Alert.alert("Update failed", "Could not update this item.");
+    } finally {
+      setRowBusyId(null);
+    }
+  };
+
+  const requestDeleteItem = (itemId: string) => {
+    setConfirmDeleteId(itemId);
+  };
+
+  const cancelDeleteItem = () => {
+    setConfirmDeleteId(null);
+  };
+
+  const deleteWardrobeItem = async (itemId: string) => {
+    try {
+      setRowBusyId(itemId);
+
+      await deleteDoc(doc(db, "wardrobe_items", itemId));
+
+      setWardrobeItems((prev) => prev.filter((it) => it.id !== itemId));
+      setConfirmDeleteId(null);
+
+      if (editingId === itemId) {
+        setEditingId(null);
+      }
+    } catch (error: any) {
+      console.log("Delete wardrobe error:", error);
+      const message =
+        error?.message || "Could not delete this item.";
+      if (Platform.OS === "web" && typeof window !== "undefined") {
+        window.alert("Delete failed: " + message);
+      } else {
+        Alert.alert("Delete failed", message);
+      }
+    } finally {
+      setRowBusyId(null);
+    }
+  };
+
+  const loadScheduledEvents = async () => {
+    try {
+      const q = query(
+        collection(db, "scheduled_events"),
+        orderBy("createdAt", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+
+      const events = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setScheduledEvents(events);
+    } catch (error) {
+      console.log("Load events error:", error);
+      Alert.alert("Error", "Could not load scheduled events.");
+    }
+  };
+
+  const ConfidenceBar = ({ label, value }: any) => {
+    const percentage = Math.round((value || 0) * 100);
+
+    return (
+      <View style={styles.confidenceBox}>
+        <View style={styles.confidenceTop}>
+          <Text style={styles.confidenceLabel}>{label}</Text>
+          <Text style={styles.confidenceValue}>{percentage}%</Text>
+        </View>
+
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${percentage}%` }]} />
+        </View>
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <StatusBar barStyle="light-content" />
+
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>E-Wardrobe AI</Text>
+        <Text style={styles.subtitle}>
+          AI clothing prediction, wardrobe storage, and dressing schedule
+        </Text>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Upload Clothing Images</Text>
+
+          <Text style={styles.imageSideLabel}>Front side (used for prediction)</Text>
+
+          <TouchableOpacity style={styles.uploadBox} onPress={pickImage}>
+            {image ? (
+              <Image source={{ uri: image.uri }} style={styles.previewImage} />
+            ) : (
+              <Text style={styles.uploadText}>Tap to choose image</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.primaryButton} onPress={pickImage}>
+            <Text style={styles.buttonText}>Choose Front Image</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.imageSideLabel}>Back side (optional, save only)</Text>
+
+          <TouchableOpacity style={styles.uploadBox} onPress={pickBackImage}>
+            {backImage ? (
+              <Image source={{ uri: backImage.uri }} style={styles.previewImage} />
+            ) : (
+              <Text style={styles.uploadText}>Tap to add back image</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.secondaryButton} onPress={pickBackImage}>
+            <Text style={styles.buttonText}>Choose Back Image (Optional)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.predictButton,
+              (!image || loading) && styles.disabledButton,
+            ]}
+            onPress={predictImage}
+            disabled={!image || loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text style={styles.buttonText}>Predict Clothing</Text>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {processedImageUrl && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Background Removed Images</Text>
+            <Text style={styles.imageSideLabel}>Front side</Text>
+            <Image source={{ uri: processedImageUrl }} style={styles.previewImage} />
+            {backImageUrl && (
+              <>
+                <Text style={styles.imageSideLabel}>Back side</Text>
+                <Image source={{ uri: backImageUrl }} style={styles.previewImage} />
+              </>
+            )}
+          </View>
+        )}
+
+        {prediction && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>AI Prediction Results</Text>
+
+            <View style={styles.resultGrid}>
+              <View style={styles.resultBox}>
+                <Text style={styles.resultLabel}>Type</Text>
+                <Text style={styles.resultValue}>{prediction.type}</Text>
+              </View>
+
+              <View style={styles.resultBox}>
+                <Text style={styles.resultLabel}>Color</Text>
+                <Text style={styles.resultValue}>{prediction.color}</Text>
+              </View>
+
+              <View style={styles.resultBox}>
+                <Text style={styles.resultLabel}>Gender</Text>
+                <Text style={styles.resultValue}>{prediction.gender}</Text>
+              </View>
+
+              <View style={styles.resultBox}>
+                <Text style={styles.resultLabel}>Season</Text>
+                <Text style={styles.resultValue}>{prediction.season}</Text>
+              </View>
+
+              <View style={styles.resultBox}>
+                <Text style={styles.resultLabel}>Material</Text>
+                <Text style={styles.resultValue}>{prediction.material}</Text>
+              </View>
+            </View>
+
+            <ConfidenceBar label="Type Confidence" value={prediction.type_confidence} />
+            <ConfidenceBar label="Color Confidence" value={prediction.color_confidence} />
+            <ConfidenceBar label="Gender Confidence" value={prediction.gender_confidence} />
+            <ConfidenceBar label="Season Confidence" value={prediction.season_confidence} />
+            <ConfidenceBar label="Material Confidence" value={prediction.material_confidence} />
+
+            {trendAnalysis?.matches?.length > 0 && (
+              <View style={styles.trendPanel}>
+                <Text style={styles.trendTitle}>Trend-Aware Suggestions</Text>
+                <Text style={styles.trendSource}>{trendAnalysis.source}</Text>
+
+                {trendAnalysis.matches.map((trend: any) => (
+                  <View key={trend.keyword} style={styles.trendItem}>
+                    <View style={styles.trendHeader}>
+                      <Text style={styles.trendKeyword}>{trend.keyword}</Text>
+                      <Text style={styles.trendScore}>{trend.score}%</Text>
+                    </View>
+                    <Text style={styles.trendMeta}>
+                      Matched: {trend.matched_on.join(", ")}
+                    </Text>
+                    <Text style={styles.trendSuggestion}>{trend.suggestion}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={[styles.saveButton, saving && styles.disabledButton]}
+              onPress={saveWardrobeItem}
+              disabled={saving}
+            >
+              <Text style={styles.buttonText}>
+                {saving ? "Saving..." : "Save to Wardrobe"}
+              </Text>
+            </TouchableOpacity>
+
+            {savedItemId && (
+              <Text style={styles.savedText}>Saved Item ID: {savedItemId}</Text>
+            )}
+          </View>
+        )}
+
+        {savedItemId && (
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>Schedule Dressing Event</Text>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Event name"
+              placeholderTextColor="#94a3b8"
+              value={eventName}
+              onChangeText={setEventName}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Date: 2026-05-20"
+              placeholderTextColor="#94a3b8"
+              value={eventDate}
+              onChangeText={setEventDate}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Time: 18:30"
+              placeholderTextColor="#94a3b8"
+              value={eventTime}
+              onChangeText={setEventTime}
+            />
+
+            <TextInput
+              style={[styles.input, styles.notesInput]}
+              placeholder="Notes"
+              placeholderTextColor="#94a3b8"
+              value={eventNotes}
+              onChangeText={setEventNotes}
+              multiline
+            />
+
+            <TouchableOpacity style={styles.scheduleButton} onPress={saveScheduleEvent}>
+              <Text style={styles.buttonText}>Save Schedule</Text>
+            </TouchableOpacity>
+
+            {eventSuggestion?.suggestion && (
+              <View style={styles.eventSuggestionBox}>
+                <Text style={styles.eventSuggestionTitle}>Best For This Date</Text>
+                <Text style={styles.eventSuggestionText}>{eventSuggestion.suggestion}</Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Saved Wardrobe Items</Text>
+
+          <TouchableOpacity style={styles.primaryButton} onPress={loadSavedDetails}>
+            <Text style={styles.buttonText}>View Saved Wardrobe Items</Text>
+          </TouchableOpacity>
+
+          {wardrobeItems.map((item) => {
+            const isEditing = editingId === item.id;
+            const isBusy = rowBusyId === item.id;
+
+            return (
+              <View key={item.id} style={styles.savedCard}>
+                {item.processedImageUrl && (
+                  <Image source={{ uri: item.processedImageUrl }} style={styles.smallImage} />
+                )}
+                {item.backImageUrl && (
+                  <>
+                    <Text style={styles.savedInfo}>Back side:</Text>
+                    <Image source={{ uri: item.backImageUrl }} style={styles.smallImage} />
+                  </>
+                )}
+
+                {isEditing ? (
+                  <>
+                    <Text style={styles.editLabel}>Type</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={editForm.type}
+                      onChangeText={(t) => setEditForm((f) => ({ ...f, type: t }))}
+                      placeholder="Type"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Color</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={editForm.color}
+                      onChangeText={(t) => setEditForm((f) => ({ ...f, color: t }))}
+                      placeholder="Color"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Gender</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={editForm.gender}
+                      onChangeText={(t) => setEditForm((f) => ({ ...f, gender: t }))}
+                      placeholder="Gender"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Season</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={editForm.season}
+                      onChangeText={(t) => setEditForm((f) => ({ ...f, season: t }))}
+                      placeholder="Season"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Fabric</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={editForm.material}
+                      onChangeText={(t) => setEditForm((f) => ({ ...f, material: t }))}
+                      placeholder="Fabric"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <View style={styles.cardActions}>
+                      <TouchableOpacity
+                        style={[
+                          styles.saveButton,
+                          styles.cardActionButton,
+                          isBusy && styles.disabledButton,
+                        ]}
+                        onPress={() => saveEditItem(item.id)}
+                        disabled={isBusy}
+                      >
+                        <Text style={styles.buttonText}>
+                          {isBusy ? "Saving..." : "Save Changes"}
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.secondaryButton, styles.cardActionButton]}
+                        onPress={cancelEditItem}
+                        disabled={isBusy}
+                      >
+                        <Text style={styles.buttonText}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.savedTitle}>{item.type}</Text>
+                    <Text style={styles.savedInfo}>Color: {item.color}</Text>
+                    <Text style={styles.savedInfo}>Gender: {item.gender}</Text>
+                    <Text style={styles.savedInfo}>Season: {item.season}</Text>
+                    {item.material ? (
+                      <Text style={styles.savedInfo}>Fabric: {item.material}</Text>
+                    ) : null}
+                    {item.trendAnalysis?.matches?.length > 0 && (
+                      <Text style={styles.savedInfo}>
+                        Trend: {item.trendAnalysis.matches[0].keyword}
+                      </Text>
+                    )}
+                    <Text style={styles.savedInfo}>Item ID: {item.id}</Text>
+
+                    {confirmDeleteId === item.id ? (
+                      <>
+                        <Text style={styles.confirmText}>
+                          Delete this item permanently?
+                        </Text>
+                        <View style={styles.cardActions}>
+                          <TouchableOpacity
+                            style={[
+                              styles.deleteButton,
+                              styles.cardActionButton,
+                              isBusy && styles.disabledButton,
+                            ]}
+                            onPress={() => deleteWardrobeItem(item.id)}
+                            disabled={isBusy}
+                          >
+                            <Text style={styles.buttonText}>
+                              {isBusy ? "Deleting..." : "Confirm Delete"}
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={[styles.secondaryButton, styles.cardActionButton]}
+                            onPress={cancelDeleteItem}
+                            disabled={isBusy}
+                          >
+                            <Text style={styles.buttonText}>Keep</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
+                    ) : (
+                      <View style={styles.cardActions}>
+                        <TouchableOpacity
+                          style={[styles.editButton, styles.cardActionButton]}
+                          onPress={() => startEditItem(item)}
+                          disabled={isBusy}
+                        >
+                          <Text style={styles.buttonText}>Edit</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[styles.deleteButton, styles.cardActionButton]}
+                          onPress={() => requestDeleteItem(item.id)}
+                          disabled={isBusy}
+                        >
+                          <Text style={styles.buttonText}>Delete</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </>
+                )}
+              </View>
+            );
+          })}
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Scheduled Dressing Events</Text>
+
+          <TouchableOpacity style={styles.scheduleButton} onPress={loadScheduledEvents}>
+            <Text style={styles.buttonText}>View Scheduled Events</Text>
+          </TouchableOpacity>
+
+          {scheduledEvents.map((event) => (
+            <View key={event.id} style={styles.savedCard}>
+              {event.processedImageUrl && (
+                <Image source={{ uri: event.processedImageUrl }} style={styles.smallImage} />
+              )}
+
+              <Text style={styles.savedTitle}>{event.eventName}</Text>
+              <Text style={styles.savedInfo}>Date: {event.eventDate}</Text>
+              <Text style={styles.savedInfo}>Time: {event.eventTime}</Text>
+              <Text style={styles.savedInfo}>Dress: {event.clothingType}</Text>
+              <Text style={styles.savedInfo}>Color: {event.clothingColor}</Text>
+              <Text style={styles.savedInfo}>Notes: {event.notes}</Text>
+              {event.trendSuggestion?.suggestion && (
+                <Text style={styles.savedInfo}>
+                  Suggestion: {event.trendSuggestion.suggestion}
+                </Text>
+              )}
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: "#080C18",
+  },
+
+  container: {
+    padding: 18,
+    paddingBottom: 48,
+    maxWidth: 640,
+    width: "100%",
+    alignSelf: "center",
+  },
+
+  title: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#F8FAFC",
+    textAlign: "center",
+    letterSpacing: -0.6,
+    marginTop: 24,
+  },
+
+  subtitle: {
+    fontSize: 14,
+    color: "#8A97AD",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 26,
+    marginTop: 10,
+    paddingHorizontal: 12,
+  },
+
+  card: {
+    backgroundColor: "#111A2E",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#1F2A44",
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.28,
+    shadowRadius: 24,
+    elevation: 4,
+  },
+
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#F1F5F9",
+    letterSpacing: -0.2,
+    marginBottom: 16,
+  },
+
+  uploadBox: {
+    height: 280,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderStyle: "dashed",
+    borderColor: "#3B4763",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#0B1220",
+    overflow: "hidden",
+    marginBottom: 14,
+  },
+
+  uploadText: {
+    color: "#7C8AA3",
+    fontSize: 15,
+    fontWeight: "500",
+  },
+
+  previewImage: {
+    width: "100%",
+    height: 280,
+    borderRadius: 16,
+    resizeMode: "contain",
+    backgroundColor: "#ffffff",
+  },
+
+  primaryButton: {
+    backgroundColor: "#6366F1",
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: "center",
+    marginBottom: 12,
+    shadowColor: "#6366F1",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+
+  secondaryButton: {
+    backgroundColor: "#1E293B",
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: "center",
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#2E3B54",
+  },
+
+  imageSideLabel: {
+    color: "#9AA7BD",
+    fontSize: 12,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    marginBottom: 10,
+  },
+
+  predictButton: {
+    backgroundColor: "#10B981",
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: "center",
+    shadowColor: "#10B981",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.32,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+
+  saveButton: {
+    backgroundColor: "#F59E0B",
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: "center",
+    marginTop: 18,
+    shadowColor: "#F59E0B",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+
+  scheduleButton: {
+    backgroundColor: "#8B5CF6",
+    paddingVertical: 15,
+    borderRadius: 14,
+    alignItems: "center",
+    marginTop: 8,
+    shadowColor: "#8B5CF6",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.32,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+
+  disabledButton: {
+    backgroundColor: "#334155",
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+
+  buttonText: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+
+  resultGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 22,
+  },
+
+  resultBox: {
+    width: "48%",
+    backgroundColor: "#0B1220",
+    borderRadius: 14,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#1F2A44",
+  },
+
+  resultLabel: {
+    color: "#8A97AD",
+    fontSize: 11,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    marginBottom: 6,
+  },
+
+  resultValue: {
+    color: "#F1F5F9",
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: -0.2,
+  },
+
+  confidenceBox: {
+    marginBottom: 14,
+  },
+
+  confidenceTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 7,
+  },
+
+  confidenceLabel: {
+    color: "#9AA7BD",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+
+  confidenceValue: {
+    color: "#C7D2FE",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+
+  progressTrack: {
+    height: 8,
+    backgroundColor: "#1E293B",
+    borderRadius: 999,
+    overflow: "hidden",
+  },
+
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#818CF8",
+    borderRadius: 999,
+  },
+
+  trendPanel: {
+    backgroundColor: "#0B1220",
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 8,
+    marginBottom: 2,
+    borderWidth: 1,
+    borderColor: "#26324C",
+  },
+
+  trendTitle: {
+    color: "#F1F5F9",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: -0.2,
+    marginBottom: 4,
+  },
+
+  trendSource: {
+    color: "#7C8AA3",
+    fontSize: 11,
+    marginBottom: 14,
+  },
+
+  trendItem: {
+    backgroundColor: "#131C30",
+    borderRadius: 12,
+    padding: 13,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#1F2A44",
+  },
+
+  trendHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 5,
+  },
+
+  trendKeyword: {
+    color: "#F1F5F9",
+    flex: 1,
+    fontSize: 14,
+    fontWeight: "800",
+    textTransform: "capitalize",
+  },
+
+  trendScore: {
+    color: "#34D399",
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
+  trendMeta: {
+    color: "#818CF8",
+    fontSize: 11,
+    fontWeight: "500",
+    marginBottom: 6,
+  },
+
+  trendSuggestion: {
+    color: "#AEB9CC",
+    fontSize: 13,
+    lineHeight: 19,
+  },
+
+  eventSuggestionBox: {
+    backgroundColor: "#0B1220",
+    borderRadius: 14,
+    padding: 15,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: "#1C7F5C",
+  },
+
+  eventSuggestionTitle: {
+    color: "#34D399",
+    fontSize: 14,
+    fontWeight: "800",
+    letterSpacing: 0.2,
+    marginBottom: 6,
+  },
+
+  eventSuggestionText: {
+    color: "#AEB9CC",
+    fontSize: 13,
+    lineHeight: 19,
+  },
+
+  input: {
+    backgroundColor: "#0B1220",
+    color: "#F1F5F9",
+    borderWidth: 1,
+    borderColor: "#26324C",
+    borderRadius: 12,
+    paddingVertical: 13,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    fontSize: 15,
+  },
+
+  notesInput: {
+    height: 96,
+    textAlignVertical: "top",
+  },
+
+  savedText: {
+    color: "#34D399",
+    fontWeight: "600",
+    marginTop: 12,
+    fontSize: 13,
+  },
+
+  savedCard: {
+    backgroundColor: "#0B1220",
+    borderRadius: 14,
+    padding: 15,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "#1F2A44",
+  },
+
+  smallImage: {
+    width: "100%",
+    height: 180,
+    borderRadius: 12,
+    resizeMode: "contain",
+    backgroundColor: "#ffffff",
+    marginBottom: 12,
+  },
+
+  savedTitle: {
+    color: "#F1F5F9",
+    fontSize: 17,
+    fontWeight: "800",
+    letterSpacing: -0.2,
+    marginBottom: 8,
+  },
+
+  savedInfo: {
+    color: "#AEB9CC",
+    fontSize: 13,
+    lineHeight: 20,
+    marginBottom: 3,
+  },
+
+  cardActions: {
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 14,
+  },
+
+  cardActionButton: {
+    flex: 1,
+    marginTop: 0,
+    marginBottom: 0,
+  },
+
+  editButton: {
+    backgroundColor: "#6366F1",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+
+  deleteButton: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+
+  editLabel: {
+    color: "#9AA7BD",
+    fontSize: 11,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+    marginTop: 4,
+    marginBottom: 6,
+  },
+
+  confirmText: {
+    color: "#FCA5A5",
+    fontSize: 13,
+    fontWeight: "600",
+    marginTop: 12,
+  },
+});
