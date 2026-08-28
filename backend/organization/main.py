@@ -1,20 +1,20 @@
-from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends, HTTPException
+"""Smart Wardrobe Organization - reads the shared wardrobe store.
+
+Items saved from the classification flow are organized here: clustered into
+layout groups, assigned physical wardrobe positions, and checked for
+over/under-use. Wear and wash events update the same shared store, so the
+counts persist across all features.
+"""
+
+from types import SimpleNamespace
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-import pandas as pd
-import os
-import threading
 
-from backend.organization import database, crud, ml_engine
+from backend.core import store
+from backend.organization import ml_engine
 
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    _load_csv_data()          # fast — just CSV insert
-    threading.Thread(target=_run_accuracy_report, daemon=True).start()
-    yield
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,124 +24,78 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_db():
-    db = database.SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
-def _load_csv_data():
-    csv_path = os.path.normpath(
-        os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'sri_lanka_smart_wardrobe_dataset.csv')
-    )
-    db = database.SessionLocal()
-    try:
-        if db.query(database.Item).count() == 0:
-            print(f"Loading CSV from: {csv_path}")
-            df = pd.read_csv(csv_path)
-            for _, row in df.iterrows():
-                db.add(database.Item(
-                    item_id_str          = str(row['item_id']),
-                    category             = str(row['category']),
-                    color                = str(row['color']),
-                    fabric               = str(row['fabric']),
-                    occasion             = str(row['occasion']),
-                    total_wear_count     = int(row['total_wear_count']),
-                    current_cycle_wears  = int(row['current_cycle_wears']),
-                    max_wears_before_wash= int(row['max_wears_before_wash']),
-                    status               = str(row['status']),
-                    sustainability_score = float(row['sustainability_score']),
-                ))
-            db.commit()
-            print(f"Loaded {len(df)} items into the database.")
-        else:
-            print("Database already populated, skipping CSV load.")
-    except Exception as e:
-        print(f"ERROR loading CSV: {e}")
-    finally:
-        db.close()
-
-
-def _run_accuracy_report():
-    db = database.SessionLocal()
-    try:
-        all_items = db.query(database.Item).all()
-        ml_engine.print_model_accuracy(all_items)
-    except Exception as e:
-        print(f"ERROR in accuracy report: {e}")
-    finally:
-        db.close()
+def _items():
+    """Shared-store items as attribute objects for the ML engine (keyed by item_id)."""
+    objs = []
+    for d in store.list_items():
+        o = SimpleNamespace(**d)
+        o.id = d["item_id"]
+        objs.append(o)
+    return objs
 
 
 @app.get("/items/organized")
-def get_organized_items(db: Session = Depends(get_db)):
-    items     = crud.get_items(db)
+def get_organized_items():
+    items     = _items()
     clusters  = ml_engine.SmartWardrobeEngine.get_clusters(items)
     positions = ml_engine.SmartWardrobeEngine.assign_wardrobe_positions(items)
 
     result = []
-    for item in items:
-        item_dict = {c.name: getattr(item, c.name) for c in item.__table__.columns}
-        item_dict['layout_group'] = clusters.get(item.id, 0)
-        item_dict.update(positions.get(item.id, {}))
-        result.append(item_dict)
+    for o in items:
+        row = dict(o.__dict__)
+        row["layout_group"] = clusters.get(o.id, 0)
+        row.update(positions.get(o.id, {}))
+        result.append(row)
     return result
 
 
 @app.get("/wardrobe/layout")
-def get_wardrobe_layout(db: Session = Depends(get_db)):
-    items     = crud.get_items(db)
+def get_wardrobe_layout():
+    items     = _items()
     positions = ml_engine.SmartWardrobeEngine.assign_wardrobe_positions(items)
 
     section_counts = {k: 0 for k in ml_engine.WARDROBE_SECTIONS}
     for pos in positions.values():
-        section_counts[pos['wardrobe_section']] += 1
+        section_counts[pos["wardrobe_section"]] += 1
 
     total = len(items)
     return {
-        'total_items': total,
-        'sections': {
+        "total_items": total,
+        "sections": {
             k: {
                 **ml_engine.WARDROBE_SECTIONS[k],
-                'item_count':       section_counts[k],
-                'utilization_pct':  round(section_counts[k] / total * 100) if total else 0,
+                "item_count":      section_counts[k],
+                "utilization_pct": round(section_counts[k] / total * 100) if total else 0,
             }
             for k in ml_engine.WARDROBE_SECTIONS
         },
     }
 
 
-@app.post("/items/wear/{item_id_str}")
-def wear_item(item_id_str: str, db: Session = Depends(get_db)):
-    item = crud.record_wear(db, item_id_str)
+@app.post("/items/wear/{item_id}")
+def wear_item(item_id: str):
+    item = store.record_wear(item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    return {"message": "Wear recorded", "status": item.status}
+    return {"message": "Wear recorded", "status": item["status"]}
 
 
-@app.post("/items/wash/{item_id_str}")
-def wash_item(item_id_str: str, db: Session = Depends(get_db)):
-    item = crud.wash_item(db, item_id_str)
+@app.post("/items/wash/{item_id}")
+def wash_item(item_id: str):
+    item = store.record_wash(item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    return {"message": "Item marked as washed", "status": item.status}
+    return {"message": "Item marked as washed", "status": item["status"]}
 
 
 @app.get("/items/insights")
-def get_insights(db: Session = Depends(get_db)):
-    items = crud.get_items(db)
+def get_insights():
+    items       = _items()
     anomalies   = ml_engine.SmartWardrobeEngine.detect_anomalies(items)
-    dirty_count = db.query(database.Item).filter(database.Item.status == "Dirty").count()
+    dirty_count = sum(1 for o in items if o.status == "Dirty")
     return {
         "dirty_count": dirty_count,
         "underused":   anomalies["underused"],
         "overused":    anomalies["overused"],
     }
-
-
-# When this app is mounted as a sub-application (see backend/main.py), Starlette
-# does not run its lifespan, so seed the DB at import time too. `_load_csv_data`
-# is a no-op once the table is populated, so running it here and in `lifespan`
-# is safe.
-_load_csv_data()

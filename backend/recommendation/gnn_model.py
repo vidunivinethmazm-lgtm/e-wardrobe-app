@@ -102,7 +102,8 @@ def build_edges_from_data(wardrobe, csv_path=None):
         (2, 3),  # Cotton Kurti    ↔ Georgette Gown  (layered traditional)
     ]
     for i, j in cross_group:
-        edge_set.add((min(i, j), max(i, j)))
+        if i < n and j < n:            # skip when the wardrobe is smaller
+            edge_set.add((min(i, j), max(i, j)))
 
     src, dst = [], []
     for i, j in sorted(edge_set):

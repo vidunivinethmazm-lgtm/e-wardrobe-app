@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -14,17 +13,10 @@ import {
 } from "react-native";
 
 import axios from "axios";
-import {
-  collection,
-  getDocs,
-  orderBy,
-  query,
-} from "firebase/firestore";
 
-import { db } from "../../firebaseConfig";
+import { CLASSIFICATION_URL, WARDROBE_URL } from "../../constants/api";
 
-const API_BASE = Platform.OS === "web" ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
-const API_URL = `${API_BASE}/classification`;
+const API_URL = CLASSIFICATION_URL;
 
 export default function TrendsScreen() {
   const [loading, setLoading] = useState(false);
@@ -35,25 +27,26 @@ export default function TrendsScreen() {
     try {
       setLoading(true);
 
-      const wardrobeQuery = query(
-        collection(db, "wardrobe_items"),
-        orderBy("createdAt", "desc")
-      );
-      const eventQuery = query(
-        collection(db, "scheduled_events"),
-        orderBy("createdAt", "desc")
-      );
+      const [wardrobeRes, eventsRes] = await Promise.all([
+        axios.get(`${WARDROBE_URL}/`),
+        axios.get(`${WARDROBE_URL}/schedule`),
+      ]);
 
-      const wardrobeSnapshot = await getDocs(wardrobeQuery);
-      const eventSnapshot = await getDocs(eventQuery);
-
-      const wardrobeItems = wardrobeSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const wardrobeItems = wardrobeRes.data.map((d: any) => ({
+        id: d.item_id,
+        type: d.type,
+        color: d.color,
+        gender: d.gender,
+        season: d.season,
+        material: d.material,
+        processedImageUrl: d.processed_image_url,
+        trendAnalysis: d.trend_analysis,
       }));
-      const events = eventSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const events = eventsRes.data.map((e: any) => ({
+        id: e.event_id,
+        eventName: e.event_name,
+        eventDate: e.event_date,
+        eventTime: e.event_time,
       }));
 
       const analysisResponse = await axios.post(`${API_URL}/wardrobe/trend-analysis`, {

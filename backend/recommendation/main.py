@@ -6,7 +6,14 @@ import torch
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.recommendation.gnn_model import StylingGNN, load_graph_data
+from backend.recommendation.gnn_model import (
+    StylingGNN,
+    build_edges_from_data,
+    build_node_features,
+    load_graph_data,
+)
+from backend.core import store
+from backend.core.schema import to_recommendation_item
 
 # Data / model files live next to this module; resolve them from here so the
 # app works no matter what the current working directory is.
@@ -76,10 +83,22 @@ async def recommend(
 ):
     if not AI:
         return {"error": "Models not loaded"}
-    nlp, vec, gnn, x, edge_index = AI
+    nlp, vec, gnn, _x0, _e0 = AI
 
-    with open(HERE / 'wardrobe.json', 'r') as f:
-        wardrobe = json.load(f)
+    # Recommend from the user's saved wardrobe (shared store). Fall back to the
+    # bundled demo wardrobe when there aren't enough real items yet.
+    saved = store.list_items()
+    if len(saved) >= 3:
+        wardrobe = [to_recommendation_item(d, i) for i, d in enumerate(saved)]
+        wardrobe_source = "user_wardrobe"
+    else:
+        with open(HERE / 'wardrobe.json', 'r') as f:
+            wardrobe = json.load(f)
+        wardrobe_source = "demo_wardrobe"
+
+    # Node features + edges are rebuilt from whatever wardrobe we're using.
+    x = build_node_features(wardrobe)
+    edge_index = build_edges_from_data(wardrobe)
 
     def detect_event_type(text: str) -> str:
         text = text.lower()
@@ -271,7 +290,6 @@ async def recommend(
     if event_type == 'ColdOutdoor':
         predicted_intent = 'Casual'
 
-    _, _, gnn, x, edge_index = AI
     with torch.no_grad():
         item_embeddings = gnn.encode(x, edge_index)[:len(wardrobe)]
 
@@ -326,6 +344,8 @@ async def recommend(
         'event_class':       event_class,
         'location_detected': city,
         'weather':           weather,
+        'wardrobe_source':   wardrobe_source,
+        'items_considered':  len(wardrobe),
         'logic_summary':     f'Combined NLP intent, GNN wardrobe ranking, and colour harmony for {event_class}.',
         'recommendations':   results[:3],
     }

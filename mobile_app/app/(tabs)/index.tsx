@@ -17,22 +17,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { CLASSIFICATION_URL, WARDROBE_URL } from "../../constants/api";
 
-import { db } from "../../firebaseConfig";
-
-const API_BASE = Platform.OS === "web" ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
-const API_URL = `${API_BASE}/classification`;
+const API_URL = CLASSIFICATION_URL;
 
 export default function App() {
   const [image, setImage] = useState<any>(null);
@@ -198,35 +185,21 @@ export default function App() {
     try {
       setSaving(true);
 
-      const savePromise = addDoc(collection(db, "wardrobe_items"), {
-        type: prediction.type,
-        typeConfidence: prediction.type_confidence,
-        color: prediction.color,
-        colorConfidence: prediction.color_confidence,
-        gender: prediction.gender,
-        genderConfidence: prediction.gender_confidence,
-        season: prediction.season,
-        seasonConfidence: prediction.season_confidence,
-        material: prediction.material,
-        materialConfidence: prediction.material_confidence,
-        originalImageUrl,
-        backImageUrl,
-        processedImageUrl,
-        trendAnalysis,
-        createdAt: serverTimestamp(),
+      const response = await axios.post(`${WARDROBE_URL}/`, {
+        prediction: { ...prediction, trend_analysis: trendAnalysis },
+        images: {
+          original_image_url: originalImageUrl,
+          processed_image_url: processedImageUrl,
+          back_image_url: backImageUrl,
+          back_processed_image_url: backImageUrl,
+        },
       });
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Firebase save timeout")), 15000)
-      );
+      setSavedItemId(response.data.item_id);
 
-      const docRef: any = await Promise.race([savePromise, timeoutPromise]);
-
-      setSavedItemId(docRef.id);
-
-      Alert.alert("Saved", "Wardrobe item saved to Firebase.");
+      Alert.alert("Saved", "Added to your wardrobe.");
     } catch (error: any) {
-      console.log("Firebase save error:", error);
+      console.log("Save error:", error);
       Alert.alert("Save failed", error.message || "Could not save item.");
     } finally {
       setSaving(false);
@@ -272,20 +245,16 @@ export default function App() {
         console.log("Schedule suggestion error:", suggestionError);
       }
 
-      await addDoc(collection(db, "scheduled_events"), {
-        wardrobeItemId: savedItemId,
-        eventName,
-        eventDate,
-        eventTime,
+      await axios.post(`${WARDROBE_URL}/schedule`, {
+        wardrobe_item_id: savedItemId,
+        event_name: eventName,
+        event_date: eventDate,
+        event_time: eventTime,
         notes: eventNotes,
-        clothingType: prediction?.type,
-        clothingColor: prediction?.color,
-        clothingGender: prediction?.gender,
-        clothingSeason: prediction?.season,
-        clothingMaterial: prediction?.material,
-        processedImageUrl,
-        trendSuggestion: scheduleSuggestion,
-        createdAt: serverTimestamp(),
+        clothing_type: prediction?.type,
+        clothing_color: prediction?.color,
+        processed_image_url: processedImageUrl,
+        trend_suggestion: scheduleSuggestion,
       });
 
       setEventSuggestion(scheduleSuggestion);
@@ -294,7 +263,7 @@ export default function App() {
       setEventTime("");
       setEventNotes("");
 
-      Alert.alert("Scheduled", "Dressing event saved to Firebase.");
+      Alert.alert("Scheduled", "Dressing event saved.");
     } catch (error) {
       console.log("Schedule error:", error);
       Alert.alert("Schedule failed", "Could not save event.");
@@ -303,16 +272,19 @@ export default function App() {
 
   const loadSavedDetails = async () => {
     try {
-      const q = query(
-        collection(db, "wardrobe_items"),
-        orderBy("createdAt", "desc")
-      );
+      const response = await axios.get(`${WARDROBE_URL}/`);
 
-      const snapshot = await getDocs(q);
-
-      const items = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const items = response.data.map((d: any) => ({
+        id: d.item_id,
+        type: d.type,
+        color: d.color,
+        gender: d.gender,
+        season: d.season,
+        material: d.material,
+        originalImageUrl: d.original_image_url,
+        processedImageUrl: d.processed_image_url,
+        backImageUrl: d.back_processed_image_url || d.back_image_url,
+        trendAnalysis: d.trend_analysis,
       }));
 
       setWardrobeItems(items);
@@ -341,7 +313,7 @@ export default function App() {
     try {
       setRowBusyId(itemId);
 
-      await updateDoc(doc(db, "wardrobe_items", itemId), {
+      await axios.patch(`${WARDROBE_URL}/${itemId}`, {
         type: editForm.type,
         color: editForm.color,
         gender: editForm.gender,
@@ -375,7 +347,7 @@ export default function App() {
     try {
       setRowBusyId(itemId);
 
-      await deleteDoc(doc(db, "wardrobe_items", itemId));
+      await axios.delete(`${WARDROBE_URL}/${itemId}`);
 
       setWardrobeItems((prev) => prev.filter((it) => it.id !== itemId));
       setConfirmDeleteId(null);
@@ -399,16 +371,18 @@ export default function App() {
 
   const loadScheduledEvents = async () => {
     try {
-      const q = query(
-        collection(db, "scheduled_events"),
-        orderBy("createdAt", "desc")
-      );
+      const response = await axios.get(`${WARDROBE_URL}/schedule`);
 
-      const snapshot = await getDocs(q);
-
-      const events = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const events = response.data.map((e: any) => ({
+        id: e.event_id,
+        eventName: e.event_name,
+        eventDate: e.event_date,
+        eventTime: e.event_time,
+        notes: e.notes,
+        clothingType: e.clothing_type,
+        clothingColor: e.clothing_color,
+        processedImageUrl: e.processed_image_url,
+        trendSuggestion: e.trend_suggestion,
       }));
 
       setScheduledEvents(events);

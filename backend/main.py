@@ -26,6 +26,7 @@ app = FastAPI(title="E-Wardrobe AI")
 
 # prefix  ->  "package.module:attribute" of that feature's FastAPI app
 FEATURES = {
+    "/wardrobe":       "backend.core.api:app",          # shared wardrobe store
     "/classification": "backend.classification.main:app",
     "/recommendation": "backend.recommendation.main:app",
     "/organization":  "backend.organization.main:app",
