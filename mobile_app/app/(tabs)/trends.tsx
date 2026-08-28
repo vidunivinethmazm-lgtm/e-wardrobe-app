@@ -84,7 +84,7 @@ export default function TrendsScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Wardrobe Trends</Text>
@@ -212,10 +212,11 @@ function statusStyle(status: string) {
   return { color: "#38bdf8", borderColor: "#38bdf8" };
 }
 
+/* Tailwind violet / slate palette - matches the Recommend screen. */
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#F3F0FF",
   },
 
   container: {
@@ -226,48 +227,58 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#ffffff",
+    color: "#2D1B69",
     textAlign: "center",
     marginTop: 20,
   },
 
   subtitle: {
     fontSize: 14,
-    color: "#cbd5e1",
+    color: "#6B7280",
     textAlign: "center",
     marginBottom: 22,
     marginTop: 8,
   },
 
   primaryButton: {
-    backgroundColor: "#16a34a",
+    backgroundColor: "#7C3AED",
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginBottom: 18,
+    shadowColor: "#7C3AED",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 3,
   },
 
   disabledButton: {
-    backgroundColor: "#475569",
+    backgroundColor: "#C4B5FD",
   },
 
   buttonText: {
     color: "#ffffff",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "800",
   },
 
   card: {
-    backgroundColor: "#1e293b",
-    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
     padding: 18,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: "#EDE9FE",
+    shadowColor: "#6D28D9",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
 
   sectionTitle: {
-    color: "#ffffff",
+    color: "#1F2937",
     fontSize: 20,
     fontWeight: "800",
     marginBottom: 14,
@@ -281,21 +292,21 @@ const styles = StyleSheet.create({
 
   scoreBox: {
     flex: 1,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#F5F3FF",
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: "#EDE9FE",
   },
 
   scoreValue: {
-    color: "#ffffff",
+    color: "#1F2937",
     fontSize: 24,
     fontWeight: "900",
   },
 
   scoreLabel: {
-    color: "#94a3b8",
+    color: "#6B7280",
     fontSize: 13,
     marginTop: 4,
   },
@@ -308,7 +319,7 @@ const styles = StyleSheet.create({
   },
 
   chartLabel: {
-    color: "#cbd5e1",
+    color: "#4B5563",
     fontSize: 13,
     width: 72,
   },
@@ -316,7 +327,7 @@ const styles = StyleSheet.create({
   chartTrack: {
     flex: 1,
     height: 12,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#EDE9FE",
     borderRadius: 12,
     overflow: "hidden",
   },
@@ -327,7 +338,7 @@ const styles = StyleSheet.create({
   },
 
   chartValue: {
-    color: "#ffffff",
+    color: "#1F2937",
     fontSize: 13,
     fontWeight: "800",
     width: 24,
@@ -335,27 +346,29 @@ const styles = StyleSheet.create({
   },
 
   suggestionBox: {
-    backgroundColor: "#0f172a",
+    backgroundColor: "#FAFAFA",
     borderRadius: 14,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: "#EDE9FE",
+    borderLeftWidth: 3,
+    borderLeftColor: "#7C3AED",
   },
 
   suggestionText: {
-    color: "#cbd5e1",
+    color: "#4B5563",
     fontSize: 14,
     lineHeight: 20,
   },
 
   itemCard: {
-    backgroundColor: "#0f172a",
+    backgroundColor: "#F9FAFB",
     borderRadius: 16,
     padding: 14,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: "#EDE9FE",
   },
 
   itemImage: {
@@ -363,7 +376,7 @@ const styles = StyleSheet.create({
     height: 170,
     borderRadius: 14,
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#EDE9FE",
     marginBottom: 12,
   },
 
@@ -376,7 +389,7 @@ const styles = StyleSheet.create({
   },
 
   itemTitle: {
-    color: "#ffffff",
+    color: "#1F2937",
     flex: 1,
     fontSize: 17,
     fontWeight: "800",
@@ -395,7 +408,7 @@ const styles = StyleSheet.create({
 
   progressTrack: {
     height: 10,
-    backgroundColor: "#334155",
+    backgroundColor: "#EDE9FE",
     borderRadius: 10,
     overflow: "hidden",
     marginBottom: 10,
@@ -403,46 +416,46 @@ const styles = StyleSheet.create({
 
   progressFill: {
     height: "100%",
-    backgroundColor: "#22c55e",
+    backgroundColor: "#7C3AED",
     borderRadius: 10,
   },
 
   itemInfo: {
-    color: "#cbd5e1",
+    color: "#4B5563",
     fontSize: 13,
     marginBottom: 4,
   },
 
   itemSuggestion: {
-    color: "#e2e8f0",
+    color: "#374151",
     fontSize: 13,
     lineHeight: 19,
     marginTop: 6,
   },
 
   eventCard: {
-    backgroundColor: "#0f172a",
+    backgroundColor: "#F9FAFB",
     borderRadius: 16,
     padding: 14,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: "#EDE9FE",
   },
 
   eventTitle: {
-    color: "#ffffff",
+    color: "#1F2937",
     fontSize: 17,
     fontWeight: "800",
     marginBottom: 4,
   },
 
   eventMeta: {
-    color: "#38bdf8",
+    color: "#7C3AED",
     fontSize: 13,
   },
 
   emptyText: {
-    color: "#94a3b8",
+    color: "#6B7280",
     fontSize: 14,
   },
 });

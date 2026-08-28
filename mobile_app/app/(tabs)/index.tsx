@@ -411,7 +411,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>E-Wardrobe AI</Text>
@@ -800,10 +800,11 @@ export default function App() {
   );
 }
 
+/* Tailwind violet / slate palette - matches the Recommend screen. */
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#080C18",
+    backgroundColor: "#F3F0FF",
   },
 
   container: {
@@ -817,7 +818,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#F8FAFC",
+    color: "#2D1B69",
     textAlign: "center",
     letterSpacing: -0.6,
     marginTop: 24,
@@ -825,7 +826,7 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: 14,
-    color: "#8A97AD",
+    color: "#6B7280",
     textAlign: "center",
     lineHeight: 20,
     marginBottom: 26,
@@ -834,23 +835,23 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#111A2E",
-    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#1F2A44",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.28,
-    shadowRadius: 24,
+    borderColor: "#EDE9FE",
+    shadowColor: "#6D28D9",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 4,
   },
 
   sectionTitle: {
     fontSize: 17,
-    fontWeight: "700",
-    color: "#F1F5F9",
+    fontWeight: "800",
+    color: "#1F2937",
     letterSpacing: -0.2,
     marginBottom: 16,
   },
@@ -860,16 +861,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1.5,
     borderStyle: "dashed",
-    borderColor: "#3B4763",
+    borderColor: "#DDD6FE",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F5F3FF",
     overflow: "hidden",
     marginBottom: 14,
   },
 
   uploadText: {
-    color: "#7C8AA3",
+    color: "#9CA3AF",
     fontSize: 15,
     fontWeight: "500",
   },
@@ -879,81 +880,81 @@ const styles = StyleSheet.create({
     height: 280,
     borderRadius: 16,
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#EDE9FE",
   },
 
   primaryButton: {
-    backgroundColor: "#6366F1",
+    backgroundColor: "#7C3AED",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginBottom: 12,
-    shadowColor: "#6366F1",
+    shadowColor: "#7C3AED",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   secondaryButton: {
-    backgroundColor: "#1E293B",
+    backgroundColor: "#8B5CF6",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#2E3B54",
+    borderColor: "#DDD6FE",
   },
 
   imageSideLabel: {
-    color: "#9AA7BD",
+    color: "#7C3AED",
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1.5,
     marginBottom: 10,
   },
 
   predictButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#7C3AED",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
-    shadowColor: "#10B981",
+    shadowColor: "#7C3AED",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.32,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   saveButton: {
-    backgroundColor: "#F59E0B",
+    backgroundColor: "#10B981",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginTop: 18,
-    shadowColor: "#F59E0B",
+    shadowColor: "#10B981",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   scheduleButton: {
     backgroundColor: "#8B5CF6",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginTop: 8,
     shadowColor: "#8B5CF6",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.32,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   disabledButton: {
-    backgroundColor: "#334155",
+    backgroundColor: "#C4B5FD",
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -961,7 +962,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#ffffff",
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "800",
     letterSpacing: 0.3,
   },
 
@@ -974,24 +975,24 @@ const styles = StyleSheet.create({
 
   resultBox: {
     width: "48%",
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F5F3FF",
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#1F2A44",
+    borderColor: "#EDE9FE",
   },
 
   resultLabel: {
-    color: "#8A97AD",
+    color: "#7C3AED",
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1,
     marginBottom: 6,
   },
 
   resultValue: {
-    color: "#F1F5F9",
+    color: "#1F2937",
     fontSize: 17,
     fontWeight: "800",
     letterSpacing: -0.2,
@@ -1008,42 +1009,44 @@ const styles = StyleSheet.create({
   },
 
   confidenceLabel: {
-    color: "#9AA7BD",
+    color: "#4B5563",
     fontSize: 13,
     fontWeight: "500",
   },
 
   confidenceValue: {
-    color: "#C7D2FE",
+    color: "#7C3AED",
     fontSize: 13,
     fontWeight: "700",
   },
 
   progressTrack: {
     height: 8,
-    backgroundColor: "#1E293B",
+    backgroundColor: "#EDE9FE",
     borderRadius: 999,
     overflow: "hidden",
   },
 
   progressFill: {
     height: "100%",
-    backgroundColor: "#818CF8",
+    backgroundColor: "#7C3AED",
     borderRadius: 999,
   },
 
   trendPanel: {
-    backgroundColor: "#0B1220",
+    backgroundColor: "#FAFAFA",
     borderRadius: 16,
     padding: 16,
     marginTop: 8,
     marginBottom: 2,
     borderWidth: 1,
-    borderColor: "#26324C",
+    borderColor: "#EDE9FE",
+    borderLeftWidth: 3,
+    borderLeftColor: "#7C3AED",
   },
 
   trendTitle: {
-    color: "#F1F5F9",
+    color: "#7C3AED",
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: -0.2,
@@ -1051,18 +1054,18 @@ const styles = StyleSheet.create({
   },
 
   trendSource: {
-    color: "#7C8AA3",
+    color: "#9CA3AF",
     fontSize: 11,
     marginBottom: 14,
   },
 
   trendItem: {
-    backgroundColor: "#131C30",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 13,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#1F2A44",
+    borderColor: "#EDE9FE",
   },
 
   trendHeader: {
@@ -1074,7 +1077,7 @@ const styles = StyleSheet.create({
   },
 
   trendKeyword: {
-    color: "#F1F5F9",
+    color: "#1F2937",
     flex: 1,
     fontSize: 14,
     fontWeight: "800",
@@ -1082,35 +1085,35 @@ const styles = StyleSheet.create({
   },
 
   trendScore: {
-    color: "#34D399",
+    color: "#10B981",
     fontSize: 14,
     fontWeight: "800",
   },
 
   trendMeta: {
-    color: "#818CF8",
+    color: "#7C3AED",
     fontSize: 11,
     fontWeight: "500",
     marginBottom: 6,
   },
 
   trendSuggestion: {
-    color: "#AEB9CC",
+    color: "#4B5563",
     fontSize: 13,
     lineHeight: 19,
   },
 
   eventSuggestionBox: {
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F0FDF4",
     borderRadius: 14,
     padding: 15,
     marginTop: 14,
     borderWidth: 1,
-    borderColor: "#1C7F5C",
+    borderColor: "#10B981",
   },
 
   eventSuggestionTitle: {
-    color: "#34D399",
+    color: "#065F46",
     fontSize: 14,
     fontWeight: "800",
     letterSpacing: 0.2,
@@ -1118,17 +1121,17 @@ const styles = StyleSheet.create({
   },
 
   eventSuggestionText: {
-    color: "#AEB9CC",
+    color: "#065F46",
     fontSize: 13,
     lineHeight: 19,
   },
 
   input: {
-    backgroundColor: "#0B1220",
-    color: "#F1F5F9",
-    borderWidth: 1,
-    borderColor: "#26324C",
-    borderRadius: 12,
+    backgroundColor: "#F5F3FF",
+    color: "#1F2937",
+    borderWidth: 1.5,
+    borderColor: "#DDD6FE",
+    borderRadius: 14,
     paddingVertical: 13,
     paddingHorizontal: 14,
     marginBottom: 12,
@@ -1141,19 +1144,19 @@ const styles = StyleSheet.create({
   },
 
   savedText: {
-    color: "#34D399",
+    color: "#065F46",
     fontWeight: "600",
     marginTop: 12,
     fontSize: 13,
   },
 
   savedCard: {
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F9FAFB",
     borderRadius: 14,
     padding: 15,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#1F2A44",
+    borderColor: "#EDE9FE",
   },
 
   smallImage: {
@@ -1161,12 +1164,12 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 12,
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#EDE9FE",
     marginBottom: 12,
   },
 
   savedTitle: {
-    color: "#F1F5F9",
+    color: "#1F2937",
     fontSize: 17,
     fontWeight: "800",
     letterSpacing: -0.2,
@@ -1174,7 +1177,7 @@ const styles = StyleSheet.create({
   },
 
   savedInfo: {
-    color: "#AEB9CC",
+    color: "#4B5563",
     fontSize: 13,
     lineHeight: 20,
     marginBottom: 3,
@@ -1193,31 +1196,31 @@ const styles = StyleSheet.create({
   },
 
   editButton: {
-    backgroundColor: "#6366F1",
+    backgroundColor: "#7C3AED",
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
   },
 
   deleteButton: {
     backgroundColor: "#EF4444",
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
   },
 
   editLabel: {
-    color: "#9AA7BD",
+    color: "#7C3AED",
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1,
     marginTop: 4,
     marginBottom: 6,
   },
 
   confirmText: {
-    color: "#FCA5A5",
+    color: "#DC2626",
     fontSize: 13,
     fontWeight: "600",
     marginTop: 12,

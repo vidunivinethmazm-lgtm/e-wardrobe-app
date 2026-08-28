@@ -9,14 +9,15 @@ import { ORGANIZATION_URL } from '../../constants/api';
 
 // ── Theme (from SmartWardrobeApp/src/theme/colors.js) ───────────────────────
 
+// Tailwind violet / slate palette - matches the Recommend screen.
 const COLORS = {
-  primary: '#5C4033', primaryDark: '#3E2723', primaryLight: '#8D6E63', accent: '#FF8F00',
-  background: '#FFF8F0', surface: '#FFFFFF',
-  clean: '#C8E6C9', cleanText: '#2E7D32', dirty: '#FFCDD2', dirtyText: '#C62828', dirtyBg: '#FFEBEE',
-  scoreGood: '#4CAF50', scoreMid: '#FF9800', scoreLow: '#F44336',
-  zoneHome: '#E8F5E9', zoneCasual: '#E3F2FD', zoneOffice: '#F3E5F5', zoneReligious: '#FFF3E0', zoneWedding: '#FCE4EC',
-  textPrimary: '#3E2723', textSecondary: '#6D4C41', textMuted: '#9E9E9E',
-  border: '#E0E0E0', divider: '#F5F5F5', topBar: '#5C4033', topBarSub: '#D7B89C',
+  primary: '#7C3AED', primaryDark: '#6D28D9', primaryLight: '#8B5CF6', accent: '#7C3AED',
+  background: '#F3F0FF', surface: '#FFFFFF',
+  clean: '#D1FAE5', cleanText: '#065F46', dirty: '#FEE2E2', dirtyText: '#B91C1C', dirtyBg: '#FEF2F2',
+  scoreGood: '#10B981', scoreMid: '#F59E0B', scoreLow: '#EF4444',
+  zoneHome: '#EDE9FE', zoneCasual: '#F5F3FF', zoneOffice: '#EDE9FE', zoneReligious: '#F5F3FF', zoneWedding: '#EDE9FE',
+  textPrimary: '#1F2937', textSecondary: '#4B5563', textMuted: '#9CA3AF',
+  border: '#EDE9FE', divider: '#F1F5F9', topBar: '#2D1B69', topBarSub: '#C4B5FD',
 };
 
 // ── API (integrated backend mounts organization under /organization) ─────────
@@ -32,10 +33,10 @@ const itemId    = (i: any) => i.item_id ?? i.item_id_str ?? i.id;
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const SECTION_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  A: { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' },
-  B: { bg: '#E3F2FD', text: '#1565C0', border: '#90CAF9' },
-  C: { bg: '#FFF8E1', text: '#F57F17', border: '#FFE082' },
-  D: { bg: '#F3E5F5', text: '#6A1B9A', border: '#CE93D8' },
+  A: { bg: '#EDE9FE', text: '#6D28D9', border: '#DDD6FE' },
+  B: { bg: '#ECFDF5', text: '#065F46', border: '#A7F3D0' },
+  C: { bg: '#FFF7ED', text: '#92400E', border: '#FED7AA' },
+  D: { bg: '#EEF2FF', text: '#3730A3', border: '#C7D2FE' },
 };
 
 const ZONES = [
@@ -205,7 +206,7 @@ const InsightsScreen = ({ items, insights, refreshing, onRefresh }: any) => {
       <Text style={styles.screenSub}>Powered by ML anomaly detection</Text>
 
       <View style={styles.statsRow}>
-        <StatCard value={items.length} label="Total" bg="#E3F2FD" />
+        <StatCard value={items.length} label="Total" bg="#EDE9FE" />
         <StatCard value={cleanCount} label="Clean" bg={COLORS.clean} />
         <StatCard value={insights.dirty_count} label="Dirty" bg={COLORS.dirty} />
       </View>
@@ -463,7 +464,7 @@ const styles = StyleSheet.create({
   wearCount:      { fontSize: 11, fontWeight: '600', color: COLORS.primary },
   scoreRow:       { flexDirection: 'row', alignItems: 'center' },
   scoreLabel:     { fontSize: 10, color: COLORS.textMuted, width: 34 },
-  scoreBarBg:     { flex: 1, height: 6, backgroundColor: '#EEEEEE', borderRadius: 3, marginHorizontal: 4 },
+  scoreBarBg:     { flex: 1, height: 6, backgroundColor: '#EDE9FE', borderRadius: 3, marginHorizontal: 4 },
   scoreBarFill:   { height: 6, borderRadius: 3 },
   scoreNum:       { fontSize: 10, fontWeight: '700', width: 30, textAlign: 'right' },
   positionBadge:  { marginTop: 8, borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 4 },
@@ -488,8 +489,8 @@ const styles = StyleSheet.create({
   statNum:        { fontSize: 26, fontWeight: 'bold', color: COLORS.textPrimary },
   statLabel:      { fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
 
-  alertCard:      { backgroundColor: '#FFF3E0', borderLeftWidth: 4, borderLeftColor: COLORS.accent, padding: 14, borderRadius: 10, marginBottom: 16 },
-  alertTitle:     { fontWeight: 'bold', color: '#E65100', marginBottom: 4 },
+  alertCard:      { backgroundColor: '#FEF3C7', borderLeftWidth: 4, borderLeftColor: '#F59E0B', padding: 14, borderRadius: 10, marginBottom: 16 },
+  alertTitle:     { fontWeight: 'bold', color: '#92400E', marginBottom: 4 },
   alertBody:      { color: COLORS.textSecondary, fontSize: 13, lineHeight: 20 },
 
   insightSection: {
@@ -529,7 +530,7 @@ const styles = StyleSheet.create({
   },
   tabItem:        { flex: 1, alignItems: 'center' },
   tabPill:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 7, paddingHorizontal: 14, borderRadius: 24, gap: 5 },
-  tabPillActive:  { backgroundColor: '#F3EBE7' },
+  tabPillActive:  { backgroundColor: '#EDE9FE' },
   tabIcon:        { fontSize: 18 },
   tabIconActive:  { fontSize: 20 },
   tabLabel:       { fontSize: 12, color: COLORS.textMuted, fontWeight: '500' },
