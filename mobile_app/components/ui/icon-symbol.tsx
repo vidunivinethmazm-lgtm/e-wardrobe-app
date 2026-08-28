@@ -19,6 +19,7 @@ const MAPPING = {
   'chart.bar.fill': 'bar-chart',
   'sparkles': 'auto-awesome',
   'square.grid.2x2.fill': 'grid-view',
+  'clock.fill': 'history',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
 } as IconMapping;
