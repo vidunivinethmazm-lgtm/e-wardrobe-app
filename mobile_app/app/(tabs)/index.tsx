@@ -34,16 +34,11 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [savedItemId, setSavedItemId] = useState<string | null>(null);
-  // snapshot of the just-saved item, kept for the schedule step after the
-  // prediction result is collapsed
-  const [lastSaved, setLastSaved] = useState<any>(null);
 
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventTime, setEventTime] = useState("");
   const [eventNotes, setEventNotes] = useState("");
-  const [eventSuggestion, setEventSuggestion] = useState<any>(null);
 
   const [wardrobeItems, setWardrobeItems] = useState<any[]>([]);
   const [scheduledEvents, setScheduledEvents] = useState<any[]>([]);
@@ -66,8 +61,6 @@ export default function App() {
     setOriginalImageUrl(null);
     setBackImage(null);
     setBackImageUrl(null);
-    setSavedItemId(null);
-    setLastSaved(null);
 
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -108,7 +101,6 @@ export default function App() {
       setProcessedImageUrl(null);
       setOriginalImageUrl(null);
       setBackImageUrl(null);
-      setSavedItemId(null);
     }
   };
 
@@ -180,6 +172,43 @@ export default function App() {
     }
   };
 
+  // Fires the dressing-event save for a just-saved wardrobe item, using the
+  // current schedule-form fields. Returns the trend suggestion (or null).
+  const postScheduleEvent = async (item: any) => {
+    let suggestion: any = null;
+    try {
+      const r = await axios.post(`${API_URL}/schedule/suggestion`, {
+        items: [{
+          id: item.id,
+          type: item.type,
+          color: item.color,
+          gender: item.gender,
+          season: item.season,
+          material: item.material,
+          processedImageUrl: item.processedImageUrl,
+        }],
+        event: { eventName, eventDate, eventTime },
+      });
+      suggestion = r.data;
+    } catch (suggestionError) {
+      console.log("Schedule suggestion error:", suggestionError);
+    }
+
+    await axios.post(`${WARDROBE_URL}/schedule`, {
+      wardrobe_item_id: item.id,
+      event_name: eventName,
+      event_date: eventDate,
+      event_time: eventTime,
+      notes: eventNotes,
+      clothing_type: item.type,
+      clothing_color: item.color,
+      processed_image_url: item.processedImageUrl,
+      trend_suggestion: suggestion,
+    });
+
+    return suggestion;
+  };
+
   const saveWardrobeItem = async () => {
     if (!prediction) {
       Alert.alert("No prediction", "Please predict clothing first.");
@@ -199,8 +228,7 @@ export default function App() {
         },
       });
 
-      setSavedItemId(response.data.item_id);
-      setLastSaved({
+      const snapshot = {
         id: response.data.item_id,
         type: prediction.type,
         color: prediction.color,
@@ -208,7 +236,7 @@ export default function App() {
         season: prediction.season,
         material: prediction.material,
         processedImageUrl,
-      });
+      };
 
       // Collapse the prediction result now that it's saved.
       setPrediction(null);
@@ -219,99 +247,34 @@ export default function App() {
       setImage(null);
       setBackImage(null);
 
-      // Keep the "Schedule Dressing Event" form open only if the user has
-      // already started filling it in; otherwise collapse that too.
-      const scheduleStarted =
-        !!(eventName.trim() || eventDate.trim() || eventTime.trim() || eventNotes.trim());
-      if (!scheduleStarted) {
-        setSavedItemId(null);
-        setLastSaved(null);
+      // If the dressing-event form was filled in, save that event too.
+      const scheduleComplete =
+        !!(eventName.trim() && eventDate.trim() && eventTime.trim());
+      let message = "Added to your wardrobe.";
+      if (scheduleComplete) {
+        try {
+          const suggestion = await postScheduleEvent(snapshot);
+          message = suggestion?.suggestion
+            ? `Saved to your wardrobe and scheduled.\n\nBest for this date: ${suggestion.suggestion}`
+            : "Saved to your wardrobe and scheduled.";
+        } catch (scheduleError) {
+          console.log("Schedule save error:", scheduleError);
+          message = "Saved to your wardrobe. The dressing event could not be saved - try again from the Scheduled Events section.";
+        }
       }
 
-      Alert.alert(
-        "Saved",
-        scheduleStarted
-          ? "Added to your wardrobe. Finish the dressing event below."
-          : "Added to your wardrobe."
-      );
-    } catch (error: any) {
-      console.log("Save error:", error);
-      Alert.alert("Save failed", error.message || "Could not save item.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const saveScheduleEvent = async () => {
-    if (!savedItemId) {
-      Alert.alert(
-        "Save item first",
-        "Please save the wardrobe item before scheduling."
-      );
-      return;
-    }
-
-    if (!eventName || !eventDate || !eventTime) {
-      Alert.alert("Missing details", "Enter event name, date, and time.");
-      return;
-    }
-
-    const item = lastSaved ?? prediction ?? {};
-
-    try {
-      let scheduleSuggestion = null;
-
-      try {
-        const suggestionResponse = await axios.post(`${API_URL}/schedule/suggestion`, {
-          items: [{
-            id: savedItemId,
-            type: item.type,
-            color: item.color,
-            gender: item.gender,
-            season: item.season,
-            material: item.material,
-            processedImageUrl: item.processedImageUrl,
-          }],
-          event: {
-            eventName,
-            eventDate,
-            eventTime,
-          },
-        });
-        scheduleSuggestion = suggestionResponse.data;
-      } catch (suggestionError) {
-        console.log("Schedule suggestion error:", suggestionError);
-      }
-
-      await axios.post(`${WARDROBE_URL}/schedule`, {
-        wardrobe_item_id: savedItemId,
-        event_name: eventName,
-        event_date: eventDate,
-        event_time: eventTime,
-        notes: eventNotes,
-        clothing_type: item.type,
-        clothing_color: item.color,
-        processed_image_url: item.processedImageUrl,
-        trend_suggestion: scheduleSuggestion,
-      });
-
+      // Collapse and reset the schedule form.
       setEventName("");
       setEventDate("");
       setEventTime("");
       setEventNotes("");
 
-      // Collapse the schedule section once the event is saved.
-      setEventSuggestion(null);
-      setSavedItemId(null);
-      setLastSaved(null);
-
-      const tip = scheduleSuggestion?.suggestion
-        ? `\n\nBest for this date: ${scheduleSuggestion.suggestion}`
-        : "";
-      Alert.alert("Scheduled", `Dressing event saved.${tip}`);
-    } catch (error) {
-      console.log("Schedule error:", error);
-      Alert.alert("Schedule failed", "Could not save event.");
+      Alert.alert("Saved", message);
+    } catch (error: any) {
+      console.log("Save error:", error);
+      Alert.alert("Save failed", error.message || "Could not save item.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -588,19 +551,19 @@ export default function App() {
               disabled={saving}
             >
               <Text style={styles.buttonText}>
-                {saving ? "Saving..." : "Save to Wardrobe"}
+                {saving
+                  ? "Saving..."
+                  : eventName.trim() && eventDate.trim() && eventTime.trim()
+                  ? "Save to Wardrobe & Schedule"
+                  : "Save to Wardrobe"}
               </Text>
             </TouchableOpacity>
-
-            {savedItemId && (
-              <Text style={styles.savedText}>Saved Item ID: {savedItemId}</Text>
-            )}
           </View>
         )}
 
-        {(prediction || savedItemId) && (
+        {prediction && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Schedule Dressing Event</Text>
+            <Text style={styles.sectionTitle}>Schedule Dressing Event (optional)</Text>
 
             <TextInput
               style={styles.input}
@@ -635,22 +598,9 @@ export default function App() {
               multiline
             />
 
-            <TouchableOpacity
-              style={[styles.scheduleButton, !savedItemId && styles.disabledButton]}
-              onPress={saveScheduleEvent}
-              disabled={!savedItemId}
-            >
-              <Text style={styles.buttonText}>
-                {savedItemId ? "Save Schedule" : "Save the item to wardrobe first"}
-              </Text>
-            </TouchableOpacity>
-
-            {eventSuggestion?.suggestion && (
-              <View style={styles.eventSuggestionBox}>
-                <Text style={styles.eventSuggestionTitle}>Best For This Date</Text>
-                <Text style={styles.eventSuggestionText}>{eventSuggestion.suggestion}</Text>
-              </View>
-            )}
+            <Text style={styles.savedInfo}>
+              Fill event name, date and time to save this dressing event together with the item. Leave blank to save the item only.
+            </Text>
           </View>
         )}
 
