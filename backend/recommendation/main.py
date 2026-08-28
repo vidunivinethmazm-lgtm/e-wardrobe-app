@@ -208,18 +208,50 @@ async def recommend(
             return embeddings[indices].mean(dim=0)
         return embeddings.mean(dim=0)
 
+    # Fabric families - covers both the recommender's own vocabulary and the
+    # materials the classification model produces (denim, leather, suede, ...).
+    WARM_FABRICS  = ('wool', 'polyester', 'fleece', 'leather', 'velvet', 'denim', 'knit', 'suede', 'nylon')
+    COOL_FABRICS  = ('linen', 'cotton', 'viscose', 'rayon', 'chambray')
+    LIGHT_FABRICS = ('silk', 'chiffon', 'georgette', 'satin', 'organza')
+    WET_WEATHER   = ('rain', 'drizzle', 'thunderstorm', 'snow', 'squall')
+
     def temperature_score(fabric: str) -> float:
         f = fabric.lower() if fabric else ''
         if temperature < 18:
-            if f in ['wool', 'polyester']:   return  0.15
-            if f in ['linen', 'cotton']:     return  0.05
-            if f in ['silk', 'chiffon', 'georgette', 'rayon', 'viscose']: return -0.10
+            if any(k in f for k in WARM_FABRICS):  return  0.15
+            if any(k in f for k in COOL_FABRICS):  return  0.05
+            if any(k in f for k in LIGHT_FABRICS): return -0.10
         elif temperature < 25:
             return 0.05
         else:
-            if f in ['linen', 'cotton', 'viscose', 'rayon']: return  0.10
-            if f in ['wool', 'polyester']:   return -0.10
+            if any(k in f for k in COOL_FABRICS):  return  0.10
+            if any(k in f for k in LIGHT_FABRICS): return  0.03
+            if any(k in f for k in WARM_FABRICS):  return -0.10
         return 0.0
+
+    def weather_score(fabric: str) -> float:
+        """How the fabric copes with the current sky and humidity for `city`."""
+        f = fabric.lower() if fabric else ''
+        w = weather.lower() if weather else ''
+        s = 0.0
+
+        if any(k in w for k in WET_WEATHER):
+            if any(k in f for k in ('suede', 'silk', 'satin', 'velvet', 'linen')):
+                s -= 0.12                      # water-sensitive
+            if any(k in f for k in ('polyester', 'nylon', 'denim', 'wool', 'fleece')):
+                s += 0.10                      # quick-dry / water-shedding / durable
+        elif 'clear' in w:
+            if any(k in f for k in ('linen', 'cotton', 'chambray')):
+                s += 0.10                      # breathable under direct sun
+            if any(k in f for k in ('wool', 'fleece', 'leather', 'velvet', 'denim')):
+                s -= 0.10                      # heat traps
+
+        if humidity >= 75:
+            if any(k in f for k in ('linen', 'cotton', 'viscose', 'rayon')):
+                s += 0.08
+            if any(k in f for k in ('polyester', 'nylon', 'silk', 'leather')):
+                s -= 0.08                      # clammy / sticky in humid air
+        return s
 
     def explain(outfit_name: str, fabric: str, color: str, is_suitable: bool, similarity: float, event_type: str) -> str:
         f = fabric.lower() if fabric else ''
@@ -261,15 +293,26 @@ async def recommend(
                 parts.append("Too lightweight for cold outdoor conditions")
 
         if temperature < 18:
-            if f in ['wool', 'polyester']:
-                parts.append(f"Warm fabric suits {temperature:.0f}°C cool weather")
-            elif f in ['silk', 'chiffon', 'rayon']:
+            if any(k in f for k in WARM_FABRICS):
+                parts.append(f"Warm fabric suits {temperature:.0f}°C in {city}")
+            elif any(k in f for k in LIGHT_FABRICS):
                 parts.append(f"Too thin for {temperature:.0f}°C — consider layering")
         elif temperature > 28:
-            if f in ['linen', 'cotton', 'viscose']:
-                parts.append(f"Breathable fabric ideal for {temperature:.0f}°C heat")
-            elif f == 'wool':
+            if any(k in f for k in COOL_FABRICS):
+                parts.append(f"Breathable fabric ideal for {temperature:.0f}°C heat in {city}")
+            elif any(k in f for k in WARM_FABRICS):
                 parts.append(f"Heavy fabric — may be too warm at {temperature:.0f}°C")
+
+        w = weather.lower() if weather else ''
+        if any(k in w for k in WET_WEATHER):
+            if any(k in f for k in ('suede', 'silk', 'satin', 'velvet')):
+                parts.append(f"{weather} in {city} — {fabric} is easily marked by water")
+            elif any(k in f for k in ('polyester', 'nylon', 'denim', 'wool')):
+                parts.append(f"{weather} in {city} — {fabric} shrugs off wet weather")
+        elif 'clear' in w and any(k in f for k in ('linen', 'cotton')):
+            parts.append(f"Clear skies in {city} — a breathable weave keeps you cool")
+        if humidity >= 75 and any(k in f for k in ('linen', 'cotton', 'viscose', 'rayon')):
+            parts.append(f"{humidity}% humidity — this fabric stays comfortable")
 
         if is_suitable:
             parts.append(f"NLP model: {fabric} suits this event type")
@@ -317,9 +360,13 @@ async def recommend(
         similarity     = similarity_scores[idx]
         event_score    = event_preference_score(outfit_name, fabric, event_type)
         temp_score     = temperature_score(fabric)
+        weather_s      = weather_score(fabric)
         color_s        = colour_score(color, event_type)
 
-        score = float(0.3 * category_match + 0.55 * similarity + 0.15 * event_score + temp_score + color_s)
+        score = float(
+            0.3 * category_match + 0.55 * similarity + 0.15 * event_score
+            + temp_score + weather_s + color_s
+        )
         confidence  = f"{min(100, max(0, int(score * 100)))}%"
         reason      = explain(outfit_name, fabric, color, is_suitable, similarity, event_type)
         combination = suggest_combination(item, wardrobe, event_type)
@@ -344,9 +391,15 @@ async def recommend(
         'event_class':       event_class,
         'location_detected': city,
         'weather':           weather,
+        'temperature':       round(temperature, 1),
+        'humidity':          humidity,
         'wardrobe_source':   wardrobe_source,
         'items_considered':  len(wardrobe),
-        'logic_summary':     f'Combined NLP intent, GNN wardrobe ranking, and colour harmony for {event_class}.',
+        'logic_summary': (
+            f'Ranked your wardrobe for {event_class} in {city} — '
+            f'{weather}, {temperature:.0f}°C, {humidity}% humidity — '
+            f'via NLP intent, GNN style match, and fabric/colour fit.'
+        ),
         'recommendations':   results[:3],
     }
 
