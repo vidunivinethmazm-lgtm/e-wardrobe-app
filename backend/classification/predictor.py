@@ -215,18 +215,23 @@ def extract_cloth_only(input_image: Image.Image, predicted_type: str) -> Image.I
 
     work = _limit_size(input_image.convert("RGBA"))
 
+    # Alpha matting gives the smoothest edge but needs a ~1.9 GB transient
+    # allocation per image - enough to tip this memory-constrained box over
+    # (it always fell back anyway). Set EWARDROBE_ALPHA_MATTING=1 to opt in.
+    use_matting = os.getenv("EWARDROBE_ALPHA_MATTING") == "1"
+    matting_opts = dict(
+        alpha_matting=True,
+        alpha_matting_foreground_threshold=240,
+        alpha_matting_background_threshold=10,
+        alpha_matting_erode_size=10,
+    ) if use_matting else {}
     try:
         matted = remove(
-            work,
-            session=get_subject_session(),
-            alpha_matting=True,
-            alpha_matting_foreground_threshold=240,
-            alpha_matting_background_threshold=10,
-            alpha_matting_erode_size=10,
-            post_process_mask=True,
+            work, session=get_subject_session(),
+            post_process_mask=True, **matting_opts,
         ).convert("RGBA")
     except Exception as exc:
-        print(f"Alpha-matted removal failed, using plain removal: {exc}")
+        print(f"Subject removal fallback ({type(exc).__name__}: {exc})")
         matted = remove(work, session=get_subject_session()).convert("RGBA")
 
     # The cloth parser is only a useful region gate when we can tell it which
@@ -295,7 +300,9 @@ def predict_clothing(image_path: str):
 
     # Preserve the established classifier input: the default rembg model
     # removes only the scene background and keeps the photographed subject.
-    subject_only = remove(input_image).convert("RGBA")
+    # Reuse the cached u2net session - a bare remove() rebuilds a 176 MB ONNX
+    # session on every request and eventually exhausts memory ("bad allocation").
+    subject_only = remove(input_image, session=get_subject_session()).convert("RGBA")
     rgb_image = Image.new("RGB", subject_only.size, "white")
     rgb_image.paste(subject_only, mask=subject_only.getchannel("A"))
 
