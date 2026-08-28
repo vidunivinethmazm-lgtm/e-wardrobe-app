@@ -606,8 +606,13 @@ export default function App() {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Saved Wardrobe Items</Text>
 
-          <TouchableOpacity style={styles.primaryButton} onPress={loadSavedDetails}>
-            <Text style={styles.buttonText}>View Saved Wardrobe Items</Text>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={wardrobeItems.length > 0 ? () => setWardrobeItems([]) : loadSavedDetails}
+          >
+            <Text style={styles.buttonText}>
+              {wardrobeItems.length > 0 ? "Hide Wardrobe Items" : "View Saved Wardrobe Items"}
+            </Text>
           </TouchableOpacity>
 
           {wardrobeItems.map((item) => {
@@ -771,8 +776,13 @@ export default function App() {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Scheduled Dressing Events</Text>
 
-          <TouchableOpacity style={styles.scheduleButton} onPress={loadScheduledEvents}>
-            <Text style={styles.buttonText}>View Scheduled Events</Text>
+          <TouchableOpacity
+            style={styles.scheduleButton}
+            onPress={scheduledEvents.length > 0 ? () => setScheduledEvents([]) : loadScheduledEvents}
+          >
+            <Text style={styles.buttonText}>
+              {scheduledEvents.length > 0 ? "Hide Scheduled Events" : "View Scheduled Events"}
+            </Text>
           </TouchableOpacity>
 
           {scheduledEvents.map((event) => (
