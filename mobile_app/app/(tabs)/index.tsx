@@ -210,8 +210,7 @@ export default function App() {
         processedImageUrl,
       });
 
-      // Collapse the prediction result now that it's saved - the upload box
-      // and the "Schedule Dressing Event" step (gated on savedItemId) remain.
+      // Collapse the prediction result now that it's saved.
       setPrediction(null);
       setTrendAnalysis(null);
       setProcessedImageUrl(null);
@@ -220,7 +219,21 @@ export default function App() {
       setImage(null);
       setBackImage(null);
 
-      Alert.alert("Saved", "Added to your wardrobe.");
+      // Keep the "Schedule Dressing Event" form open only if the user has
+      // already started filling it in; otherwise collapse that too.
+      const scheduleStarted =
+        !!(eventName.trim() || eventDate.trim() || eventTime.trim() || eventNotes.trim());
+      if (!scheduleStarted) {
+        setSavedItemId(null);
+        setLastSaved(null);
+      }
+
+      Alert.alert(
+        "Saved",
+        scheduleStarted
+          ? "Added to your wardrobe. Finish the dressing event below."
+          : "Added to your wardrobe."
+      );
     } catch (error: any) {
       console.log("Save error:", error);
       Alert.alert("Save failed", error.message || "Could not save item.");
@@ -585,7 +598,7 @@ export default function App() {
           </View>
         )}
 
-        {savedItemId && (
+        {(prediction || savedItemId) && (
           <View style={styles.card}>
             <Text style={styles.sectionTitle}>Schedule Dressing Event</Text>
 
@@ -622,8 +635,14 @@ export default function App() {
               multiline
             />
 
-            <TouchableOpacity style={styles.scheduleButton} onPress={saveScheduleEvent}>
-              <Text style={styles.buttonText}>Save Schedule</Text>
+            <TouchableOpacity
+              style={[styles.scheduleButton, !savedItemId && styles.disabledButton]}
+              onPress={saveScheduleEvent}
+              disabled={!savedItemId}
+            >
+              <Text style={styles.buttonText}>
+                {savedItemId ? "Save Schedule" : "Save the item to wardrobe first"}
+              </Text>
             </TouchableOpacity>
 
             {eventSuggestion?.suggestion && (
