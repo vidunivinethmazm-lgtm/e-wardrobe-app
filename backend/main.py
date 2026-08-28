@@ -28,8 +28,8 @@ app = FastAPI(title="E-Wardrobe AI")
 FEATURES = {
     "/classification": "backend.classification.main:app",
     "/recommendation": "backend.recommendation.main:app",
+    "/organization":  "backend.organization.main:app",
     # "/visualization": "backend.visualization.main:app",
-    # "/organization":  "backend.organization.main:app",
 }
 
 _mounted: list[str] = []

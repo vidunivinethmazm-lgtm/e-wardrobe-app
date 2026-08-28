@@ -16,3 +16,7 @@ scipy
 torch-geometric
 scikit-learn
 pandas
+
+# organization
+sqlalchemy
+joblib
