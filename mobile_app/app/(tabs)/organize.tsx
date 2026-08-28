@@ -1,220 +1,537 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+  View, Text, ScrollView, TouchableOpacity, StyleSheet,
+  StatusBar, ActivityIndicator, RefreshControl, Alert,
+} from 'react-native';
+import axios from 'axios';
 
-import axios from "axios";
+import { ORGANIZATION_URL } from '../../constants/api';
 
-import { ORGANIZATION_URL } from "../../constants/api";
+// ── Theme (from SmartWardrobeApp/src/theme/colors.js) ───────────────────────
 
-const SECTION_ORDER = ["A", "B", "C", "D"];
+const COLORS = {
+  primary: '#5C4033', primaryDark: '#3E2723', primaryLight: '#8D6E63', accent: '#FF8F00',
+  background: '#FFF8F0', surface: '#FFFFFF',
+  clean: '#C8E6C9', cleanText: '#2E7D32', dirty: '#FFCDD2', dirtyText: '#C62828', dirtyBg: '#FFEBEE',
+  scoreGood: '#4CAF50', scoreMid: '#FF9800', scoreLow: '#F44336',
+  zoneHome: '#E8F5E9', zoneCasual: '#E3F2FD', zoneOffice: '#F3E5F5', zoneReligious: '#FFF3E0', zoneWedding: '#FCE4EC',
+  textPrimary: '#3E2723', textSecondary: '#6D4C41', textMuted: '#9E9E9E',
+  border: '#E0E0E0', divider: '#F5F5F5', topBar: '#5C4033', topBarSub: '#D7B89C',
+};
 
-export default function OrganizeScreen() {
-  const [loading, setLoading] = useState(false);
-  const [rowBusy, setRowBusy] = useState<string | null>(null);
-  const [items, setItems] = useState<any[]>([]);
-  const [layout, setLayout] = useState<any>(null);
-  const [insights, setInsights] = useState<any>(null);
+// ── API (integrated backend mounts organization under /organization) ─────────
 
-  const load = async () => {
-    try {
-      setLoading(true);
-      const [orgRes, layoutRes, insightRes] = await Promise.all([
-        axios.get(`${ORGANIZATION_URL}/items/organized`),
-        axios.get(`${ORGANIZATION_URL}/wardrobe/layout`),
-        axios.get(`${ORGANIZATION_URL}/items/insights`),
-      ]);
-      setItems(orgRes.data);
-      setLayout(layoutRes.data);
-      setInsights(insightRes.data);
-    } catch (error: any) {
-      console.log("Organize error:", error);
-      Alert.alert("Could not organize", error.message || "Check the backend server.");
-    } finally {
-      setLoading(false);
-    }
-  };
+const api = axios.create({ baseURL: ORGANIZATION_URL, timeout: 10000 });
+const fetchOrganizedItems  = () => api.get('/items/organized').then(r => r.data);
+const fetchInsights        = () => api.get('/items/insights').then(r => r.data);
+const fetchWardrobeLayout  = () => api.get('/wardrobe/layout').then(r => r.data);
+const wearItem  = (id: string) => api.post(`/items/wear/${id}`).then(r => r.data);
+const washItem  = (id: string) => api.post(`/items/wash/${id}`).then(r => r.data);
+const itemId    = (i: any) => i.item_id ?? i.item_id_str ?? i.id;
 
-  const act = async (itemId: string, action: "wear" | "wash") => {
-    try {
-      setRowBusy(itemId + action);
-      await axios.post(`${ORGANIZATION_URL}/items/${action}/${itemId}`);
-      await load();
-    } catch (error: any) {
-      console.log("Wear/wash error:", error);
-      Alert.alert("Action failed", error.message || "Try again.");
-    } finally {
-      setRowBusy(null);
-    }
-  };
+// ── Constants ────────────────────────────────────────────────────────────────
 
-  const grouped = SECTION_ORDER.map((sec) => ({
-    section: sec,
-    items: items.filter((i) => i.wardrobe_section === sec),
-  })).filter((g) => g.items.length > 0);
+const SECTION_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  A: { bg: '#E8F5E9', text: '#2E7D32', border: '#A5D6A7' },
+  B: { bg: '#E3F2FD', text: '#1565C0', border: '#90CAF9' },
+  C: { bg: '#FFF8E1', text: '#F57F17', border: '#FFE082' },
+  D: { bg: '#F3E5F5', text: '#6A1B9A', border: '#CE93D8' },
+};
+
+const ZONES = [
+  { occasion: 'Home',      label: '🏠 Daily Essentials', bg: COLORS.zoneHome },
+  { occasion: 'Casual',    label: '👕 Casual Wear',      bg: COLORS.zoneCasual },
+  { occasion: 'Office',    label: '👔 Office Wear',       bg: COLORS.zoneOffice },
+  { occasion: 'Religious', label: '🙏 Occasion Wear',     bg: COLORS.zoneReligious },
+  { occasion: 'Wedding',   label: '💍 Special Events',    bg: COLORS.zoneWedding },
+];
+
+const TABS = [
+  { label: 'Wardrobe', icon: '👗' },
+  { label: 'Insights', icon: '💡' },
+  { label: 'Laundry',  icon: '🧺' },
+];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const scoreColor = (score: number) => {
+  if (score > 70) return COLORS.scoreGood;
+  if (score > 40) return COLORS.scoreMid;
+  return COLORS.scoreLow;
+};
+
+// Backend stores sustainability_score as a 0–1 float; the reference UI expects 0–100.
+const normScore = (s: number) => {
+  const v = Number(s ?? 0);
+  return Math.round(v <= 1 ? v * 100 : v);
+};
+
+// ── Sub-components ───────────────────────────────────────────────────────────
+
+const ItemCard = ({ item, onWear }: any) => {
+  const score = normScore(item.sustainability_score);
+  const section = item.wardrobe_section ?? '?';
+  const secColor = SECTION_COLORS[section] ?? { bg: '#F5F5F5', text: '#757575', border: '#E0E0E0' };
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" />
-
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Wardrobe Organization</Text>
-        <Text style={styles.subtitle}>
-          Your saved clothes clustered into zones, with wear &amp; wash tracking
-        </Text>
-
-        <TouchableOpacity
-          style={[styles.primaryButton, loading && styles.disabledButton]}
-          onPress={load}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#ffffff" />
-          ) : (
-            <Text style={styles.buttonText}>Organize My Wardrobe</Text>
-          )}
-        </TouchableOpacity>
-
-        {insights && (
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Insights</Text>
-            <View style={styles.statRow}>
-              <View style={styles.statBox}>
-                <Text style={styles.statValue}>{insights.dirty_count}</Text>
-                <Text style={styles.statLabel}>Need washing</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statValue}>{insights.overused?.length ?? 0}</Text>
-                <Text style={styles.statLabel}>Overused</Text>
-              </View>
-              <View style={styles.statBox}>
-                <Text style={styles.statValue}>{insights.underused?.length ?? 0}</Text>
-                <Text style={styles.statLabel}>Underused</Text>
-              </View>
-            </View>
-          </View>
-        )}
-
-        {layout && (
-          <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Wardrobe Layout ({layout.total_items} items)</Text>
-            {SECTION_ORDER.map((k) => {
-              const s = layout.sections[k];
-              return (
-                <View key={k} style={styles.layoutRow}>
-                  <Text style={styles.layoutSec}>{k}</Text>
-                  <View style={styles.layoutInfo}>
-                    <Text style={styles.layoutLabel}>{s.label}</Text>
-                    <Text style={styles.layoutLoc}>{s.location}</Text>
-                  </View>
-                  <Text style={styles.layoutCount}>{s.item_count}</Text>
-                </View>
-              );
-            })}
-          </View>
-        )}
-
-        {grouped.map((g) => (
-          <View key={g.section} style={styles.card}>
-            <Text style={styles.sectionTitle}>
-              Section {g.section} · {g.items[0].section_label}
-            </Text>
-
-            {g.items.map((item) => (
-              <View key={item.item_id} style={styles.itemCard}>
-                <View style={styles.itemHeader}>
-                  <Text style={styles.itemName}>{item.name}</Text>
-                  <Text
-                    style={[
-                      styles.badge,
-                      item.status === "Dirty" ? styles.badgeDirty : styles.badgeClean,
-                    ]}
-                  >
-                    {item.status}
-                  </Text>
-                </View>
-                <Text style={styles.itemMeta}>{item.position_label}</Text>
-                <Text style={styles.itemMeta}>
-                  Worn {item.total_wear_count}× · {item.current_cycle_wears}/{item.max_wears_before_wash} this cycle
-                </Text>
-
-                <View style={styles.actions}>
-                  <TouchableOpacity
-                    style={[styles.wearBtn, rowBusy === item.item_id + "wear" && styles.disabledButton]}
-                    onPress={() => act(item.item_id, "wear")}
-                    disabled={!!rowBusy}
-                  >
-                    <Text style={styles.actionText}>Wore it</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.washBtn, rowBusy === item.item_id + "wash" && styles.disabledButton]}
-                    onPress={() => act(item.item_id, "wash")}
-                    disabled={!!rowBusy}
-                  >
-                    <Text style={styles.actionText}>Washed it</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
-          </View>
-        ))}
-
-        {items.length === 0 && !loading && (
-          <Text style={styles.emptyText}>
-            Save some clothes in the Wardrobe tab, then organize them here.
+    <TouchableOpacity
+      style={[styles.card, item.status === 'Dirty' && styles.dirtyCard]}
+      onPress={() => onWear(item)}
+      activeOpacity={0.8}
+    >
+      <View style={styles.cardHeader}>
+        <Text style={styles.itemCategory} numberOfLines={1}>{item.category}</Text>
+        <View style={[styles.statusBadge, { backgroundColor: item.status === 'Clean' ? COLORS.clean : COLORS.dirty }]}>
+          <Text style={[styles.statusText, { color: item.status === 'Clean' ? COLORS.cleanText : COLORS.dirtyText }]}>
+            {item.status}
           </Text>
+        </View>
+      </View>
+
+      <Text style={styles.cardDetail}>{item.fabric} · {item.color}</Text>
+
+      <View style={styles.wearRow}>
+        <Text style={styles.wearLabel}>Cycle</Text>
+        <Text style={styles.wearCount}>{item.current_cycle_wears}/{item.max_wears_before_wash}</Text>
+      </View>
+
+      <View style={styles.scoreRow}>
+        <Text style={styles.scoreLabel}>Health</Text>
+        <View style={styles.scoreBarBg}>
+          <View style={[styles.scoreBarFill, { width: `${score}%`, backgroundColor: scoreColor(score) }]} />
+        </View>
+        <Text style={[styles.scoreNum, { color: scoreColor(score) }]}>{score}%</Text>
+      </View>
+
+      <View style={[styles.positionBadge, { backgroundColor: secColor.bg, borderColor: secColor.border }]}>
+        <Text style={[styles.positionText, { color: secColor.text }]}>
+          {item.section_label ?? `Section ${section}`}  ·  Slot {item.wardrobe_slot ?? '–'}
+        </Text>
+        <Text style={[styles.positionSub, { color: secColor.text }]}>{item.section_location ?? ''}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const StatCard = ({ value, label, bg }: any) => (
+  <View style={[styles.statCard, { backgroundColor: bg }]}>
+    <Text style={styles.statNum}>{value}</Text>
+    <Text style={styles.statLabel}>{label}</Text>
+  </View>
+);
+
+const WardrobeCapacityBar = ({ layout }: any) => {
+  if (!layout) return null;
+  const sections = [
+    { key: 'A', icon: '🏷️' }, { key: 'B', icon: '👕' },
+    { key: 'C', icon: '📦' }, { key: 'D', icon: '🗄️' },
+  ];
+  return (
+    <View style={styles.capacityCard}>
+      <Text style={styles.capacityTitle}>Wardrobe Position Map</Text>
+      <Text style={styles.capacitySub}>{layout.total_items} items auto-assigned by usage frequency</Text>
+      <View style={styles.capacityRow}>
+        {sections.map(({ key, icon }) => {
+          const sec = layout.sections[key];
+          const color = SECTION_COLORS[key];
+          return (
+            <View key={key} style={[styles.capacitySection, { backgroundColor: color.bg, borderColor: color.border }]}>
+              <Text style={styles.capacityIcon}>{icon}</Text>
+              <Text style={[styles.capacitySectionLabel, { color: color.text }]}>{sec.label}</Text>
+              <Text style={[styles.capacitySectionCount, { color: color.text }]}>{sec.item_count}</Text>
+              <Text style={styles.capacitySectionLoc} numberOfLines={1}>{sec.location}</Text>
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+};
+
+// ── Screens ──────────────────────────────────────────────────────────────────
+
+const WardrobeScreen = ({ items, layout, refreshing, onRefresh, onWear }: any) => (
+  <ScrollView
+    style={styles.screen}
+    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
+  >
+    <Text style={styles.screenTitle}>My Wardrobe</Text>
+    <Text style={styles.screenSub}>
+      {items.length} items · {items.filter((i: any) => i.status === 'Dirty').length} need washing
+    </Text>
+
+    <WardrobeCapacityBar layout={layout} />
+
+    {ZONES.map(zone => {
+      const zoneItems = items
+        .filter((i: any) => i.occasion === zone.occasion)
+        .sort((a: any, b: any) => {
+          const secOrder: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };
+          const secDiff = (secOrder[a.wardrobe_section] ?? 4) - (secOrder[b.wardrobe_section] ?? 4);
+          return secDiff !== 0 ? secDiff : (a.wardrobe_slot ?? 0) - (b.wardrobe_slot ?? 0);
+        });
+      if (zoneItems.length === 0) return null;
+      return (
+        <View key={zone.occasion} style={[styles.zone, { backgroundColor: zone.bg }]}>
+          <View style={styles.zoneHeader}>
+            <Text style={styles.zoneTitle}>{zone.label}</Text>
+            <Text style={styles.zoneCount}>{zoneItems.length} items</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {zoneItems.map((item: any) => (
+              <ItemCard key={itemId(item)} item={item} onWear={onWear} />
+            ))}
+          </ScrollView>
+        </View>
+      );
+    })}
+    <View style={{ height: 24 }} />
+  </ScrollView>
+);
+
+const InsightsScreen = ({ items, insights, refreshing, onRefresh }: any) => {
+  if (!insights) return <ActivityIndicator style={styles.centered} color={COLORS.primary} />;
+
+  const underusedItems = items.filter((i: any) => insights.underused?.includes(i.id));
+  const overusedItems  = items.filter((i: any) => insights.overused?.includes(i.id));
+  const cleanCount     = items.filter((i: any) => i.status === 'Clean').length;
+
+  return (
+    <ScrollView
+      style={styles.screen}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
+    >
+      <Text style={styles.screenTitle}>Smart Insights</Text>
+      <Text style={styles.screenSub}>Powered by ML anomaly detection</Text>
+
+      <View style={styles.statsRow}>
+        <StatCard value={items.length} label="Total" bg="#E3F2FD" />
+        <StatCard value={cleanCount} label="Clean" bg={COLORS.clean} />
+        <StatCard value={insights.dirty_count} label="Dirty" bg={COLORS.dirty} />
+      </View>
+
+      {insights.dirty_count >= 5 && (
+        <View style={styles.alertCard}>
+          <Text style={styles.alertTitle}>🧺 Laundry Fatigue Alert</Text>
+          <Text style={styles.alertBody}>
+            {insights.dirty_count} items are waiting to be washed. Time for a wash cycle!
+          </Text>
+        </View>
+      )}
+
+      {underusedItems.length > 0 && (
+        <View style={styles.insightSection}>
+          <Text style={styles.insightSectionTitle}>😴 Underutilized Items</Text>
+          <Text style={styles.insightSectionSub}>Worn far less than others — style them today!</Text>
+          {underusedItems.map((item: any) => (
+            <View key={itemId(item)} style={styles.insightRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.insightItemName}>{item.category}</Text>
+                <Text style={styles.insightItemDetail}>{item.fabric} · {item.total_wear_count} total wears</Text>
+              </View>
+              <Text style={[styles.insightScore, { color: COLORS.scoreGood }]}>{normScore(item.sustainability_score)}%</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {overusedItems.length > 0 && (
+        <View style={styles.insightSection}>
+          <Text style={styles.insightSectionTitle}>⚠️ Overused Items</Text>
+          <Text style={styles.insightSectionSub}>Worn far more than average — consider a quality check.</Text>
+          {overusedItems.map((item: any) => (
+            <View key={itemId(item)} style={styles.insightRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.insightItemName}>{item.category}</Text>
+                <Text style={styles.insightItemDetail}>{item.fabric} · {item.total_wear_count} total wears</Text>
+              </View>
+              <Text style={[styles.insightScore, { color: COLORS.scoreLow }]}>{normScore(item.sustainability_score)}%</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {underusedItems.length === 0 && overusedItems.length === 0 && (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>✅</Text>
+          <Text style={styles.emptyText}>All wear patterns look normal!</Text>
+        </View>
+      )}
+      <View style={{ height: 24 }} />
+    </ScrollView>
+  );
+};
+
+const LaundryScreen = ({ items, refreshing, onRefresh, onWash }: any) => {
+  const dirtyItems = items.filter((i: any) => i.status === 'Dirty');
+  return (
+    <ScrollView
+      style={styles.screen}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
+    >
+      <Text style={styles.screenTitle}>Laundry Queue</Text>
+      <Text style={styles.screenSub}>{dirtyItems.length} items need washing</Text>
+
+      {dirtyItems.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>✅</Text>
+          <Text style={styles.emptyText}>All items are clean!</Text>
+        </View>
+      ) : (
+        dirtyItems.map((item: any) => (
+          <View key={itemId(item)} style={styles.laundryRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.laundryName}>{item.category}</Text>
+              <Text style={styles.laundryDetail}>{item.fabric} · {item.color}</Text>
+              <Text style={styles.laundryWears}>
+                Worn {item.current_cycle_wears}/{item.max_wears_before_wash} times this cycle
+              </Text>
+            </View>
+            <TouchableOpacity style={styles.washBtn} onPress={() => onWash(item)}>
+              <Text style={styles.washBtnText}>Washed ✓</Text>
+            </TouchableOpacity>
+          </View>
+        ))
+      )}
+      <View style={{ height: 24 }} />
+    </ScrollView>
+  );
+};
+
+// ── Screen root ──────────────────────────────────────────────────────────────
+
+export default function OrganizeScreen() {
+  const [activeTab, setActiveTab]           = useState(0);
+  const [items, setItems]                   = useState<any[]>([]);
+  const [insights, setInsights]             = useState<any>(null);
+  const [wardrobeLayout, setWardrobeLayout] = useState<any>(null);
+  const [loading, setLoading]               = useState(true);
+  const [refreshing, setRefreshing]         = useState(false);
+  const [error, setError]                   = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    setError(null);
+    try {
+      const [organizedItems, smartInsights, layout] = await Promise.all([
+        fetchOrganizedItems(),
+        fetchInsights(),
+        fetchWardrobeLayout(),
+      ]);
+      setItems(organizedItems);
+      setInsights(smartInsights);
+      setWardrobeLayout(layout);
+    } catch {
+      setError('Could not reach the server.\nMake sure the backend is running:\n\nuvicorn backend.main:app --host 0.0.0.0 --port 8000');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(() => { setRefreshing(true); loadData(); }, [loadData]);
+
+  const handleWear = useCallback(async (item: any) => {
+    if (item.status === 'Dirty') {
+      Alert.alert('Item Dirty', 'Wash this item before wearing it again.');
+      return;
+    }
+    try {
+      await wearItem(itemId(item));
+      loadData();
+    } catch {
+      Alert.alert('Error', 'Could not record wear.');
+    }
+  }, [loadData]);
+
+  const handleWash = useCallback(async (item: any) => {
+    try {
+      await washItem(itemId(item));
+      loadData();
+    } catch {
+      Alert.alert('Error', 'Could not mark as washed.');
+    }
+  }, [loadData]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingScreen}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingText}>Loading your wardrobe...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.loadingScreen}>
+        <Text style={{ fontSize: 40, marginBottom: 16 }}>⚠️</Text>
+        <Text style={[styles.loadingText, { color: '#C62828', textAlign: 'center', paddingHorizontal: 32 }]}>{error}</Text>
+        <TouchableOpacity
+          style={{ marginTop: 24, backgroundColor: COLORS.primary, paddingHorizontal: 32, paddingVertical: 12, borderRadius: 24 }}
+          onPress={() => { setLoading(true); loadData(); }}
+        >
+          <Text style={{ color: '#FFF', fontWeight: '600' }}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor={COLORS.topBar} barStyle="light-content" />
+
+      <View style={styles.topBar}>
+        <Text style={styles.appTitle}>Smart Wardrobe</Text>
+        <Text style={styles.appSubtitle}>Sri Lanka Edition</Text>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        {activeTab === 0 && (
+          <WardrobeScreen
+            items={items} layout={wardrobeLayout}
+            refreshing={refreshing} onRefresh={onRefresh}
+            onWear={handleWear}
+          />
         )}
-      </ScrollView>
-    </SafeAreaView>
+        {activeTab === 1 && (
+          <InsightsScreen
+            items={items} insights={insights}
+            refreshing={refreshing} onRefresh={onRefresh}
+          />
+        )}
+        {activeTab === 2 && (
+          <LaundryScreen
+            items={items} refreshing={refreshing}
+            onRefresh={onRefresh} onWash={handleWash}
+          />
+        )}
+      </View>
+
+      <View style={styles.tabBar}>
+        {TABS.map((tab, i) => {
+          const active = activeTab === i;
+          return (
+            <TouchableOpacity key={i} style={styles.tabItem} onPress={() => setActiveTab(i)} activeOpacity={0.8}>
+              <View style={[styles.tabPill, active && styles.tabPillActive]}>
+                <Text style={[styles.tabIcon, active && styles.tabIconActive]}>{tab.icon}</Text>
+                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
   );
 }
 
+// ── Styles (from SmartWardrobeApp/App.js) ───────────────────────────────────
+
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: "#080C18" },
-  container: { padding: 18, paddingBottom: 48, maxWidth: 640, width: "100%", alignSelf: "center" },
+  container:      { flex: 1, backgroundColor: COLORS.background },
+  loadingScreen:  { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
+  loadingText:    { marginTop: 12, color: COLORS.primary, fontSize: 16 },
+  centered:       { marginTop: 60 },
 
-  title: { fontSize: 30, fontWeight: "800", color: "#F8FAFC", textAlign: "center", letterSpacing: -0.5, marginTop: 24 },
-  subtitle: { fontSize: 14, color: "#8A97AD", textAlign: "center", lineHeight: 20, marginTop: 10, marginBottom: 22, paddingHorizontal: 12 },
+  topBar:         { backgroundColor: COLORS.topBar, paddingHorizontal: 20, paddingVertical: 14 },
+  appTitle:       { color: '#FFF', fontSize: 22, fontWeight: 'bold' },
+  appSubtitle:    { color: COLORS.topBarSub, fontSize: 12 },
 
-  primaryButton: { backgroundColor: "#8B5CF6", paddingVertical: 15, borderRadius: 14, alignItems: "center", marginBottom: 16 },
-  disabledButton: { backgroundColor: "#334155" },
-  buttonText: { color: "#ffffff", fontSize: 15, fontWeight: "700", letterSpacing: 0.3 },
+  screen:         { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
+  screenTitle:    { fontSize: 22, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 2 },
+  screenSub:      { fontSize: 13, color: COLORS.primaryLight, marginBottom: 16 },
 
-  card: { backgroundColor: "#111A2E", borderRadius: 20, padding: 20, marginBottom: 16, borderWidth: 1, borderColor: "#1F2A44" },
-  sectionTitle: { fontSize: 16, fontWeight: "800", color: "#F1F5F9", marginBottom: 12, letterSpacing: -0.2 },
+  zone:           { borderRadius: 14, padding: 14, marginBottom: 16 },
+  zoneHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  zoneTitle:      { fontSize: 15, fontWeight: '700', color: COLORS.textPrimary },
+  zoneCount:      { fontSize: 12, color: COLORS.textSecondary },
 
-  statRow: { flexDirection: "row", gap: 10 },
-  statBox: { flex: 1, backgroundColor: "#0B1220", borderRadius: 14, padding: 14, borderWidth: 1, borderColor: "#1F2A44" },
-  statValue: { color: "#F1F5F9", fontSize: 22, fontWeight: "900" },
-  statLabel: { color: "#8A97AD", fontSize: 11, marginTop: 4, textTransform: "uppercase", letterSpacing: 0.5 },
+  card: {
+    backgroundColor: COLORS.surface, padding: 14, borderRadius: 12,
+    marginRight: 12, width: 165, elevation: 3,
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
+  },
+  dirtyCard:      { backgroundColor: COLORS.dirtyBg },
+  cardHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  itemCategory:   { fontSize: 14, fontWeight: 'bold', color: COLORS.textPrimary, flex: 1, marginRight: 4 },
+  statusBadge:    { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 },
+  statusText:     { fontSize: 9, fontWeight: '700' },
+  cardDetail:     { fontSize: 11, color: COLORS.primaryLight, marginBottom: 8 },
+  wearRow:        { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
+  wearLabel:      { fontSize: 11, color: COLORS.textMuted },
+  wearCount:      { fontSize: 11, fontWeight: '600', color: COLORS.primary },
+  scoreRow:       { flexDirection: 'row', alignItems: 'center' },
+  scoreLabel:     { fontSize: 10, color: COLORS.textMuted, width: 34 },
+  scoreBarBg:     { flex: 1, height: 6, backgroundColor: '#EEEEEE', borderRadius: 3, marginHorizontal: 4 },
+  scoreBarFill:   { height: 6, borderRadius: 3 },
+  scoreNum:       { fontSize: 10, fontWeight: '700', width: 30, textAlign: 'right' },
+  positionBadge:  { marginTop: 8, borderRadius: 6, borderWidth: 1, paddingHorizontal: 6, paddingVertical: 4 },
+  positionText:   { fontSize: 9, fontWeight: '700' },
+  positionSub:    { fontSize: 8, marginTop: 1, opacity: 0.8 },
 
-  layoutRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8 },
-  layoutSec: { color: "#C7D2FE", fontSize: 18, fontWeight: "900", width: 24, textAlign: "center" },
-  layoutInfo: { flex: 1 },
-  layoutLabel: { color: "#F1F5F9", fontSize: 14, fontWeight: "700" },
-  layoutLoc: { color: "#8A97AD", fontSize: 12 },
-  layoutCount: { color: "#818CF8", fontSize: 16, fontWeight: "800" },
+  capacityCard: {
+    backgroundColor: COLORS.surface, borderRadius: 14, padding: 14,
+    marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4,
+  },
+  capacityTitle:  { fontSize: 14, fontWeight: '700', color: COLORS.textPrimary, marginBottom: 2 },
+  capacitySub:    { fontSize: 11, color: COLORS.primaryLight, marginBottom: 10 },
+  capacityRow:    { flexDirection: 'row', gap: 8 },
+  capacitySection:{ flex: 1, borderRadius: 10, borderWidth: 1, padding: 8, alignItems: 'center' },
+  capacityIcon:         { fontSize: 16, marginBottom: 3 },
+  capacitySectionLabel: { fontSize: 9, fontWeight: '700', textAlign: 'center' },
+  capacitySectionCount: { fontSize: 18, fontWeight: 'bold', marginTop: 2 },
+  capacitySectionLoc:   { fontSize: 8, color: '#888', marginTop: 2, textAlign: 'center' },
 
-  itemCard: { backgroundColor: "#0B1220", borderRadius: 14, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: "#1F2A44" },
-  itemHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 10 },
-  itemName: { color: "#F1F5F9", fontSize: 15, fontWeight: "800", flex: 1, letterSpacing: -0.2 },
-  badge: { borderRadius: 10, borderWidth: 1, fontSize: 11, fontWeight: "800", paddingHorizontal: 8, paddingVertical: 3 },
-  badgeClean: { color: "#34D399", borderColor: "#1C7F5C" },
-  badgeDirty: { color: "#FCA5A5", borderColor: "#7F1D1D" },
-  itemMeta: { color: "#AEB9CC", fontSize: 12, marginTop: 5 },
+  statsRow:       { flexDirection: 'row', gap: 10, marginBottom: 16 },
+  statCard:       { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
+  statNum:        { fontSize: 26, fontWeight: 'bold', color: COLORS.textPrimary },
+  statLabel:      { fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
 
-  actions: { flexDirection: "row", gap: 10, marginTop: 12 },
-  wearBtn: { flex: 1, backgroundColor: "#6366F1", paddingVertical: 11, borderRadius: 12, alignItems: "center" },
-  washBtn: { flex: 1, backgroundColor: "#1E293B", paddingVertical: 11, borderRadius: 12, alignItems: "center", borderWidth: 1, borderColor: "#2E3B54" },
-  actionText: { color: "#ffffff", fontSize: 14, fontWeight: "700" },
+  alertCard:      { backgroundColor: '#FFF3E0', borderLeftWidth: 4, borderLeftColor: COLORS.accent, padding: 14, borderRadius: 10, marginBottom: 16 },
+  alertTitle:     { fontWeight: 'bold', color: '#E65100', marginBottom: 4 },
+  alertBody:      { color: COLORS.textSecondary, fontSize: 13, lineHeight: 20 },
 
-  emptyText: { color: "#8A97AD", fontSize: 14, textAlign: "center", marginTop: 20, lineHeight: 20 },
+  insightSection: {
+    backgroundColor: COLORS.surface, borderRadius: 12, padding: 14, marginBottom: 16,
+    elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4,
+  },
+  insightSectionTitle: { fontSize: 16, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 2 },
+  insightSectionSub:   { fontSize: 12, color: COLORS.primaryLight, marginBottom: 10 },
+  insightRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 8, borderTopWidth: 1, borderTopColor: COLORS.divider,
+  },
+  insightItemName:   { fontSize: 14, fontWeight: '600', color: COLORS.textPrimary },
+  insightItemDetail: { fontSize: 12, color: COLORS.primaryLight, marginTop: 1 },
+  insightScore:      { fontSize: 17, fontWeight: 'bold' },
+
+  laundryRow: {
+    backgroundColor: COLORS.surface, borderRadius: 12, padding: 14, marginBottom: 10,
+    flexDirection: 'row', alignItems: 'center',
+    elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4,
+  },
+  laundryName:   { fontSize: 15, fontWeight: 'bold', color: COLORS.textPrimary },
+  laundryDetail: { fontSize: 12, color: COLORS.primaryLight, marginTop: 1 },
+  laundryWears:  { fontSize: 11, color: COLORS.textMuted, marginTop: 3 },
+  washBtn:       { backgroundColor: COLORS.primary, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
+  washBtnText:   { color: '#FFF', fontSize: 12, fontWeight: '600' },
+
+  emptyState:    { alignItems: 'center', paddingTop: 60 },
+  emptyEmoji:    { fontSize: 52 },
+  emptyText:     { fontSize: 16, color: COLORS.primaryLight, marginTop: 12 },
+
+  tabBar: {
+    flexDirection: 'row', backgroundColor: COLORS.surface,
+    borderTopWidth: 1, borderTopColor: COLORS.border,
+    paddingVertical: 8, paddingHorizontal: 8,
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: -3 }, elevation: 12,
+  },
+  tabItem:        { flex: 1, alignItems: 'center' },
+  tabPill:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 7, paddingHorizontal: 14, borderRadius: 24, gap: 5 },
+  tabPillActive:  { backgroundColor: '#F3EBE7' },
+  tabIcon:        { fontSize: 18 },
+  tabIconActive:  { fontSize: 20 },
+  tabLabel:       { fontSize: 12, color: COLORS.textMuted, fontWeight: '500' },
+  tabLabelActive: { color: COLORS.primary, fontWeight: '700' },
 });
