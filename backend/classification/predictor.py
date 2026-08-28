@@ -22,7 +22,7 @@ os.environ.setdefault("U2NET_HOME", str(PROJECT_DIR / "models" / "rembg"))
 from rembg import new_session, remove
 from torchvision import transforms
 
-from backend.classification.material_detector import predict_material
+from backend.classification.material_detector import predict_garment_type, predict_material
 
 from backend.classification.models_loader import (
     device,
@@ -228,22 +228,26 @@ def extract_cloth_only(input_image: Image.Image, predicted_type: str) -> Image.I
         print(f"Alpha-matted removal failed, using plain removal: {exc}")
         matted = remove(work, session=get_subject_session()).convert("RGBA")
 
+    # The cloth parser is only a useful region gate when we can tell it which
+    # half of the body to look at. Without a category (dresses, gowns, sarees,
+    # jumpsuits, ...) it returns a stacked 3-panel mask that can't be used, so
+    # fall back to the matted full-subject cut-out.
     region = None
-    try:
-        cloth_options = {"cloth_category": cloth_category} if cloth_category else {}
-        parsed = remove(
-            work,
-            session=get_cloth_session(),
-            post_process_mask=True,
-            **cloth_options,
-        ).convert("RGBA")
-        region = _cloth_region(np.asarray(parsed.getchannel("A")))
-    except Exception as exc:
-        print(f"Cloth parsing skipped: {exc}")
+    if cloth_category:
+        try:
+            parsed = remove(
+                work,
+                session=get_cloth_session(),
+                post_process_mask=True,
+                cloth_category=cloth_category,
+            ).convert("RGBA")
+            region = _cloth_region(np.asarray(parsed.getchannel("A")))
+        except Exception as exc:
+            print(f"Cloth parsing skipped: {exc}")
 
-    if region is not None:
-        matted_alpha = np.asarray(matted.getchannel("A")).astype(np.float32)
-        garment_alpha = np.clip(matted_alpha * region, 0, 255).astype(np.uint8)
+    matted_alpha = np.asarray(matted.getchannel("A"))
+    if region is not None and region.shape == matted_alpha.shape:
+        garment_alpha = np.clip(matted_alpha.astype(np.float32) * region, 0, 255).astype(np.uint8)
         result = matted.copy()
         result.putalpha(Image.fromarray(garment_alpha, mode="L"))
     else:
@@ -300,6 +304,16 @@ def predict_clothing(image_path: str):
     color_result = predict_attribute(color_model, color_idx_to_class, image_tensor)
     gender_result = predict_attribute(gender_model, gender_idx_to_class, image_tensor)
     season_result = predict_attribute(season_model, season_idx_to_class, image_tensor)
+
+    # The 23-class article-type model has no Dress / Skirt / Saree / Gown /
+    # Jacket / etc. A zero-shot CLIP pass over the full garment vocabulary
+    # overrides it whenever it confidently sees one of those missing types.
+    try:
+        garment = predict_garment_type(input_image)
+        if not garment["is_native"] and garment["confidence"] >= 0.30:
+            type_result = {"label": garment["label"], "confidence": garment["confidence"]}
+    except Exception as exc:
+        print(f"Garment-type refinement unavailable: {exc}")
 
     predicted_type = type_result["label"]
     cloth_only = extract_cloth_only(input_image, predicted_type)

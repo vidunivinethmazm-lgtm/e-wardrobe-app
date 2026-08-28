@@ -10,16 +10,27 @@ from uuid import uuid4
 
 # Article type (classification) -> coarse category (recommendation)
 TYPE_TO_CATEGORY = {
+    # tops / upper
     "Tshirts": "top", "Shirts": "top", "Tops": "top", "Kurtas": "top",
+    "Blazers": "top", "Jackets": "top", "Coats": "top", "Sweaters": "top",
+    "Cardigans": "top", "Sweatshirts": "top", "Shrugs": "top", "Shawls": "top",
+    # bottoms
     "Trousers": "bottom", "Jeans": "bottom", "Shorts": "bottom", "Briefs": "bottom",
-    "Dresses": "dress",
+    "Skirts": "bottom", "Leggings": "bottom", "Trackpants": "bottom",
+    # one-piece / dress family
+    "Dresses": "dress", "Gowns": "dress", "Jumpsuits": "dress",
+    "Saree": "dress", "Lehenga": "dress", "Salwar": "dress",
 }
 
 # Article type -> everyday occasion bucket (organization uses these 5 values)
 TYPE_TO_OCCASION = {
     "Tshirts": "Casual", "Tops": "Casual", "Jeans": "Casual", "Shorts": "Home",
-    "Shirts": "Office", "Trousers": "Office",
-    "Kurtas": "Religious", "Dresses": "Wedding",
+    "Shirts": "Office", "Trousers": "Office", "Blazers": "Office",
+    "Kurtas": "Religious", "Saree": "Religious", "Lehenga": "Religious", "Salwar": "Religious",
+    "Dresses": "Wedding", "Gowns": "Wedding",
+    "Jumpsuits": "Casual", "Skirts": "Casual", "Leggings": "Home", "Trackpants": "Home",
+    "Jackets": "Casual", "Coats": "Casual", "Sweaters": "Casual",
+    "Cardigans": "Casual", "Sweatshirts": "Casual", "Shrugs": "Casual", "Shawls": "Casual",
 }
 
 # Rough wash cadence by category
