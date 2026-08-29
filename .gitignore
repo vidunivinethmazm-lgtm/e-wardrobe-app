@@ -48,3 +48,11 @@ push_commits.ps1
 # Derived data (only data/raw/styles.csv is tracked)
 data/processed/
 data/splits/
+
+# SQLite
+*.db
+
+# local backend run logs
+backend.log
+backend.out.log
+backend.err.log

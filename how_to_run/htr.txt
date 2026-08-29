@@ -1,7 +1,0 @@
-(venv) PS D:\Git\eshani-2026\e_wardrobe_ai> venv\Scripts\activate
-
-(venv) PS D:\Git\eshani-2026\e_wardrobe_ai> python -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
-
-Material detection uses the pretrained openai/clip-vit-base-patch32 model.
-Run pip install -r backend/requirements.txt after pulling these changes.
-The model downloads once on the first prediction and is then cached locally.
