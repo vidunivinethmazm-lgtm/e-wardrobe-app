@@ -6,6 +6,7 @@ import {
 import axios from 'axios';
 
 import { ORGANIZATION_URL, WARDROBE_URL } from '../../constants/api';
+import { authStore } from '../auth';
 
 // ── Theme (from SmartWardrobeApp/src/theme/colors.js) ───────────────────────
 
@@ -23,6 +24,14 @@ const COLORS = {
 // ── API (integrated backend mounts organization under /organization) ─────────
 
 const api = axios.create({ baseURL: ORGANIZATION_URL, timeout: 10000 });
+// Scope every organization request to the signed-in account.
+api.interceptors.request.use(config => {
+  if (authStore.token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${authStore.token}`;
+  }
+  return config;
+});
 const fetchOrganizedItems  = () => api.get('/items/organized').then(r => r.data);
 const fetchInsights        = () => api.get('/items/insights').then(r => r.data);
 const fetchWardrobeLayout  = () => api.get('/wardrobe/layout').then(r => r.data);

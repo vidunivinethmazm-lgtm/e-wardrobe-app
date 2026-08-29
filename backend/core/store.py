@@ -77,10 +77,22 @@ def _now() -> str:
 
 
 # ---------------------------------------------------------------- wardrobe ---
+#
+# Every wardrobe item, schedule event and recommendation search belongs to
+# one account. `user_id` is required on every call; a document is only ever
+# returned to the account that owns it.
 
-def add_item(prediction: dict, images: dict | None = None,
+def _own_get_item(item_id: str, user_id: str) -> dict | None:
+    if _use_mongo():
+        return _items_col.find_one({"item_id": item_id, "user_id": user_id})
+    item = _items.get(item_id)
+    return item if item and item.get("user_id") == user_id else None
+
+
+def add_item(prediction: dict, user_id: str, images: dict | None = None,
              name: str | None = None, price: float = 0.0) -> dict:
     item = build_item(prediction, images, name, price)
+    item["user_id"] = user_id
     if _use_mongo():
         _items_col.insert_one(dict(item))
         return _clean(item)
@@ -89,47 +101,43 @@ def add_item(prediction: dict, images: dict | None = None,
     return item
 
 
-def list_items() -> list[dict]:
+def list_items(user_id: str) -> list[dict]:
     if _use_mongo():
         return [_clean(d) for d in
-                _items_col.find().sort("created_at", -1)]
+                _items_col.find({"user_id": user_id}).sort("created_at", -1)]
     with _lock:
-        return sorted(_items.values(), key=lambda d: d["created_at"], reverse=True)
+        rows = [d for d in _items.values() if d.get("user_id") == user_id]
+        return sorted(rows, key=lambda d: d["created_at"], reverse=True)
 
 
-def get_item(item_id: str) -> dict | None:
-    if _use_mongo():
-        return _clean(_items_col.find_one({"item_id": item_id}))
+def get_item(item_id: str, user_id: str) -> dict | None:
+    return _clean(_own_get_item(item_id, user_id))
+
+
+def update_item(item_id: str, changes: dict, user_id: str) -> dict | None:
     with _lock:
-        return _items.get(item_id)
-
-
-def update_item(item_id: str, changes: dict) -> dict | None:
-    if _use_mongo():
-        item = _items_col.find_one({"item_id": item_id})
+        item = _own_get_item(item_id, user_id)
         if item is None:
             return None
         apply_edits(item, changes)
-        _items_col.replace_one({"item_id": item_id}, item)
-        return _clean(item)
-    with _lock:
-        item = _items.get(item_id)
-        if item is None:
-            return None
-        apply_edits(item, changes)
-        return item
+        if _use_mongo():
+            _items_col.replace_one({"item_id": item_id, "user_id": user_id}, item)
+        return _clean(dict(item))
 
 
-def delete_item(item_id: str) -> bool:
+def delete_item(item_id: str, user_id: str) -> bool:
     if _use_mongo():
-        return _items_col.delete_one({"item_id": item_id}).deleted_count > 0
+        return _items_col.delete_one(
+            {"item_id": item_id, "user_id": user_id}).deleted_count > 0
     with _lock:
+        if _own_get_item(item_id, user_id) is None:
+            return False
         return _items.pop(item_id, None) is not None
 
 
-def record_wear(item_id: str) -> dict | None:
-    if _use_mongo():
-        item = _items_col.find_one({"item_id": item_id})
+def record_wear(item_id: str, user_id: str) -> dict | None:
+    with _lock:
+        item = _own_get_item(item_id, user_id)
         if item is None:
             return None
         item["total_wear_count"] += 1
@@ -137,53 +145,45 @@ def record_wear(item_id: str) -> dict | None:
         if item["current_cycle_wears"] >= item["max_wears_before_wash"]:
             item["status"] = "Dirty"
         item["updated_at"] = _now()
-        _items_col.replace_one({"item_id": item_id}, item)
-        return _clean(item)
+        if _use_mongo():
+            _items_col.replace_one({"item_id": item_id, "user_id": user_id}, item)
+        return _clean(dict(item))
+
+
+def record_wash(item_id: str, user_id: str) -> dict | None:
     with _lock:
-        item = _items.get(item_id)
-        if item is None:
-            return None
-        item["total_wear_count"] += 1
-        item["current_cycle_wears"] += 1
-        if item["current_cycle_wears"] >= item["max_wears_before_wash"]:
-            item["status"] = "Dirty"
-        item["updated_at"] = _now()
-        return item
-
-
-def record_wash(item_id: str) -> dict | None:
-    if _use_mongo():
-        item = _items_col.find_one({"item_id": item_id})
+        item = _own_get_item(item_id, user_id)
         if item is None:
             return None
         item["current_cycle_wears"] = 0
         item["status"] = "Clean"
         item["updated_at"] = _now()
-        _items_col.replace_one({"item_id": item_id}, item)
-        return _clean(item)
-    with _lock:
-        item = _items.get(item_id)
-        if item is None:
-            return None
-        item["current_cycle_wears"] = 0
-        item["status"] = "Clean"
-        item["updated_at"] = _now()
-        return item
+        if _use_mongo():
+            _items_col.replace_one({"item_id": item_id, "user_id": user_id}, item)
+        return _clean(dict(item))
 
 
-def count_items() -> int:
+def count_items(user_id: str) -> int:
     if _use_mongo():
-        return _items_col.count_documents({})
+        return _items_col.count_documents({"user_id": user_id})
     with _lock:
-        return len(_items)
+        return sum(1 for d in _items.values() if d.get("user_id") == user_id)
 
 
 # ------------------------------------------------------------ schedule ---
 
-def add_event(data: dict) -> dict:
+def _own_get_event(event_id: str, user_id: str) -> dict | None:
+    if _use_mongo():
+        return _events_col.find_one({"event_id": event_id, "user_id": user_id})
+    ev = _events.get(event_id)
+    return ev if ev and ev.get("user_id") == user_id else None
+
+
+def add_event(data: dict, user_id: str) -> dict:
     event = {
         "event_id": f"e_{uuid4().hex[:12]}",
         "created_at": _now(),
+        "user_id": user_id,
         **data,
     }
     if _use_mongo():
@@ -194,41 +194,39 @@ def add_event(data: dict) -> dict:
     return event
 
 
-def list_events() -> list[dict]:
+def list_events(user_id: str) -> list[dict]:
     if _use_mongo():
         return [_clean(d) for d in
-                _events_col.find().sort("created_at", -1)]
+                _events_col.find({"user_id": user_id}).sort("created_at", -1)]
     with _lock:
-        return sorted(_events.values(), key=lambda d: d["created_at"], reverse=True)
+        rows = [d for d in _events.values() if d.get("user_id") == user_id]
+        return sorted(rows, key=lambda d: d["created_at"], reverse=True)
 
 
 _EDITABLE_EVENT_FIELDS = {"event_name", "event_date", "event_time", "notes"}
 
 
-def update_event(event_id: str, changes: dict) -> dict | None:
+def update_event(event_id: str, changes: dict, user_id: str) -> dict | None:
     patch = {k: v for k, v in changes.items()
              if k in _EDITABLE_EVENT_FIELDS and v is not None}
-    if _use_mongo():
-        event = _events_col.find_one({"event_id": event_id})
+    with _lock:
+        event = _own_get_event(event_id, user_id)
         if event is None:
             return None
         event.update(patch)
         event["updated_at"] = _now()
-        _events_col.replace_one({"event_id": event_id}, event)
-        return _clean(event)
-    with _lock:
-        event = _events.get(event_id)
-        if event is None:
-            return None
-        event.update(patch)
-        event["updated_at"] = _now()
-        return event
+        if _use_mongo():
+            _events_col.replace_one({"event_id": event_id, "user_id": user_id}, event)
+        return _clean(dict(event))
 
 
-def delete_event(event_id: str) -> bool:
+def delete_event(event_id: str, user_id: str) -> bool:
     if _use_mongo():
-        return _events_col.delete_one({"event_id": event_id}).deleted_count > 0
+        return _events_col.delete_one(
+            {"event_id": event_id, "user_id": user_id}).deleted_count > 0
     with _lock:
+        if _own_get_event(event_id, user_id) is None:
+            return False
         return _events.pop(event_id, None) is not None
 
 
@@ -238,9 +236,10 @@ def delete_event(event_id: str) -> bool:
 # resolved location / weather, the ranked outfit list that was shown, and the
 # user's like / skip / free-text feedback on that result.
 
-def add_recommendation(entry: dict) -> dict:
+def add_recommendation(entry: dict, user_id: str) -> dict:
     doc = {k: v for k, v in entry.items() if k != "_id"}
     doc["rec_id"] = f"r_{uuid4().hex[:12]}"
+    doc["user_id"] = user_id
     doc.setdefault("created_at", _now())
     doc.setdefault("feedback", {})
     if _use_mongo():
@@ -251,32 +250,34 @@ def add_recommendation(entry: dict) -> dict:
     return doc
 
 
-def list_recommendations(limit: int = 50) -> list[dict]:
+def list_recommendations(user_id: str, limit: int = 50) -> list[dict]:
     limit = max(1, min(limit, 200))
     if _use_mongo():
         return [_clean(d) for d in
-                _recs_col.find().sort("created_at", -1).limit(limit)]
+                _recs_col.find({"user_id": user_id}).sort("created_at", -1).limit(limit)]
     with _lock:
-        rows = sorted(_recs.values(), key=lambda d: d["created_at"], reverse=True)
+        rows = sorted((d for d in _recs.values() if d.get("user_id") == user_id),
+                      key=lambda d: d["created_at"], reverse=True)
         return rows[:limit]
 
 
 def _save_rec(doc: dict) -> dict:
     doc["updated_at"] = _now()
     if _use_mongo():
-        _recs_col.replace_one({"rec_id": doc["rec_id"]}, doc)
+        _recs_col.replace_one({"rec_id": doc["rec_id"], "user_id": doc["user_id"]}, doc)
     return _clean(dict(doc))
 
 
-def _get_rec(rec_id: str) -> dict | None:
+def _get_rec(rec_id: str, user_id: str) -> dict | None:
     if _use_mongo():
-        return _recs_col.find_one({"rec_id": rec_id})
-    return _recs.get(rec_id)
+        return _recs_col.find_one({"rec_id": rec_id, "user_id": user_id})
+    doc = _recs.get(rec_id)
+    return doc if doc and doc.get("user_id") == user_id else None
 
 
-def set_recommendation_feedback(rec_id: str, outfit: str, action: str) -> dict | None:
+def set_recommendation_feedback(rec_id: str, outfit: str, action: str, user_id: str) -> dict | None:
     with _lock:
-        doc = _get_rec(rec_id)
+        doc = _get_rec(rec_id, user_id)
         if doc is None:
             return None
         fb = dict(doc.get("feedback") or {})
@@ -288,9 +289,9 @@ def set_recommendation_feedback(rec_id: str, outfit: str, action: str) -> dict |
         return _save_rec(doc)
 
 
-def set_recommendation_feedback_map(rec_id: str, feedback: dict) -> dict | None:
+def set_recommendation_feedback_map(rec_id: str, feedback: dict, user_id: str) -> dict | None:
     with _lock:
-        doc = _get_rec(rec_id)
+        doc = _get_rec(rec_id, user_id)
         if doc is None:
             return None
         doc["feedback"] = {k: v for k, v in (feedback or {}).items()
@@ -298,29 +299,33 @@ def set_recommendation_feedback_map(rec_id: str, feedback: dict) -> dict | None:
         return _save_rec(doc)
 
 
-def set_recommendation_note(rec_id: str, note: str) -> dict | None:
+def set_recommendation_note(rec_id: str, note: str, user_id: str) -> dict | None:
     with _lock:
-        doc = _get_rec(rec_id)
+        doc = _get_rec(rec_id, user_id)
         if doc is None:
             return None
         doc["note"] = (note or "").strip() or None
         return _save_rec(doc)
 
 
-def delete_recommendation(rec_id: str) -> bool:
+def delete_recommendation(rec_id: str, user_id: str) -> bool:
     if _use_mongo():
-        return _recs_col.delete_one({"rec_id": rec_id}).deleted_count > 0
+        return _recs_col.delete_one(
+            {"rec_id": rec_id, "user_id": user_id}).deleted_count > 0
     with _lock:
+        if _get_rec(rec_id, user_id) is None:
+            return False
         return _recs.pop(rec_id, None) is not None
 
 
-def clear_recommendations() -> int:
+def clear_recommendations(user_id: str) -> int:
     if _use_mongo():
-        return _recs_col.delete_many({}).deleted_count
+        return _recs_col.delete_many({"user_id": user_id}).deleted_count
     with _lock:
-        n = len(_recs)
-        _recs.clear()
-        return n
+        gone = [k for k, v in _recs.items() if v.get("user_id") == user_id]
+        for k in gone:
+            _recs.pop(k, None)
+        return len(gone)
 
 
 # ------------------------------------------------------- accounts / profile ---

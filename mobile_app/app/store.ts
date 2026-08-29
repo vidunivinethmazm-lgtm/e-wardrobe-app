@@ -1,6 +1,9 @@
 import { RECOMMENDATION_URL } from '../constants/api';
+import { authStore } from './auth';
 
 const HISTORY_URL = `${RECOMMENDATION_URL}/history`;
+
+const jsonHeaders = () => ({ 'Content-Type': 'application/json', ...authStore.authHeaders() });
 
 export interface RecommendationDetail {
   outfit: string;
@@ -48,8 +51,9 @@ class WardrobeStore {
   // Pull the saved search history from the backend (MongoDB). Best-effort:
   // if the server can't be reached the in-memory history is left untouched.
   async hydrate() {
+    if (!authStore.token) { this.history = []; this.notify(); return; }
     try {
-      const res = await fetch(HISTORY_URL);
+      const res = await fetch(HISTORY_URL, { headers: authStore.authHeaders() });
       if (!res.ok) return;
       const rows = await res.json();
       if (!Array.isArray(rows)) return;
@@ -80,7 +84,7 @@ class WardrobeStore {
     try {
       const res = await fetch(HISTORY_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify({
           occasion: entry.occasion, event_class: entry.event_class,
           location: entry.location, weather: entry.weather, time: entry.time,
@@ -102,7 +106,7 @@ class WardrobeStore {
     try {
       await fetch(`${HISTORY_URL}/${entryId}/${path}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: jsonHeaders(),
         body: JSON.stringify(body),
       });
     } catch { /* offline - local state is still updated */ }
@@ -154,7 +158,7 @@ class WardrobeStore {
     this.history = [];
     this.feedback = {};
     this.notify();
-    fetch(HISTORY_URL, { method: 'DELETE' }).catch(() => {});
+    fetch(HISTORY_URL, { method: 'DELETE', headers: authStore.authHeaders() }).catch(() => {});
   }
 
   subscribe(fn: Listener) {

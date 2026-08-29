@@ -3,7 +3,7 @@ import pickle
 from pathlib import Path
 
 import torch
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -14,6 +14,7 @@ from backend.recommendation.gnn_model import (
     load_graph_data,
 )
 from backend.core import store
+from backend.core.auth_dep import current_user_id
 from backend.core.schema import to_recommendation_item
 
 # Data / model files live next to this module; resolve them from here so the
@@ -81,6 +82,7 @@ async def recommend(
     weather: str = "Unknown",
     humidity: int = 0,
     temperature: float = 28.0,
+    uid: str = Depends(current_user_id),
 ):
     if not AI:
         return {"error": "Models not loaded"}
@@ -89,7 +91,7 @@ async def recommend(
     # Recommend from every item in the user's saved wardrobe (shared store),
     # each carrying its own uploaded / background-removed photo. Only fall back
     # to the bundled demo wardrobe when the user hasn't saved anything yet.
-    saved = store.list_items()
+    saved = store.list_items(uid)
     if saved:
         wardrobe = [to_recommendation_item(d, i) for i, d in enumerate(saved)]
         wardrobe_source = "user_wardrobe"
@@ -432,21 +434,22 @@ class NotePatch(BaseModel):
 
 
 @app.get("/history")
-async def get_history(limit: int = 50):
-    return store.list_recommendations(limit)
+async def get_history(limit: int = 50, uid: str = Depends(current_user_id)):
+    return store.list_recommendations(uid, limit)
 
 
 @app.post("/history")
-async def add_history(search: SavedSearch):
-    return store.add_recommendation(search.model_dump())
+async def add_history(search: SavedSearch, uid: str = Depends(current_user_id)):
+    return store.add_recommendation(search.model_dump(), uid)
 
 
 @app.patch("/history/{rec_id}/feedback")
-async def patch_history_feedback(rec_id: str, patch: FeedbackPatch):
+async def patch_history_feedback(rec_id: str, patch: FeedbackPatch,
+                                 uid: str = Depends(current_user_id)):
     if patch.feedback is not None:
-        updated = store.set_recommendation_feedback_map(rec_id, patch.feedback)
+        updated = store.set_recommendation_feedback_map(rec_id, patch.feedback, uid)
     elif patch.outfit is not None:
-        updated = store.set_recommendation_feedback(rec_id, patch.outfit, patch.action)
+        updated = store.set_recommendation_feedback(rec_id, patch.outfit, patch.action, uid)
     else:
         raise HTTPException(status_code=422, detail="give 'feedback' map or 'outfit' + 'action'")
     if updated is None:
@@ -455,21 +458,22 @@ async def patch_history_feedback(rec_id: str, patch: FeedbackPatch):
 
 
 @app.patch("/history/{rec_id}/note")
-async def patch_history_note(rec_id: str, patch: NotePatch):
-    updated = store.set_recommendation_note(rec_id, patch.note)
+async def patch_history_note(rec_id: str, patch: NotePatch,
+                             uid: str = Depends(current_user_id)):
+    updated = store.set_recommendation_note(rec_id, patch.note, uid)
     if updated is None:
         raise HTTPException(status_code=404, detail="history entry not found")
     return updated
 
 
 @app.delete("/history/{rec_id}")
-async def remove_history(rec_id: str):
-    return {"deleted": store.delete_recommendation(rec_id)}
+async def remove_history(rec_id: str, uid: str = Depends(current_user_id)):
+    return {"deleted": store.delete_recommendation(rec_id, uid)}
 
 
 @app.delete("/history")
-async def clear_history():
-    return {"cleared": store.clear_recommendations()}
+async def clear_history(uid: str = Depends(current_user_id)):
+    return {"cleared": store.clear_recommendations(uid)}
 
 
 if __name__ == "__main__":

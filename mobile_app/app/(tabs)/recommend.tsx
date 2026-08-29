@@ -7,6 +7,7 @@ import {
 import { Image } from 'expo-image';
 import * as Location from 'expo-location';
 import { wardrobeStore, HistoryEntry, RecommendationDetail, ApiResponse, FeedbackMap } from '../store';
+import { authStore } from '../auth';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -270,7 +271,10 @@ export default function HomeScreen() {
         const ctrl  = new AbortController();
         const timer = setTimeout(() => ctrl.abort(), 5000);
         try {
-          const response = await fetch(`http://${host}:8000${RECOMMEND_PATH}?${query}`, { signal: ctrl.signal });
+          const response = await fetch(`http://${host}:8000${RECOMMEND_PATH}?${query}`, {
+            signal: ctrl.signal,
+            headers: authStore.authHeaders(),
+          });
           clearTimeout(timer);
           if (!response.ok) { lastError = `${host}: ${response.status}`; continue; }
           const parsed = await response.json();

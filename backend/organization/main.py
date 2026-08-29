@@ -8,10 +8,11 @@ counts persist across all features.
 
 from types import SimpleNamespace
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.core import store
+from backend.core.auth_dep import current_user_id
 from backend.organization import ml_engine
 
 app = FastAPI()
@@ -25,10 +26,10 @@ app.add_middleware(
 )
 
 
-def _items():
+def _items(user_id: str):
     """Shared-store items as attribute objects for the ML engine (keyed by item_id)."""
     objs = []
-    for d in store.list_items():
+    for d in store.list_items(user_id):
         o = SimpleNamespace(**d)
         o.id = d["item_id"]
         objs.append(o)
@@ -36,8 +37,8 @@ def _items():
 
 
 @app.get("/items/organized")
-def get_organized_items():
-    items     = _items()
+def get_organized_items(uid: str = Depends(current_user_id)):
+    items     = _items(uid)
     clusters  = ml_engine.SmartWardrobeEngine.get_clusters(items)
     positions = ml_engine.SmartWardrobeEngine.assign_wardrobe_positions(items)
 
@@ -51,8 +52,8 @@ def get_organized_items():
 
 
 @app.get("/wardrobe/layout")
-def get_wardrobe_layout():
-    items     = _items()
+def get_wardrobe_layout(uid: str = Depends(current_user_id)):
+    items     = _items(uid)
     positions = ml_engine.SmartWardrobeEngine.assign_wardrobe_positions(items)
 
     section_counts = {k: 0 for k in ml_engine.WARDROBE_SECTIONS}
@@ -74,24 +75,24 @@ def get_wardrobe_layout():
 
 
 @app.post("/items/wear/{item_id}")
-def wear_item(item_id: str):
-    item = store.record_wear(item_id)
+def wear_item(item_id: str, uid: str = Depends(current_user_id)):
+    item = store.record_wear(item_id, uid)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"message": "Wear recorded", "status": item["status"]}
 
 
 @app.post("/items/wash/{item_id}")
-def wash_item(item_id: str):
-    item = store.record_wash(item_id)
+def wash_item(item_id: str, uid: str = Depends(current_user_id)):
+    item = store.record_wash(item_id, uid)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
     return {"message": "Item marked as washed", "status": item["status"]}
 
 
 @app.get("/items/insights")
-def get_insights():
-    items       = _items()
+def get_insights(uid: str = Depends(current_user_id)):
+    items       = _items(uid)
     anomalies   = ml_engine.SmartWardrobeEngine.detect_anomalies(items)
     dirty_count = sum(1 for o in items if o.status == "Dirty")
     return {

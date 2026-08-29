@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { AUTH_URL } from '../constants/api';
@@ -72,12 +73,13 @@ class AuthStore {
     const token = storage.get();
     if (!token) { this.ready = true; this.notify(); return; }
     this.token = token;
+    this.applyAxiosAuth();
     try {
       const res = await fetch(`${AUTH_URL}/me`, { headers: this.authHeaders() });
       if (res.ok) {
         this.user = (await res.json()).user;
       } else {
-        this.token = null; storage.set(null);
+        this.token = null; storage.set(null); this.applyAxiosAuth();
       }
     } catch {
       // backend unreachable - keep the token, let the user retry later
@@ -134,7 +136,15 @@ class AuthStore {
     this.token = token;
     this.user = user;
     storage.set(token);
+    this.applyAxiosAuth();
     this.notify();
+  }
+
+  // Keep the axios default header in sync so every feature request (wardrobe,
+  // recommendation, organization, trends) is scoped to this account.
+  private applyAxiosAuth() {
+    if (this.token) axios.defaults.headers.common.Authorization = `Bearer ${this.token}`;
+    else delete axios.defaults.headers.common.Authorization;
   }
 
   subscribe(fn: Listener) {
