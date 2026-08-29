@@ -9,3 +9,4 @@ export const CLASSIFICATION_URL = `${API_BASE}/classification`;
 export const RECOMMENDATION_URL = `${API_BASE}/recommendation`;
 export const ORGANIZATION_URL = `${API_BASE}/organization`;
 export const WARDROBE_URL = `${API_BASE}/wardrobe`;
+export const AUTH_URL = `${API_BASE}/auth`;

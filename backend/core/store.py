@@ -32,10 +32,14 @@ _lock = RLock()
 _items: dict[str, dict] = {}      # item_id -> item   (in-memory fallback)
 _events: dict[str, dict] = {}     # event_id -> event (in-memory fallback)
 _recs: dict[str, dict] = {}       # rec_id -> saved recommendation search
+_users: dict[str, dict] = {}      # user_id -> account + profile
+_sessions: dict[str, str] = {}    # token -> user_id
 
 _items_col = None
 _events_col = None
 _recs_col = None
+_users_col = None
+_sessions_col = None
 
 if _MONGODB_URI:
     from pymongo import MongoClient, DESCENDING
@@ -45,9 +49,14 @@ if _MONGODB_URI:
     _items_col = _db["items"]
     _events_col = _db["events"]
     _recs_col = _db["recommendations"]
+    _users_col = _db["users"]
+    _sessions_col = _db["sessions"]
     _items_col.create_index("item_id", unique=True)
     _events_col.create_index("event_id", unique=True)
     _recs_col.create_index("rec_id", unique=True)
+    _users_col.create_index("user_id", unique=True)
+    _users_col.create_index("email", unique=True)
+    _sessions_col.create_index("token", unique=True)
     _items_col.create_index([("created_at", DESCENDING)])
     _events_col.create_index([("created_at", DESCENDING)])
     _recs_col.create_index([("created_at", DESCENDING)])
@@ -312,3 +321,84 @@ def clear_recommendations() -> int:
         n = len(_recs)
         _recs.clear()
         return n
+
+
+# ------------------------------------------------------- accounts / profile ---
+#
+# One document per user account. `password_hash` / `salt` never leave this
+# module - callers get the public view via auth.main._public_user().
+
+def create_user(user: dict) -> dict:
+    doc = {k: v for k, v in user.items() if k != "_id"}
+    doc.setdefault("created_at", _now())
+    doc.setdefault("profile", {})
+    if _use_mongo():
+        _users_col.insert_one(dict(doc))
+        return _clean(doc)
+    with _lock:
+        _users[doc["user_id"]] = doc
+    return doc
+
+
+def get_user(user_id: str) -> dict | None:
+    if _use_mongo():
+        return _clean(_users_col.find_one({"user_id": user_id}))
+    with _lock:
+        return _users.get(user_id)
+
+
+def get_user_by_email(email: str) -> dict | None:
+    email = (email or "").strip().lower()
+    if _use_mongo():
+        return _clean(_users_col.find_one({"email": email}))
+    with _lock:
+        return next((u for u in _users.values() if u["email"] == email), None)
+
+
+_PROFILE_FIELDS = {"gender", "age", "city", "style", "avatar", "bio"}
+
+
+def update_user_profile(user_id: str, changes: dict) -> dict | None:
+    with _lock:
+        if _use_mongo():
+            doc = _users_col.find_one({"user_id": user_id})
+        else:
+            doc = _users.get(user_id)
+        if doc is None:
+            return None
+        if "name" in changes and changes["name"] is not None:
+            doc["name"] = changes["name"]
+        profile = dict(doc.get("profile") or {})
+        for key, value in changes.items():
+            if key in _PROFILE_FIELDS and value is not None:
+                profile[key] = value
+        doc["profile"] = profile
+        doc["updated_at"] = _now()
+        if _use_mongo():
+            _users_col.replace_one({"user_id": user_id}, doc)
+        return _clean(dict(doc))
+
+
+def create_session(token: str, user_id: str) -> None:
+    if _use_mongo():
+        _sessions_col.insert_one({"token": token, "user_id": user_id, "created_at": _now()})
+        return
+    with _lock:
+        _sessions[token] = user_id
+
+
+def get_session_user_id(token: str) -> str | None:
+    if not token:
+        return None
+    if _use_mongo():
+        row = _sessions_col.find_one({"token": token})
+        return row["user_id"] if row else None
+    with _lock:
+        return _sessions.get(token)
+
+
+def delete_session(token: str) -> bool:
+    if _use_mongo():
+        return _sessions_col.delete_one({"token": token}).deleted_count > 0
+    with _lock:
+        return _sessions.pop(token, None) is not None
