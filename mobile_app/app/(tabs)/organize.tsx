@@ -1,0 +1,676 @@
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View, Text, ScrollView, TouchableOpacity, StyleSheet,
+  StatusBar, ActivityIndicator, RefreshControl, Alert, TextInput,
+} from 'react-native';
+import axios from 'axios';
+
+import { ORGANIZATION_URL, WARDROBE_URL } from '../../constants/api';
+import { authStore } from '../auth';
+
+// ── Theme (from SmartWardrobeApp/src/theme/colors.js) ───────────────────────
+
+// Tailwind violet / slate palette - matches the Recommend screen.
+const COLORS = {
+  primary: '#7C3AED', primaryDark: '#6D28D9', primaryLight: '#8B5CF6', accent: '#7C3AED',
+  background: '#F3F0FF', surface: '#FFFFFF',
+  clean: '#D1FAE5', cleanText: '#065F46', dirty: '#FEE2E2', dirtyText: '#B91C1C', dirtyBg: '#FEF2F2',
+  scoreGood: '#10B981', scoreMid: '#F59E0B', scoreLow: '#EF4444',
+  zoneHome: '#EDE9FE', zoneCasual: '#F5F3FF', zoneOffice: '#EDE9FE', zoneReligious: '#F5F3FF', zoneWedding: '#EDE9FE',
+  textPrimary: '#1F2937', textSecondary: '#4B5563', textMuted: '#9CA3AF',
+  border: '#EDE9FE', divider: '#F1F5F9', topBar: '#2D1B69', topBarSub: '#C4B5FD',
+};
+
+// ── API (integrated backend mounts organization under /organization) ─────────
+
+const api = axios.create({ baseURL: ORGANIZATION_URL, timeout: 10000 });
+// Scope every organization request to the signed-in account.
+api.interceptors.request.use(config => {
+  if (authStore.token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${authStore.token}`;
+  }
+  return config;
+});
+const fetchOrganizedItems  = () => api.get('/items/organized').then(r => r.data);
+const fetchInsights        = () => api.get('/items/insights').then(r => r.data);
+const fetchWardrobeLayout  = () => api.get('/wardrobe/layout').then(r => r.data);
+const wearItem  = (id: string) => api.post(`/items/wear/${id}`).then(r => r.data);
+const washItem  = (id: string) => api.post(`/items/wash/${id}`).then(r => r.data);
+const itemId    = (i: any) => i.item_id ?? i.item_id_str ?? i.id;
+
+// Notes live on the shared wardrobe item, so they go through /wardrobe/{id}.
+const saveItemNote = (id: string, note: string) =>
+  axios.patch(`${WARDROBE_URL}/${id}`, { note }).then(r => r.data);
+
+// ── Constants ────────────────────────────────────────────────────────────────
+
+const SECTION_COLORS: Record<string, { bg: string; text: string; border: string }> = {
+  A: { bg: '#EDE9FE', text: '#6D28D9', border: '#DDD6FE' },
+  B: { bg: '#ECFDF5', text: '#065F46', border: '#A7F3D0' },
+  C: { bg: '#FFF7ED', text: '#92400E', border: '#FED7AA' },
+  D: { bg: '#EEF2FF', text: '#3730A3', border: '#C7D2FE' },
+};
+
+const ZONES = [
+  { occasion: 'Home',      label: '🏠 Daily Essentials', bg: COLORS.zoneHome },
+  { occasion: 'Casual',    label: '👕 Casual Wear',      bg: COLORS.zoneCasual },
+  { occasion: 'Office',    label: '👔 Office Wear',       bg: COLORS.zoneOffice },
+  { occasion: 'Religious', label: '🙏 Occasion Wear',     bg: COLORS.zoneReligious },
+  { occasion: 'Wedding',   label: '💍 Special Events',    bg: COLORS.zoneWedding },
+];
+
+const TABS = [
+  { label: 'Wardrobe', icon: '👗' },
+  { label: 'Insights', icon: '💡' },
+  { label: 'Laundry',  icon: '🧺' },
+];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+const scoreColor = (score: number) => {
+  if (score > 70) return COLORS.scoreGood;
+  if (score > 40) return COLORS.scoreMid;
+  return COLORS.scoreLow;
+};
+
+// Backend stores sustainability_score as a 0–1 float; the reference UI expects 0–100.
+const normScore = (s: number) => {
+  const v = Number(s ?? 0);
+  return Math.round(v <= 1 ? v * 100 : v);
+};
+
+// ── Sub-components ───────────────────────────────────────────────────────────
+
+const ItemCard = ({ item, onWear, onSaveNote }: any) => {
+  const score = normScore(item.sustainability_score);
+  const section = item.wardrobe_section ?? '?';
+  const secColor = SECTION_COLORS[section] ?? { bg: '#F5F5F5', text: '#757575', border: '#E0E0E0' };
+
+  const note = (item.note ?? '').trim();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft]     = useState(note);
+  const [saving, setSaving]   = useState(false);
+  const [noteError, setNoteError] = useState<string | null>(null);
+
+  const openEditor = () => { setDraft(note); setNoteError(null); setEditing(true); };
+  const cancel     = () => { setDraft(note); setNoteError(null); setEditing(false); };
+
+  const onDraftChange = (t: string) => { setDraft(t); if (noteError) setNoteError(null); };
+
+  const commit = async (value: string) => {
+    setSaving(true);
+    try {
+      await onSaveNote(item, value);
+      setNoteError(null);
+      setEditing(false);
+    } catch {
+      setNoteError('Could not save the note. Check your connection and try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSave = () => {
+    if (!draft.trim()) {
+      setNoteError('Note is empty — type something before saving.');
+      return;
+    }
+    commit(draft.trim());
+  };
+
+  return (
+    <TouchableOpacity
+      style={[styles.card, item.status === 'Dirty' && styles.dirtyCard]}
+      onPress={() => onWear(item)}
+      activeOpacity={0.8}
+    >
+      <View style={styles.cardHeader}>
+        <Text style={styles.itemCategory} numberOfLines={2}>{item.name ?? item.category}</Text>
+        <View style={[styles.statusBadge, { backgroundColor: item.status === 'Clean' ? COLORS.clean : COLORS.dirty }]}>
+          <Text style={[styles.statusText, { color: item.status === 'Clean' ? COLORS.cleanText : COLORS.dirtyText }]}>
+            {item.status === 'Clean' ? '✓ Ready' : '⚠ Wash'}
+          </Text>
+        </View>
+      </View>
+
+      <Text style={styles.cardDetail}>{item.fabric} · {item.color} · {item.category}</Text>
+
+      <View style={styles.wearRow}>
+        <Text style={styles.wearLabel}>Worn since last wash</Text>
+        <Text style={styles.wearCount}>{item.current_cycle_wears} / {item.max_wears_before_wash}</Text>
+      </View>
+
+      <View style={styles.scoreRow}>
+        <Text style={styles.scoreLabel}>Eco score</Text>
+        <View style={styles.scoreBarBg}>
+          <View style={[styles.scoreBarFill, { width: `${score}%`, backgroundColor: scoreColor(score) }]} />
+        </View>
+        <Text style={[styles.scoreNum, { color: scoreColor(score) }]}>{score}%</Text>
+      </View>
+
+      <View style={[styles.positionBadge, { backgroundColor: secColor.bg, borderColor: secColor.border }]}>
+        <Text style={[styles.positionText, { color: secColor.text }]}>
+          Keep it in: {item.section_label ?? `Section ${section}`} · Slot {item.wardrobe_slot ?? '–'}
+        </Text>
+        <Text style={[styles.positionSub, { color: secColor.text }]}>{item.section_location ?? ''}</Text>
+      </View>
+
+      {/* ── Personal note ── */}
+      <View style={styles.noteSection}>
+        <Text style={styles.noteLabel}>📝 NOTE</Text>
+
+        {editing ? (
+          <>
+            <TextInput
+              style={[styles.noteInput, noteError && styles.noteInputError]}
+              value={draft}
+              onChangeText={onDraftChange}
+              placeholder="e.g. gift from Amma, hem needs fixing, pairs with black belt…"
+              placeholderTextColor={COLORS.textMuted}
+              multiline
+              editable={!saving}
+            />
+            {noteError && <Text style={styles.noteErrorText}>{noteError}</Text>}
+            <View style={styles.noteBtnRow}>
+              <TouchableOpacity style={styles.noteBtn} onPress={cancel} disabled={saving}>
+                <Text style={styles.noteBtnText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.noteBtn, styles.noteBtnPrimary, saving && styles.noteBtnDisabled]}
+                onPress={handleSave}
+                disabled={saving}
+              >
+                <Text style={[styles.noteBtnText, styles.noteBtnTextPrimary]}>{saving ? 'Saving…' : 'Save'}</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : note ? (
+          <>
+            <Text style={styles.noteText}>{note}</Text>
+            <View style={styles.noteBtnRow}>
+              <TouchableOpacity style={styles.noteBtn} onPress={openEditor}>
+                <Text style={styles.noteBtnText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.noteBtn, styles.noteBtnDanger]}
+                onPress={() => commit('')}
+                disabled={saving}
+              >
+                <Text style={[styles.noteBtnText, styles.noteBtnTextDanger]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <TouchableOpacity style={styles.noteAddBtn} onPress={openEditor}>
+            <Text style={styles.noteAddText}>+ Add a note</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <Text style={styles.tapHint}>Tap this card when you wear the item</Text>
+    </TouchableOpacity>
+  );
+};
+
+const StatCard = ({ value, label, bg }: any) => (
+  <View style={[styles.statCard, { backgroundColor: bg }]}>
+    <Text style={styles.statNum}>{value}</Text>
+    <Text style={styles.statLabel}>{label}</Text>
+  </View>
+);
+
+const WardrobeCapacityBar = ({ layout }: any) => {
+  if (!layout) return null;
+  const sections = [
+    { key: 'A', icon: '🏷️' }, { key: 'B', icon: '👕' },
+    { key: 'C', icon: '📦' }, { key: 'D', icon: '🗄️' },
+  ];
+  return (
+    <View style={styles.capacityCard}>
+      <Text style={styles.capacityTitle}>Wardrobe Position Map</Text>
+      <Text style={styles.capacitySub}>{layout.total_items} items auto-assigned by usage frequency</Text>
+      <View style={styles.capacityRow}>
+        {sections.map(({ key, icon }) => {
+          const sec = layout.sections[key];
+          const color = SECTION_COLORS[key];
+          return (
+            <View key={key} style={[styles.capacitySection, { backgroundColor: color.bg, borderColor: color.border }]}>
+              <Text style={styles.capacityIcon}>{icon}</Text>
+              <Text style={[styles.capacitySectionLabel, { color: color.text }]}>{sec.label}</Text>
+              <Text style={[styles.capacitySectionCount, { color: color.text }]}>{sec.item_count}</Text>
+              <Text style={styles.capacitySectionLoc}>{sec.location}</Text>
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+};
+
+// ── Screens ──────────────────────────────────────────────────────────────────
+
+const WardrobeScreen = ({ items, layout, refreshing, onRefresh, onWear, onSaveNote }: any) => (
+  <ScrollView
+    style={styles.screen}
+    contentContainerStyle={styles.screenContent}
+    refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
+  >
+    <Text style={styles.screenTitle}>My Wardrobe</Text>
+    <Text style={styles.screenSub}>
+      {items.length} items · {items.filter((i: any) => i.status === 'Dirty').length} need washing
+    </Text>
+
+    <WardrobeCapacityBar layout={layout} />
+
+    {ZONES.map(zone => {
+      const zoneItems = items
+        .filter((i: any) => i.occasion === zone.occasion)
+        .sort((a: any, b: any) => {
+          const secOrder: Record<string, number> = { A: 0, B: 1, C: 2, D: 3 };
+          const secDiff = (secOrder[a.wardrobe_section] ?? 4) - (secOrder[b.wardrobe_section] ?? 4);
+          return secDiff !== 0 ? secDiff : (a.wardrobe_slot ?? 0) - (b.wardrobe_slot ?? 0);
+        });
+      if (zoneItems.length === 0) return null;
+      return (
+        <View key={zone.occasion} style={[styles.zone, { backgroundColor: zone.bg }]}>
+          <View style={styles.zoneHeader}>
+            <Text style={styles.zoneTitle}>{zone.label}</Text>
+            <Text style={styles.zoneCount}>{zoneItems.length} items</Text>
+          </View>
+          <View style={styles.zoneList}>
+            {zoneItems.map((item: any) => (
+              <ItemCard key={itemId(item)} item={item} onWear={onWear} onSaveNote={onSaveNote} />
+            ))}
+          </View>
+        </View>
+      );
+    })}
+    <View style={{ height: 24 }} />
+  </ScrollView>
+);
+
+const InsightsScreen = ({ items, insights, refreshing, onRefresh }: any) => {
+  if (!insights) return <ActivityIndicator style={styles.centered} color={COLORS.primary} />;
+
+  const underusedItems = items.filter((i: any) => insights.underused?.includes(i.id));
+  const overusedItems  = items.filter((i: any) => insights.overused?.includes(i.id));
+  const cleanCount     = items.filter((i: any) => i.status === 'Clean').length;
+
+  return (
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.screenContent}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
+    >
+      <Text style={styles.screenTitle}>Smart Insights</Text>
+      <Text style={styles.screenSub}>Powered by ML anomaly detection</Text>
+
+      <View style={styles.statsRow}>
+        <StatCard value={items.length} label="Total" bg="#EDE9FE" />
+        <StatCard value={cleanCount} label="Clean" bg={COLORS.clean} />
+        <StatCard value={insights.dirty_count} label="Dirty" bg={COLORS.dirty} />
+      </View>
+
+      {insights.dirty_count >= 5 && (
+        <View style={styles.alertCard}>
+          <Text style={styles.alertTitle}>🧺 Laundry Fatigue Alert</Text>
+          <Text style={styles.alertBody}>
+            {insights.dirty_count} items are waiting to be washed. Time for a wash cycle!
+          </Text>
+        </View>
+      )}
+
+      {underusedItems.length > 0 && (
+        <View style={styles.insightSection}>
+          <Text style={styles.insightSectionTitle}>😴 Underutilized Items</Text>
+          <Text style={styles.insightSectionSub}>Worn far less than others — style them today!</Text>
+          {underusedItems.map((item: any) => (
+            <View key={itemId(item)} style={styles.insightRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.insightItemName}>{item.category}</Text>
+                <Text style={styles.insightItemDetail}>{item.fabric} · {item.total_wear_count} total wears</Text>
+              </View>
+              <Text style={[styles.insightScore, { color: COLORS.scoreGood }]}>{normScore(item.sustainability_score)}%</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {overusedItems.length > 0 && (
+        <View style={styles.insightSection}>
+          <Text style={styles.insightSectionTitle}>⚠️ Overused Items</Text>
+          <Text style={styles.insightSectionSub}>Worn far more than average — consider a quality check.</Text>
+          {overusedItems.map((item: any) => (
+            <View key={itemId(item)} style={styles.insightRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.insightItemName}>{item.category}</Text>
+                <Text style={styles.insightItemDetail}>{item.fabric} · {item.total_wear_count} total wears</Text>
+              </View>
+              <Text style={[styles.insightScore, { color: COLORS.scoreLow }]}>{normScore(item.sustainability_score)}%</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {underusedItems.length === 0 && overusedItems.length === 0 && (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>✅</Text>
+          <Text style={styles.emptyText}>All wear patterns look normal!</Text>
+        </View>
+      )}
+      <View style={{ height: 24 }} />
+    </ScrollView>
+  );
+};
+
+const LaundryScreen = ({ items, refreshing, onRefresh, onWash }: any) => {
+  const dirtyItems = items.filter((i: any) => i.status === 'Dirty');
+  return (
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.screenContent}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
+    >
+      <Text style={styles.screenTitle}>Laundry Queue</Text>
+      <Text style={styles.screenSub}>{dirtyItems.length} items need washing</Text>
+
+      {dirtyItems.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>✅</Text>
+          <Text style={styles.emptyText}>All items are clean!</Text>
+        </View>
+      ) : (
+        dirtyItems.map((item: any) => (
+          <View key={itemId(item)} style={styles.laundryRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.laundryName}>{item.category}</Text>
+              <Text style={styles.laundryDetail}>{item.fabric} · {item.color}</Text>
+              <Text style={styles.laundryWears}>
+                Worn {item.current_cycle_wears}/{item.max_wears_before_wash} times this cycle
+              </Text>
+            </View>
+            <TouchableOpacity style={styles.washBtn} onPress={() => onWash(item)}>
+              <Text style={styles.washBtnText}>Washed ✓</Text>
+            </TouchableOpacity>
+          </View>
+        ))
+      )}
+      <View style={{ height: 24 }} />
+    </ScrollView>
+  );
+};
+
+// ── Screen root ──────────────────────────────────────────────────────────────
+
+export default function OrganizeScreen() {
+  const [activeTab, setActiveTab]           = useState(0);
+  const [items, setItems]                   = useState<any[]>([]);
+  const [insights, setInsights]             = useState<any>(null);
+  const [wardrobeLayout, setWardrobeLayout] = useState<any>(null);
+  const [loading, setLoading]               = useState(true);
+  const [refreshing, setRefreshing]         = useState(false);
+  const [error, setError]                   = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    setError(null);
+    try {
+      const [organizedItems, smartInsights, layout] = await Promise.all([
+        fetchOrganizedItems(),
+        fetchInsights(),
+        fetchWardrobeLayout(),
+      ]);
+      setItems(organizedItems);
+      setInsights(smartInsights);
+      setWardrobeLayout(layout);
+    } catch {
+      setError('Could not reach the server.\nMake sure the backend is running:\n\nuvicorn backend.main:app --host 0.0.0.0 --port 8000');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const onRefresh = useCallback(() => { setRefreshing(true); loadData(); }, [loadData]);
+
+  const handleWear = useCallback(async (item: any) => {
+    if (item.status === 'Dirty') {
+      Alert.alert('Item Dirty', 'Wash this item before wearing it again.');
+      return;
+    }
+    try {
+      await wearItem(itemId(item));
+      loadData();
+    } catch {
+      Alert.alert('Error', 'Could not record wear.');
+    }
+  }, [loadData]);
+
+  const handleWash = useCallback(async (item: any) => {
+    try {
+      await washItem(itemId(item));
+      loadData();
+    } catch {
+      Alert.alert('Error', 'Could not mark as washed.');
+    }
+  }, [loadData]);
+
+  const handleSaveNote = useCallback(async (item: any, note: string) => {
+    const prevNote = item.note ?? '';
+    // optimistic: patch the local copy so the card updates instantly
+    setItems(prev => prev.map(i => (itemId(i) === itemId(item) ? { ...i, note } : i)));
+    try {
+      await saveItemNote(itemId(item), note);
+      loadData();
+    } catch (e) {
+      setItems(prev => prev.map(i => (itemId(i) === itemId(item) ? { ...i, note: prevNote } : i)));
+      throw e;
+    }
+  }, [loadData]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingScreen}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingText}>Loading your wardrobe...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.loadingScreen}>
+        <Text style={{ fontSize: 40, marginBottom: 16 }}>⚠️</Text>
+        <Text style={[styles.loadingText, { color: '#C62828', textAlign: 'center', paddingHorizontal: 32 }]}>{error}</Text>
+        <TouchableOpacity
+          style={{ marginTop: 24, backgroundColor: COLORS.primary, paddingHorizontal: 32, paddingVertical: 12, borderRadius: 24 }}
+          onPress={() => { setLoading(true); loadData(); }}
+        >
+          <Text style={{ color: '#FFF', fontWeight: '600' }}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor={COLORS.topBar} barStyle="light-content" />
+
+      <View style={styles.topBar}>
+        <Text style={styles.appTitle}>Smart Wardrobe</Text>
+        <Text style={styles.appSubtitle}>Sri Lanka Edition</Text>
+      </View>
+
+      <View style={{ flex: 1 }}>
+        {activeTab === 0 && (
+          <WardrobeScreen
+            items={items} layout={wardrobeLayout}
+            refreshing={refreshing} onRefresh={onRefresh}
+            onWear={handleWear} onSaveNote={handleSaveNote}
+          />
+        )}
+        {activeTab === 1 && (
+          <InsightsScreen
+            items={items} insights={insights}
+            refreshing={refreshing} onRefresh={onRefresh}
+          />
+        )}
+        {activeTab === 2 && (
+          <LaundryScreen
+            items={items} refreshing={refreshing}
+            onRefresh={onRefresh} onWash={handleWash}
+          />
+        )}
+      </View>
+
+      <View style={styles.tabBar}>
+        {TABS.map((tab, i) => {
+          const active = activeTab === i;
+          return (
+            <TouchableOpacity key={i} style={styles.tabItem} onPress={() => setActiveTab(i)} activeOpacity={0.8}>
+              <View style={[styles.tabPill, active && styles.tabPillActive]}>
+                <Text style={[styles.tabIcon, active && styles.tabIconActive]}>{tab.icon}</Text>
+                <Text style={[styles.tabLabel, active && styles.tabLabelActive]}>{tab.label}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+// ── Styles (from SmartWardrobeApp/App.js) ───────────────────────────────────
+
+const styles = StyleSheet.create({
+  container:      { flex: 1, backgroundColor: COLORS.background },
+  loadingScreen:  { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.background },
+  loadingText:    { marginTop: 12, color: COLORS.primary, fontSize: 16 },
+  centered:       { marginTop: 60 },
+
+  topBar:         { backgroundColor: COLORS.topBar, paddingHorizontal: 20, paddingVertical: 14 },
+  appTitle:       { color: '#FFF', fontSize: 22, fontWeight: 'bold' },
+  appSubtitle:    { color: COLORS.topBarSub, fontSize: 12 },
+
+  screen:         { flex: 1 },
+  screenContent:  { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 24, width: '100%', maxWidth: 560, alignSelf: 'center' },
+  screenTitle:    { fontSize: 24, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 2 },
+  screenSub:      { fontSize: 14, color: COLORS.textSecondary, marginBottom: 16 },
+
+  zone:           { borderRadius: 16, padding: 14, marginBottom: 16 },
+  zoneHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  zoneTitle:      { fontSize: 16, fontWeight: '800', color: COLORS.textPrimary },
+  zoneCount:      { fontSize: 13, fontWeight: '600', color: COLORS.textSecondary },
+  zoneList:       { gap: 10 },
+
+  card: {
+    backgroundColor: COLORS.surface, padding: 16, borderRadius: 14,
+    width: '100%', elevation: 3,
+    shadowColor: '#6D28D9', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 3 },
+  },
+  dirtyCard:      { backgroundColor: COLORS.dirtyBg, borderWidth: 1, borderColor: '#FECACA' },
+  cardHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6, gap: 8 },
+  itemCategory:   { fontSize: 16, fontWeight: '800', color: COLORS.textPrimary, flex: 1, lineHeight: 21 },
+  statusBadge:    { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  statusText:     { fontSize: 11, fontWeight: '800' },
+  cardDetail:     { fontSize: 13, color: COLORS.textSecondary, marginBottom: 12, textTransform: 'capitalize' },
+  wearRow:        { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  wearLabel:      { fontSize: 12, color: COLORS.textMuted, fontWeight: '500' },
+  wearCount:      { fontSize: 13, fontWeight: '800', color: COLORS.primary },
+  scoreRow:       { flexDirection: 'row', alignItems: 'center' },
+  scoreLabel:     { fontSize: 12, color: COLORS.textMuted, fontWeight: '500', width: 62 },
+  scoreBarBg:     { flex: 1, height: 8, backgroundColor: '#EDE9FE', borderRadius: 999, marginHorizontal: 8 },
+  scoreBarFill:   { height: 8, borderRadius: 999 },
+  scoreNum:       { fontSize: 12, fontWeight: '800', width: 38, textAlign: 'right' },
+  positionBadge:  { marginTop: 12, borderRadius: 10, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 8 },
+  positionText:   { fontSize: 12, fontWeight: '800' },
+  positionSub:    { fontSize: 11, marginTop: 2, opacity: 0.85 },
+  tapHint:        { fontSize: 11, color: COLORS.textMuted, marginTop: 10, textAlign: 'center', fontStyle: 'italic' },
+
+  noteSection:    { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.divider },
+  noteLabel:      { fontSize: 10, fontWeight: '800', color: COLORS.primary, letterSpacing: 1, marginBottom: 6 },
+  noteText:       { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19, backgroundColor: '#F5F3FF', borderRadius: 10, padding: 10 },
+  noteInput: {
+    fontSize: 13, color: COLORS.textPrimary, minHeight: 60, textAlignVertical: 'top',
+    backgroundColor: '#F5F3FF', borderRadius: 10, borderWidth: 1, borderColor: COLORS.border, padding: 10,
+  },
+  noteInputError: { borderColor: COLORS.scoreLow, backgroundColor: '#FEF2F2' },
+  noteErrorText:  { fontSize: 12, color: COLORS.dirtyText, fontWeight: '600', marginTop: 6 },
+  noteBtnRow:        { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 },
+  noteBtn:           { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: '#F1F5F9' },
+  noteBtnPrimary:    { backgroundColor: COLORS.primary },
+  noteBtnDanger:     { backgroundColor: COLORS.dirty },
+  noteBtnDisabled:   { opacity: 0.5 },
+  noteBtnText:       { fontSize: 12, fontWeight: '700', color: COLORS.textSecondary },
+  noteBtnTextPrimary:{ color: '#FFFFFF' },
+  noteBtnTextDanger: { color: COLORS.dirtyText },
+  noteAddBtn:        { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border, backgroundColor: '#F5F3FF' },
+  noteAddText:       { fontSize: 12, fontWeight: '700', color: COLORS.primary },
+
+  capacityCard: {
+    backgroundColor: COLORS.surface, borderRadius: 16, padding: 16,
+    marginBottom: 16, elevation: 2, shadowColor: '#6D28D9', shadowOpacity: 0.08, shadowRadius: 8,
+  },
+  capacityTitle:  { fontSize: 16, fontWeight: '800', color: COLORS.textPrimary, marginBottom: 2 },
+  capacitySub:    { fontSize: 12, color: COLORS.textSecondary, marginBottom: 12 },
+  capacityRow:    { flexDirection: 'row', gap: 8 },
+  capacitySection:{ flex: 1, borderRadius: 12, borderWidth: 1, paddingVertical: 12, paddingHorizontal: 6, alignItems: 'center' },
+  capacityIcon:         { fontSize: 18, marginBottom: 4 },
+  capacitySectionLabel: { fontSize: 11, fontWeight: '800', textAlign: 'center', lineHeight: 14 },
+  capacitySectionCount: { fontSize: 24, fontWeight: '900', marginTop: 4 },
+  capacitySectionLoc:   { fontSize: 10, color: COLORS.textMuted, marginTop: 3, textAlign: 'center' },
+
+  statsRow:       { flexDirection: 'row', gap: 10, marginBottom: 16 },
+  statCard:       { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
+  statNum:        { fontSize: 26, fontWeight: 'bold', color: COLORS.textPrimary },
+  statLabel:      { fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
+
+  alertCard:      { backgroundColor: '#FEF3C7', borderLeftWidth: 4, borderLeftColor: '#F59E0B', padding: 14, borderRadius: 10, marginBottom: 16 },
+  alertTitle:     { fontWeight: 'bold', color: '#92400E', marginBottom: 4 },
+  alertBody:      { color: COLORS.textSecondary, fontSize: 13, lineHeight: 20 },
+
+  insightSection: {
+    backgroundColor: COLORS.surface, borderRadius: 12, padding: 14, marginBottom: 16,
+    elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4,
+  },
+  insightSectionTitle: { fontSize: 16, fontWeight: 'bold', color: COLORS.textPrimary, marginBottom: 2 },
+  insightSectionSub:   { fontSize: 12, color: COLORS.primaryLight, marginBottom: 10 },
+  insightRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 8, borderTopWidth: 1, borderTopColor: COLORS.divider,
+  },
+  insightItemName:   { fontSize: 14, fontWeight: '600', color: COLORS.textPrimary },
+  insightItemDetail: { fontSize: 12, color: COLORS.primaryLight, marginTop: 1 },
+  insightScore:      { fontSize: 17, fontWeight: 'bold' },
+
+  laundryRow: {
+    backgroundColor: COLORS.surface, borderRadius: 12, padding: 14, marginBottom: 10,
+    flexDirection: 'row', alignItems: 'center',
+    elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4,
+  },
+  laundryName:   { fontSize: 15, fontWeight: 'bold', color: COLORS.textPrimary },
+  laundryDetail: { fontSize: 12, color: COLORS.primaryLight, marginTop: 1 },
+  laundryWears:  { fontSize: 11, color: COLORS.textMuted, marginTop: 3 },
+  washBtn:       { backgroundColor: COLORS.primary, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20 },
+  washBtnText:   { color: '#FFF', fontSize: 12, fontWeight: '600' },
+
+  emptyState:    { alignItems: 'center', paddingTop: 60 },
+  emptyEmoji:    { fontSize: 52 },
+  emptyText:     { fontSize: 16, color: COLORS.primaryLight, marginTop: 12 },
+
+  tabBar: {
+    flexDirection: 'row', backgroundColor: COLORS.surface,
+    borderTopWidth: 1, borderTopColor: COLORS.border,
+    paddingVertical: 8, paddingHorizontal: 8,
+    shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: -3 }, elevation: 12,
+  },
+  tabItem:        { flex: 1, alignItems: 'center' },
+  tabPill:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 7, paddingHorizontal: 14, borderRadius: 24, gap: 5 },
+  tabPillActive:  { backgroundColor: '#EDE9FE' },
+  tabIcon:        { fontSize: 18 },
+  tabIconActive:  { fontSize: 20 },
+  tabLabel:       { fontSize: 12, color: COLORS.textMuted, fontWeight: '500' },
+  tabLabelActive: { color: COLORS.primary, fontWeight: '700' },
+});
