@@ -29,6 +29,7 @@ export interface HistoryEntry {
   time: string;
   data: ApiResponse;
   feedback?: FeedbackMap;
+  note?: string;
 }
 
 export type FeedbackMap = Record<string, 'liked' | 'skipped'>;
@@ -71,6 +72,14 @@ class WardrobeStore {
       else fb[outfit] = action;
       return { ...h, feedback: fb };
     });
+    this.notify();
+  }
+
+  // Free-text feedback the user types for a whole history entry.
+  setHistoryNote(entryId: string, note: string) {
+    this.history = this.history.map(h =>
+      h.id === entryId ? { ...h, note: note.trim() || undefined } : h
+    );
     this.notify();
   }
 

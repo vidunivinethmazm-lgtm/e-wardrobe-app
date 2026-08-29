@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet, View, Text, ScrollView, SafeAreaView,
-  StatusBar, TouchableOpacity,
+  StatusBar, TouchableOpacity, TextInput,
 } from 'react-native';
 import { wardrobeStore, HistoryEntry } from '../store';
 
 export default function HistoryScreen() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setHistory([...wardrobeStore.history]);
@@ -123,6 +124,54 @@ export default function HistoryScreen() {
                     })}
                   </View>
                 )}
+
+                {/* ── Free-text feedback ── */}
+                <View style={styles.noteBox}>
+                  <Text style={styles.noteLabel}>YOUR FEEDBACK</Text>
+                  {entry.note ? (
+                    <View style={styles.noteSaved}>
+                      <Text style={styles.noteSavedText}>“{entry.note}”</Text>
+                      <View style={styles.noteSavedActions}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setDrafts(d => ({ ...d, [entry.id]: entry.note ?? '' }));
+                            wardrobeStore.setHistoryNote(entry.id, '');
+                          }}
+                        >
+                          <Text style={styles.noteEdit}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => wardrobeStore.setHistoryNote(entry.id, '')}>
+                          <Text style={styles.noteRemove}>Remove</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ) : (
+                    <>
+                      <TextInput
+                        style={styles.noteInput}
+                        placeholder="Type your thoughts on these picks…"
+                        placeholderTextColor="#9CA3AF"
+                        multiline
+                        value={drafts[entry.id] ?? ''}
+                        onChangeText={t => setDrafts(d => ({ ...d, [entry.id]: t }))}
+                      />
+                      <TouchableOpacity
+                        style={[styles.noteBtn, !(drafts[entry.id] ?? '').trim() && styles.noteBtnDisabled]}
+                        disabled={!(drafts[entry.id] ?? '').trim()}
+                        onPress={() => {
+                          wardrobeStore.setHistoryNote(entry.id, drafts[entry.id] ?? '');
+                          setDrafts(d => {
+                            const next = { ...d };
+                            delete next[entry.id];
+                            return next;
+                          });
+                        }}
+                      >
+                        <Text style={styles.noteBtnText}>Add feedback</Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+                </View>
               </View>
             ))
           )}
@@ -177,4 +226,24 @@ const styles = StyleSheet.create({
   fbBtnLikedActive:   { backgroundColor: '#DCFCE7', borderWidth: 1, borderColor: '#16A34A' },
   fbBtnSkippedActive: { backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#EF4444' },
   fbBtnIcon:        { fontSize: 13 },
+
+  noteBox:   { marginTop: 12 },
+  noteLabel: { fontSize: 10, fontWeight: '700', color: '#7C3AED', letterSpacing: 1, marginBottom: 6 },
+  noteInput: {
+    minHeight: 64, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12,
+    padding: 10, fontSize: 13, color: '#374151', backgroundColor: '#FFF',
+    textAlignVertical: 'top',
+  },
+  noteBtn: {
+    marginTop: 8, alignSelf: 'flex-start', backgroundColor: '#7C3AED',
+    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10,
+  },
+  noteBtnDisabled: { backgroundColor: '#C4B5FD' },
+  noteBtnText:     { color: '#FFF', fontSize: 13, fontWeight: '700' },
+
+  noteSaved:        { backgroundColor: '#F5F3FF', borderRadius: 12, padding: 10, borderLeftWidth: 3, borderLeftColor: '#7C3AED' },
+  noteSavedText:    { fontSize: 13, color: '#4C1D95', fontStyle: 'italic', lineHeight: 19 },
+  noteSavedActions: { flexDirection: 'row', gap: 16, marginTop: 8 },
+  noteEdit:         { fontSize: 12, color: '#7C3AED', fontWeight: '700' },
+  noteRemove:       { fontSize: 12, color: '#EF4444', fontWeight: '700' },
 });
