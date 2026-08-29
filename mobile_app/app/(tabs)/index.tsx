@@ -17,21 +17,9 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  orderBy,
-  query,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
+import { CLASSIFICATION_URL, WARDROBE_URL } from "../../constants/api";
 
-import { db } from "../../firebaseConfig";
-
-const API_URL = Platform.OS === "web" ? "http://127.0.0.1:8000" : "http://10.0.2.2:8000";
+const API_URL = CLASSIFICATION_URL;
 
 export default function App() {
   const [image, setImage] = useState<any>(null);
@@ -46,13 +34,11 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const [savedItemId, setSavedItemId] = useState<string | null>(null);
 
   const [eventName, setEventName] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventTime, setEventTime] = useState("");
   const [eventNotes, setEventNotes] = useState("");
-  const [eventSuggestion, setEventSuggestion] = useState<any>(null);
 
   const [wardrobeItems, setWardrobeItems] = useState<any[]>([]);
   const [scheduledEvents, setScheduledEvents] = useState<any[]>([]);
@@ -68,6 +54,16 @@ export default function App() {
     material: "",
   });
 
+  const [editEventId, setEditEventId] = useState<string | null>(null);
+  const [delEventId, setDelEventId] = useState<string | null>(null);
+  const [eventRowBusy, setEventRowBusy] = useState<string | null>(null);
+  const [eventForm, setEventForm] = useState({
+    eventName: "",
+    eventDate: "",
+    eventTime: "",
+    notes: "",
+  });
+
   const pickImage = async () => {
     setPrediction(null);
     setTrendAnalysis(null);
@@ -75,7 +71,6 @@ export default function App() {
     setOriginalImageUrl(null);
     setBackImage(null);
     setBackImageUrl(null);
-    setSavedItemId(null);
 
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -116,7 +111,6 @@ export default function App() {
       setProcessedImageUrl(null);
       setOriginalImageUrl(null);
       setBackImageUrl(null);
-      setSavedItemId(null);
     }
   };
 
@@ -188,6 +182,43 @@ export default function App() {
     }
   };
 
+  // Fires the dressing-event save for a just-saved wardrobe item, using the
+  // current schedule-form fields. Returns the trend suggestion (or null).
+  const postScheduleEvent = async (item: any) => {
+    let suggestion: any = null;
+    try {
+      const r = await axios.post(`${API_URL}/schedule/suggestion`, {
+        items: [{
+          id: item.id,
+          type: item.type,
+          color: item.color,
+          gender: item.gender,
+          season: item.season,
+          material: item.material,
+          processedImageUrl: item.processedImageUrl,
+        }],
+        event: { eventName, eventDate, eventTime },
+      });
+      suggestion = r.data;
+    } catch (suggestionError) {
+      console.log("Schedule suggestion error:", suggestionError);
+    }
+
+    await axios.post(`${WARDROBE_URL}/schedule`, {
+      wardrobe_item_id: item.id,
+      event_name: eventName,
+      event_date: eventDate,
+      event_time: eventTime,
+      notes: eventNotes,
+      clothing_type: item.type,
+      clothing_color: item.color,
+      processed_image_url: item.processedImageUrl,
+      trend_suggestion: suggestion,
+    });
+
+    return suggestion;
+  };
+
   const saveWardrobeItem = async () => {
     if (!prediction) {
       Alert.alert("No prediction", "Please predict clothing first.");
@@ -197,121 +228,81 @@ export default function App() {
     try {
       setSaving(true);
 
-      const savePromise = addDoc(collection(db, "wardrobe_items"), {
-        type: prediction.type,
-        typeConfidence: prediction.type_confidence,
-        color: prediction.color,
-        colorConfidence: prediction.color_confidence,
-        gender: prediction.gender,
-        genderConfidence: prediction.gender_confidence,
-        season: prediction.season,
-        seasonConfidence: prediction.season_confidence,
-        material: prediction.material,
-        materialConfidence: prediction.material_confidence,
-        originalImageUrl,
-        backImageUrl,
-        processedImageUrl,
-        trendAnalysis,
-        createdAt: serverTimestamp(),
+      const response = await axios.post(`${WARDROBE_URL}/`, {
+        prediction: { ...prediction, trend_analysis: trendAnalysis },
+        images: {
+          original_image_url: originalImageUrl,
+          processed_image_url: processedImageUrl,
+          back_image_url: backImageUrl,
+          back_processed_image_url: backImageUrl,
+        },
       });
 
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Firebase save timeout")), 15000)
-      );
+      const snapshot = {
+        id: response.data.item_id,
+        type: prediction.type,
+        color: prediction.color,
+        gender: prediction.gender,
+        season: prediction.season,
+        material: prediction.material,
+        processedImageUrl,
+      };
 
-      const docRef: any = await Promise.race([savePromise, timeoutPromise]);
+      // Collapse the prediction result now that it's saved.
+      setPrediction(null);
+      setTrendAnalysis(null);
+      setProcessedImageUrl(null);
+      setOriginalImageUrl(null);
+      setBackImageUrl(null);
+      setImage(null);
+      setBackImage(null);
 
-      setSavedItemId(docRef.id);
+      // If the dressing-event form was filled in, save that event too.
+      const scheduleComplete =
+        !!(eventName.trim() && eventDate.trim() && eventTime.trim());
+      let message = "Added to your wardrobe.";
+      if (scheduleComplete) {
+        try {
+          const suggestion = await postScheduleEvent(snapshot);
+          message = suggestion?.suggestion
+            ? `Saved to your wardrobe and scheduled.\n\nBest for this date: ${suggestion.suggestion}`
+            : "Saved to your wardrobe and scheduled.";
+        } catch (scheduleError) {
+          console.log("Schedule save error:", scheduleError);
+          message = "Saved to your wardrobe. The dressing event could not be saved - try again from the Scheduled Events section.";
+        }
+      }
 
-      Alert.alert("Saved", "Wardrobe item saved to Firebase.");
+      // Collapse and reset the schedule form.
+      setEventName("");
+      setEventDate("");
+      setEventTime("");
+      setEventNotes("");
+
+      Alert.alert("Saved", message);
     } catch (error: any) {
-      console.log("Firebase save error:", error);
+      console.log("Save error:", error);
       Alert.alert("Save failed", error.message || "Could not save item.");
     } finally {
       setSaving(false);
     }
   };
 
-  const saveScheduleEvent = async () => {
-    if (!savedItemId) {
-      Alert.alert(
-        "Save item first",
-        "Please save the wardrobe item before scheduling."
-      );
-      return;
-    }
-
-    if (!eventName || !eventDate || !eventTime) {
-      Alert.alert("Missing details", "Enter event name, date, and time.");
-      return;
-    }
-
-    try {
-      let scheduleSuggestion = null;
-
-      try {
-        const suggestionResponse = await axios.post(`${API_URL}/schedule/suggestion`, {
-          items: [{
-            id: savedItemId,
-            type: prediction?.type,
-            color: prediction?.color,
-            gender: prediction?.gender,
-            season: prediction?.season,
-            material: prediction?.material,
-            processedImageUrl,
-          }],
-          event: {
-            eventName,
-            eventDate,
-            eventTime,
-          },
-        });
-        scheduleSuggestion = suggestionResponse.data;
-      } catch (suggestionError) {
-        console.log("Schedule suggestion error:", suggestionError);
-      }
-
-      await addDoc(collection(db, "scheduled_events"), {
-        wardrobeItemId: savedItemId,
-        eventName,
-        eventDate,
-        eventTime,
-        notes: eventNotes,
-        clothingType: prediction?.type,
-        clothingColor: prediction?.color,
-        clothingGender: prediction?.gender,
-        clothingSeason: prediction?.season,
-        clothingMaterial: prediction?.material,
-        processedImageUrl,
-        trendSuggestion: scheduleSuggestion,
-        createdAt: serverTimestamp(),
-      });
-
-      setEventSuggestion(scheduleSuggestion);
-      setEventName("");
-      setEventDate("");
-      setEventTime("");
-      setEventNotes("");
-
-      Alert.alert("Scheduled", "Dressing event saved to Firebase.");
-    } catch (error) {
-      console.log("Schedule error:", error);
-      Alert.alert("Schedule failed", "Could not save event.");
-    }
-  };
-
   const loadSavedDetails = async () => {
     try {
-      const q = query(
-        collection(db, "wardrobe_items"),
-        orderBy("createdAt", "desc")
-      );
+      const response = await axios.get(`${WARDROBE_URL}/`);
 
-      const snapshot = await getDocs(q);
-
-      const items = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const items = response.data.map((d: any) => ({
+        id: d.item_id,
+        type: d.type,
+        color: d.color,
+        gender: d.gender,
+        season: d.season,
+        material: d.material,
+        originalImageUrl: d.original_image_url,
+        processedImageUrl: d.processed_image_url,
+        backImageUrl: d.back_processed_image_url || d.back_image_url,
+        trendAnalysis: d.trend_analysis,
       }));
 
       setWardrobeItems(items);
@@ -340,7 +331,7 @@ export default function App() {
     try {
       setRowBusyId(itemId);
 
-      await updateDoc(doc(db, "wardrobe_items", itemId), {
+      await axios.patch(`${WARDROBE_URL}/${itemId}`, {
         type: editForm.type,
         color: editForm.color,
         gender: editForm.gender,
@@ -374,7 +365,7 @@ export default function App() {
     try {
       setRowBusyId(itemId);
 
-      await deleteDoc(doc(db, "wardrobe_items", itemId));
+      await axios.delete(`${WARDROBE_URL}/${itemId}`);
 
       setWardrobeItems((prev) => prev.filter((it) => it.id !== itemId));
       setConfirmDeleteId(null);
@@ -398,22 +389,81 @@ export default function App() {
 
   const loadScheduledEvents = async () => {
     try {
-      const q = query(
-        collection(db, "scheduled_events"),
-        orderBy("createdAt", "desc")
-      );
+      const response = await axios.get(`${WARDROBE_URL}/schedule`);
 
-      const snapshot = await getDocs(q);
-
-      const events = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const events = response.data.map((e: any) => ({
+        id: e.event_id,
+        eventName: e.event_name,
+        eventDate: e.event_date,
+        eventTime: e.event_time,
+        notes: e.notes,
+        clothingType: e.clothing_type,
+        clothingColor: e.clothing_color,
+        processedImageUrl: e.processed_image_url,
+        trendSuggestion: e.trend_suggestion,
       }));
 
       setScheduledEvents(events);
     } catch (error) {
       console.log("Load events error:", error);
       Alert.alert("Error", "Could not load scheduled events.");
+    }
+  };
+
+  const startEditEvent = (ev: any) => {
+    setEditEventId(ev.id);
+    setEventForm({
+      eventName: ev.eventName ?? "",
+      eventDate: ev.eventDate ?? "",
+      eventTime: ev.eventTime ?? "",
+      notes: ev.notes ?? "",
+    });
+  };
+
+  const cancelEditEvent = () => setEditEventId(null);
+
+  const saveEditEvent = async (id: string) => {
+    try {
+      setEventRowBusy(id);
+      await axios.patch(`${WARDROBE_URL}/schedule/${id}`, {
+        event_name: eventForm.eventName,
+        event_date: eventForm.eventDate,
+        event_time: eventForm.eventTime,
+        notes: eventForm.notes,
+      });
+      setScheduledEvents((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, ...eventForm } : e))
+      );
+      setEditEventId(null);
+      Alert.alert("Updated", "Dressing event updated.");
+    } catch (error) {
+      console.log("Update event error:", error);
+      Alert.alert("Update failed", "Could not update this event.");
+    } finally {
+      setEventRowBusy(null);
+    }
+  };
+
+  const requestDeleteEvent = (id: string) => setDelEventId(id);
+  const cancelDeleteEvent = () => setDelEventId(null);
+
+  const deleteEvent = async (id: string) => {
+    try {
+      setEventRowBusy(id);
+      await axios.delete(`${WARDROBE_URL}/schedule/${id}`);
+      setScheduledEvents((prev) => prev.filter((e) => e.id !== id));
+      setDelEventId(null);
+      if (editEventId === id) setEditEventId(null);
+    } catch (error: any) {
+      console.log("Delete event error:", error);
+      const msg = error?.message || "Could not delete this event.";
+      if (Platform.OS === "web" && typeof window !== "undefined") {
+        window.alert("Delete failed: " + msg);
+      } else {
+        Alert.alert("Delete failed", msg);
+      }
+    } finally {
+      setEventRowBusy(null);
     }
   };
 
@@ -436,7 +486,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
 
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>E-Wardrobe AI</Text>
@@ -568,19 +618,19 @@ export default function App() {
               disabled={saving}
             >
               <Text style={styles.buttonText}>
-                {saving ? "Saving..." : "Save to Wardrobe"}
+                {saving
+                  ? "Saving..."
+                  : eventName.trim() && eventDate.trim() && eventTime.trim()
+                  ? "Save to Wardrobe & Schedule"
+                  : "Save to Wardrobe"}
               </Text>
             </TouchableOpacity>
-
-            {savedItemId && (
-              <Text style={styles.savedText}>Saved Item ID: {savedItemId}</Text>
-            )}
           </View>
         )}
 
-        {savedItemId && (
+        {prediction && (
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>Schedule Dressing Event</Text>
+            <Text style={styles.sectionTitle}>Schedule Dressing Event (optional)</Text>
 
             <TextInput
               style={styles.input}
@@ -615,24 +665,22 @@ export default function App() {
               multiline
             />
 
-            <TouchableOpacity style={styles.scheduleButton} onPress={saveScheduleEvent}>
-              <Text style={styles.buttonText}>Save Schedule</Text>
-            </TouchableOpacity>
-
-            {eventSuggestion?.suggestion && (
-              <View style={styles.eventSuggestionBox}>
-                <Text style={styles.eventSuggestionTitle}>Best For This Date</Text>
-                <Text style={styles.eventSuggestionText}>{eventSuggestion.suggestion}</Text>
-              </View>
-            )}
+            <Text style={styles.savedInfo}>
+              Fill event name, date and time to save this dressing event together with the item. Leave blank to save the item only.
+            </Text>
           </View>
         )}
 
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Saved Wardrobe Items</Text>
 
-          <TouchableOpacity style={styles.primaryButton} onPress={loadSavedDetails}>
-            <Text style={styles.buttonText}>View Saved Wardrobe Items</Text>
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={wardrobeItems.length > 0 ? () => setWardrobeItems([]) : loadSavedDetails}
+          >
+            <Text style={styles.buttonText}>
+              {wardrobeItems.length > 0 ? "Hide Wardrobe Items" : "View Saved Wardrobe Items"}
+            </Text>
           </TouchableOpacity>
 
           {wardrobeItems.map((item) => {
@@ -796,39 +844,166 @@ export default function App() {
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Scheduled Dressing Events</Text>
 
-          <TouchableOpacity style={styles.scheduleButton} onPress={loadScheduledEvents}>
-            <Text style={styles.buttonText}>View Scheduled Events</Text>
+          <TouchableOpacity
+            style={styles.scheduleButton}
+            onPress={scheduledEvents.length > 0 ? () => setScheduledEvents([]) : loadScheduledEvents}
+          >
+            <Text style={styles.buttonText}>
+              {scheduledEvents.length > 0 ? "Hide Scheduled Events" : "View Scheduled Events"}
+            </Text>
           </TouchableOpacity>
 
-          {scheduledEvents.map((event) => (
-            <View key={event.id} style={styles.savedCard}>
-              {event.processedImageUrl && (
-                <Image source={{ uri: event.processedImageUrl }} style={styles.smallImage} />
-              )}
+          {scheduledEvents.map((event) => {
+            const isEditing = editEventId === event.id;
+            const isBusy = eventRowBusy === event.id;
 
-              <Text style={styles.savedTitle}>{event.eventName}</Text>
-              <Text style={styles.savedInfo}>Date: {event.eventDate}</Text>
-              <Text style={styles.savedInfo}>Time: {event.eventTime}</Text>
-              <Text style={styles.savedInfo}>Dress: {event.clothingType}</Text>
-              <Text style={styles.savedInfo}>Color: {event.clothingColor}</Text>
-              <Text style={styles.savedInfo}>Notes: {event.notes}</Text>
-              {event.trendSuggestion?.suggestion && (
-                <Text style={styles.savedInfo}>
-                  Suggestion: {event.trendSuggestion.suggestion}
-                </Text>
-              )}
-            </View>
-          ))}
+            return (
+              <View key={event.id} style={styles.savedCard}>
+                {event.processedImageUrl && (
+                  <Image source={{ uri: event.processedImageUrl }} style={styles.smallImage} />
+                )}
+
+                {isEditing ? (
+                  <>
+                    <Text style={styles.editLabel}>Event name</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={eventForm.eventName}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, eventName: t }))}
+                      placeholder="Event name"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Date</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={eventForm.eventDate}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, eventDate: t }))}
+                      placeholder="Date: 2026-05-20"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Time</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={eventForm.eventTime}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, eventTime: t }))}
+                      placeholder="Time: 18:30"
+                      placeholderTextColor="#94a3b8"
+                    />
+
+                    <Text style={styles.editLabel}>Notes</Text>
+                    <TextInput
+                      style={[styles.input, styles.notesInput]}
+                      value={eventForm.notes}
+                      onChangeText={(t) => setEventForm((f) => ({ ...f, notes: t }))}
+                      placeholder="Notes"
+                      placeholderTextColor="#94a3b8"
+                      multiline
+                    />
+
+                    <View style={styles.cardActions}>
+                      <TouchableOpacity
+                        style={[
+                          styles.saveButton,
+                          styles.cardActionButton,
+                          isBusy && styles.disabledButton,
+                        ]}
+                        onPress={() => saveEditEvent(event.id)}
+                        disabled={isBusy}
+                      >
+                        <Text style={styles.buttonText}>
+                          {isBusy ? "Saving..." : "Save Changes"}
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={[styles.secondaryButton, styles.cardActionButton]}
+                        onPress={cancelEditEvent}
+                        disabled={isBusy}
+                      >
+                        <Text style={styles.buttonText}>Cancel</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.savedTitle}>{event.eventName}</Text>
+                    <Text style={styles.savedInfo}>Date: {event.eventDate}</Text>
+                    <Text style={styles.savedInfo}>Time: {event.eventTime}</Text>
+                    <Text style={styles.savedInfo}>Dress: {event.clothingType}</Text>
+                    <Text style={styles.savedInfo}>Color: {event.clothingColor}</Text>
+                    <Text style={styles.savedInfo}>Notes: {event.notes}</Text>
+                    {event.trendSuggestion?.suggestion && (
+                      <Text style={styles.savedInfo}>
+                        Suggestion: {event.trendSuggestion.suggestion}
+                      </Text>
+                    )}
+
+                    {delEventId === event.id ? (
+                      <>
+                        <Text style={styles.confirmText}>
+                          Delete this event permanently?
+                        </Text>
+                        <View style={styles.cardActions}>
+                          <TouchableOpacity
+                            style={[
+                              styles.deleteButton,
+                              styles.cardActionButton,
+                              isBusy && styles.disabledButton,
+                            ]}
+                            onPress={() => deleteEvent(event.id)}
+                            disabled={isBusy}
+                          >
+                            <Text style={styles.buttonText}>
+                              {isBusy ? "Deleting..." : "Confirm Delete"}
+                            </Text>
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            style={[styles.secondaryButton, styles.cardActionButton]}
+                            onPress={cancelDeleteEvent}
+                            disabled={isBusy}
+                          >
+                            <Text style={styles.buttonText}>Keep</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
+                    ) : (
+                      <View style={styles.cardActions}>
+                        <TouchableOpacity
+                          style={[styles.editButton, styles.cardActionButton]}
+                          onPress={() => startEditEvent(event)}
+                          disabled={isBusy}
+                        >
+                          <Text style={styles.buttonText}>Edit</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                          style={[styles.deleteButton, styles.cardActionButton]}
+                          onPress={() => requestDeleteEvent(event.id)}
+                          disabled={isBusy}
+                        >
+                          <Text style={styles.buttonText}>Delete</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </>
+                )}
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
+/* Tailwind violet / slate palette - matches the Recommend screen. */
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#080C18",
+    backgroundColor: "#F3F0FF",
   },
 
   container: {
@@ -842,7 +1017,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#F8FAFC",
+    color: "#2D1B69",
     textAlign: "center",
     letterSpacing: -0.6,
     marginTop: 24,
@@ -850,7 +1025,7 @@ const styles = StyleSheet.create({
 
   subtitle: {
     fontSize: 14,
-    color: "#8A97AD",
+    color: "#6B7280",
     textAlign: "center",
     lineHeight: 20,
     marginBottom: 26,
@@ -859,23 +1034,23 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#111A2E",
-    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
     padding: 20,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#1F2A44",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.28,
-    shadowRadius: 24,
+    borderColor: "#EDE9FE",
+    shadowColor: "#6D28D9",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 4,
   },
 
   sectionTitle: {
     fontSize: 17,
-    fontWeight: "700",
-    color: "#F1F5F9",
+    fontWeight: "800",
+    color: "#1F2937",
     letterSpacing: -0.2,
     marginBottom: 16,
   },
@@ -885,16 +1060,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1.5,
     borderStyle: "dashed",
-    borderColor: "#3B4763",
+    borderColor: "#DDD6FE",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F5F3FF",
     overflow: "hidden",
     marginBottom: 14,
   },
 
   uploadText: {
-    color: "#7C8AA3",
+    color: "#9CA3AF",
     fontSize: 15,
     fontWeight: "500",
   },
@@ -904,81 +1079,81 @@ const styles = StyleSheet.create({
     height: 280,
     borderRadius: 16,
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#EDE9FE",
   },
 
   primaryButton: {
-    backgroundColor: "#6366F1",
+    backgroundColor: "#7C3AED",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginBottom: 12,
-    shadowColor: "#6366F1",
+    shadowColor: "#7C3AED",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   secondaryButton: {
-    backgroundColor: "#1E293B",
+    backgroundColor: "#8B5CF6",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "#2E3B54",
+    borderColor: "#DDD6FE",
   },
 
   imageSideLabel: {
-    color: "#9AA7BD",
+    color: "#7C3AED",
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1.5,
     marginBottom: 10,
   },
 
   predictButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#7C3AED",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
-    shadowColor: "#10B981",
+    shadowColor: "#7C3AED",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.32,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   saveButton: {
-    backgroundColor: "#F59E0B",
+    backgroundColor: "#10B981",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginTop: 18,
-    shadowColor: "#F59E0B",
+    shadowColor: "#10B981",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   scheduleButton: {
     backgroundColor: "#8B5CF6",
     paddingVertical: 15,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: "center",
     marginTop: 8,
     shadowColor: "#8B5CF6",
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.32,
-    shadowRadius: 14,
+    shadowRadius: 10,
     elevation: 3,
   },
 
   disabledButton: {
-    backgroundColor: "#334155",
+    backgroundColor: "#C4B5FD",
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -986,7 +1161,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#ffffff",
     fontSize: 15,
-    fontWeight: "700",
+    fontWeight: "800",
     letterSpacing: 0.3,
   },
 
@@ -999,24 +1174,24 @@ const styles = StyleSheet.create({
 
   resultBox: {
     width: "48%",
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F5F3FF",
     borderRadius: 14,
     padding: 14,
     borderWidth: 1,
-    borderColor: "#1F2A44",
+    borderColor: "#EDE9FE",
   },
 
   resultLabel: {
-    color: "#8A97AD",
+    color: "#7C3AED",
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1,
     marginBottom: 6,
   },
 
   resultValue: {
-    color: "#F1F5F9",
+    color: "#1F2937",
     fontSize: 17,
     fontWeight: "800",
     letterSpacing: -0.2,
@@ -1033,42 +1208,44 @@ const styles = StyleSheet.create({
   },
 
   confidenceLabel: {
-    color: "#9AA7BD",
+    color: "#4B5563",
     fontSize: 13,
     fontWeight: "500",
   },
 
   confidenceValue: {
-    color: "#C7D2FE",
+    color: "#7C3AED",
     fontSize: 13,
     fontWeight: "700",
   },
 
   progressTrack: {
     height: 8,
-    backgroundColor: "#1E293B",
+    backgroundColor: "#EDE9FE",
     borderRadius: 999,
     overflow: "hidden",
   },
 
   progressFill: {
     height: "100%",
-    backgroundColor: "#818CF8",
+    backgroundColor: "#7C3AED",
     borderRadius: 999,
   },
 
   trendPanel: {
-    backgroundColor: "#0B1220",
+    backgroundColor: "#FAFAFA",
     borderRadius: 16,
     padding: 16,
     marginTop: 8,
     marginBottom: 2,
     borderWidth: 1,
-    borderColor: "#26324C",
+    borderColor: "#EDE9FE",
+    borderLeftWidth: 3,
+    borderLeftColor: "#7C3AED",
   },
 
   trendTitle: {
-    color: "#F1F5F9",
+    color: "#7C3AED",
     fontSize: 16,
     fontWeight: "800",
     letterSpacing: -0.2,
@@ -1076,18 +1253,18 @@ const styles = StyleSheet.create({
   },
 
   trendSource: {
-    color: "#7C8AA3",
+    color: "#9CA3AF",
     fontSize: 11,
     marginBottom: 14,
   },
 
   trendItem: {
-    backgroundColor: "#131C30",
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 13,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: "#1F2A44",
+    borderColor: "#EDE9FE",
   },
 
   trendHeader: {
@@ -1099,7 +1276,7 @@ const styles = StyleSheet.create({
   },
 
   trendKeyword: {
-    color: "#F1F5F9",
+    color: "#1F2937",
     flex: 1,
     fontSize: 14,
     fontWeight: "800",
@@ -1107,35 +1284,35 @@ const styles = StyleSheet.create({
   },
 
   trendScore: {
-    color: "#34D399",
+    color: "#10B981",
     fontSize: 14,
     fontWeight: "800",
   },
 
   trendMeta: {
-    color: "#818CF8",
+    color: "#7C3AED",
     fontSize: 11,
     fontWeight: "500",
     marginBottom: 6,
   },
 
   trendSuggestion: {
-    color: "#AEB9CC",
+    color: "#4B5563",
     fontSize: 13,
     lineHeight: 19,
   },
 
   eventSuggestionBox: {
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F0FDF4",
     borderRadius: 14,
     padding: 15,
     marginTop: 14,
     borderWidth: 1,
-    borderColor: "#1C7F5C",
+    borderColor: "#10B981",
   },
 
   eventSuggestionTitle: {
-    color: "#34D399",
+    color: "#065F46",
     fontSize: 14,
     fontWeight: "800",
     letterSpacing: 0.2,
@@ -1143,17 +1320,17 @@ const styles = StyleSheet.create({
   },
 
   eventSuggestionText: {
-    color: "#AEB9CC",
+    color: "#065F46",
     fontSize: 13,
     lineHeight: 19,
   },
 
   input: {
-    backgroundColor: "#0B1220",
-    color: "#F1F5F9",
-    borderWidth: 1,
-    borderColor: "#26324C",
-    borderRadius: 12,
+    backgroundColor: "#F5F3FF",
+    color: "#1F2937",
+    borderWidth: 1.5,
+    borderColor: "#DDD6FE",
+    borderRadius: 14,
     paddingVertical: 13,
     paddingHorizontal: 14,
     marginBottom: 12,
@@ -1166,19 +1343,19 @@ const styles = StyleSheet.create({
   },
 
   savedText: {
-    color: "#34D399",
+    color: "#065F46",
     fontWeight: "600",
     marginTop: 12,
     fontSize: 13,
   },
 
   savedCard: {
-    backgroundColor: "#0B1220",
+    backgroundColor: "#F9FAFB",
     borderRadius: 14,
     padding: 15,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: "#1F2A44",
+    borderColor: "#EDE9FE",
   },
 
   smallImage: {
@@ -1186,12 +1363,12 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 12,
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#EDE9FE",
     marginBottom: 12,
   },
 
   savedTitle: {
-    color: "#F1F5F9",
+    color: "#1F2937",
     fontSize: 17,
     fontWeight: "800",
     letterSpacing: -0.2,
@@ -1199,7 +1376,7 @@ const styles = StyleSheet.create({
   },
 
   savedInfo: {
-    color: "#AEB9CC",
+    color: "#4B5563",
     fontSize: 13,
     lineHeight: 20,
     marginBottom: 3,
@@ -1218,31 +1395,31 @@ const styles = StyleSheet.create({
   },
 
   editButton: {
-    backgroundColor: "#6366F1",
+    backgroundColor: "#7C3AED",
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
   },
 
   deleteButton: {
     backgroundColor: "#EF4444",
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: "center",
   },
 
   editLabel: {
-    color: "#9AA7BD",
+    color: "#7C3AED",
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "800",
     textTransform: "uppercase",
-    letterSpacing: 0.6,
+    letterSpacing: 1,
     marginTop: 4,
     marginBottom: 6,
   },
 
   confirmText: {
-    color: "#FCA5A5",
+    color: "#DC2626",
     fontSize: 13,
     fontWeight: "600",
     marginTop: 12,
