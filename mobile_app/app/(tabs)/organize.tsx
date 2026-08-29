@@ -82,17 +82,21 @@ const ItemCard = ({ item, onWear, onSaveNote }: any) => {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft]     = useState(note);
   const [saving, setSaving]   = useState(false);
+  const [noteError, setNoteError] = useState<string | null>(null);
 
-  const openEditor = () => { setDraft(note); setEditing(true); };
-  const cancel     = () => { setDraft(note); setEditing(false); };
+  const openEditor = () => { setDraft(note); setNoteError(null); setEditing(true); };
+  const cancel     = () => { setDraft(note); setNoteError(null); setEditing(false); };
+
+  const onDraftChange = (t: string) => { setDraft(t); if (noteError) setNoteError(null); };
 
   const commit = async (value: string) => {
     setSaving(true);
     try {
       await onSaveNote(item, value);
+      setNoteError(null);
       setEditing(false);
     } catch {
-      Alert.alert('Error', 'Could not save the note.');
+      setNoteError('Could not save the note. Check your connection and try again.');
     } finally {
       setSaving(false);
     }
@@ -100,7 +104,7 @@ const ItemCard = ({ item, onWear, onSaveNote }: any) => {
 
   const handleSave = () => {
     if (!draft.trim()) {
-      Alert.alert('Note is empty', 'Please type something before saving.');
+      setNoteError('Note is empty — type something before saving.');
       return;
     }
     commit(draft.trim());
@@ -150,14 +154,15 @@ const ItemCard = ({ item, onWear, onSaveNote }: any) => {
         {editing ? (
           <>
             <TextInput
-              style={styles.noteInput}
+              style={[styles.noteInput, noteError && styles.noteInputError]}
               value={draft}
-              onChangeText={setDraft}
+              onChangeText={onDraftChange}
               placeholder="e.g. gift from Amma, hem needs fixing, pairs with black belt…"
               placeholderTextColor={COLORS.textMuted}
               multiline
               editable={!saving}
             />
+            {noteError && <Text style={styles.noteErrorText}>{noteError}</Text>}
             <View style={styles.noteBtnRow}>
               <TouchableOpacity style={styles.noteBtn} onPress={cancel} disabled={saving}>
                 <Text style={styles.noteBtnText}>Cancel</Text>
@@ -582,6 +587,8 @@ const styles = StyleSheet.create({
     fontSize: 13, color: COLORS.textPrimary, minHeight: 60, textAlignVertical: 'top',
     backgroundColor: '#F5F3FF', borderRadius: 10, borderWidth: 1, borderColor: COLORS.border, padding: 10,
   },
+  noteInputError: { borderColor: COLORS.scoreLow, backgroundColor: '#FEF2F2' },
+  noteErrorText:  { fontSize: 12, color: COLORS.dirtyText, fontWeight: '600', marginTop: 6 },
   noteBtnRow:        { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 },
   noteBtn:           { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: '#F1F5F9' },
   noteBtnPrimary:    { backgroundColor: COLORS.primary },
