@@ -1,6 +1,58 @@
-﻿node_modules/
-.expo/
+# Python
 __pycache__/
-venv/
 *.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.env
+.venv
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# Large data files
+data/raw/images/
+backend/uploads/
+test_images/
+
+# Model weights (large binary files)
+*.h5
+*.pkl
+*.pt
+*.pth
+*.onnx
+
+# Node / Expo
+node_modules/
+.expo/
+dist/
+web-build/
 .DS_Store
+*.local
+
+# VS Code
+.vscode/
+
+# Push script (contains credentials)
+push_commits.ps1
+
+# Archives
+*.rar
+*.zip
+
+# Derived data (only data/raw/styles.csv is tracked)
+data/processed/
+data/splits/
+
+# SQLite
+*.db
+
+# local backend run logs
+backend.log
+backend.out.log
+backend.err.log
