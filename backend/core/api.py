@@ -39,6 +39,7 @@ class EditItem(BaseModel):
     category: str | None = None
     occasion: str | None = None
     price: float | None = None
+    note: str | None = None            # "" clears it
 
 
 class ScheduleEvent(BaseModel):

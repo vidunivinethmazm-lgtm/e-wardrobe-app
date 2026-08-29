@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity, StyleSheet,
-  StatusBar, ActivityIndicator, RefreshControl, Alert,
+  StatusBar, ActivityIndicator, RefreshControl, Alert, TextInput,
 } from 'react-native';
 import axios from 'axios';
 
-import { ORGANIZATION_URL } from '../../constants/api';
+import { ORGANIZATION_URL, WARDROBE_URL } from '../../constants/api';
 
 // ── Theme (from SmartWardrobeApp/src/theme/colors.js) ───────────────────────
 
@@ -29,6 +29,10 @@ const fetchWardrobeLayout  = () => api.get('/wardrobe/layout').then(r => r.data)
 const wearItem  = (id: string) => api.post(`/items/wear/${id}`).then(r => r.data);
 const washItem  = (id: string) => api.post(`/items/wash/${id}`).then(r => r.data);
 const itemId    = (i: any) => i.item_id ?? i.item_id_str ?? i.id;
+
+// Notes live on the shared wardrobe item, so they go through /wardrobe/{id}.
+const saveItemNote = (id: string, note: string) =>
+  axios.patch(`${WARDROBE_URL}/${id}`, { note }).then(r => r.data);
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -69,10 +73,30 @@ const normScore = (s: number) => {
 
 // ── Sub-components ───────────────────────────────────────────────────────────
 
-const ItemCard = ({ item, onWear }: any) => {
+const ItemCard = ({ item, onWear, onSaveNote }: any) => {
   const score = normScore(item.sustainability_score);
   const section = item.wardrobe_section ?? '?';
   const secColor = SECTION_COLORS[section] ?? { bg: '#F5F5F5', text: '#757575', border: '#E0E0E0' };
+
+  const note = (item.note ?? '').trim();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft]     = useState(note);
+  const [saving, setSaving]   = useState(false);
+
+  const openEditor = () => { setDraft(note); setEditing(true); };
+  const cancel     = () => { setDraft(note); setEditing(false); };
+
+  const commit = async (value: string) => {
+    setSaving(true);
+    try {
+      await onSaveNote(item, value);
+      setEditing(false);
+    } catch {
+      Alert.alert('Error', 'Could not save the note.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <TouchableOpacity
@@ -109,6 +133,57 @@ const ItemCard = ({ item, onWear }: any) => {
           Keep it in: {item.section_label ?? `Section ${section}`} · Slot {item.wardrobe_slot ?? '–'}
         </Text>
         <Text style={[styles.positionSub, { color: secColor.text }]}>{item.section_location ?? ''}</Text>
+      </View>
+
+      {/* ── Personal note ── */}
+      <View style={styles.noteSection}>
+        <Text style={styles.noteLabel}>📝 NOTE</Text>
+
+        {editing ? (
+          <>
+            <TextInput
+              style={styles.noteInput}
+              value={draft}
+              onChangeText={setDraft}
+              placeholder="e.g. gift from Amma, hem needs fixing, pairs with black belt…"
+              placeholderTextColor={COLORS.textMuted}
+              multiline
+              editable={!saving}
+            />
+            <View style={styles.noteBtnRow}>
+              <TouchableOpacity style={styles.noteBtn} onPress={cancel} disabled={saving}>
+                <Text style={styles.noteBtnText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.noteBtn, styles.noteBtnPrimary, !draft.trim() && styles.noteBtnDisabled]}
+                onPress={() => commit(draft.trim())}
+                disabled={saving || !draft.trim()}
+              >
+                <Text style={[styles.noteBtnText, styles.noteBtnTextPrimary]}>{saving ? 'Saving…' : 'Save'}</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : note ? (
+          <>
+            <Text style={styles.noteText}>{note}</Text>
+            <View style={styles.noteBtnRow}>
+              <TouchableOpacity style={styles.noteBtn} onPress={openEditor}>
+                <Text style={styles.noteBtnText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.noteBtn, styles.noteBtnDanger]}
+                onPress={() => commit('')}
+                disabled={saving}
+              >
+                <Text style={[styles.noteBtnText, styles.noteBtnTextDanger]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        ) : (
+          <TouchableOpacity style={styles.noteAddBtn} onPress={openEditor}>
+            <Text style={styles.noteAddText}>+ Add a note</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <Text style={styles.tapHint}>Tap this card when you wear the item</Text>
@@ -153,7 +228,7 @@ const WardrobeCapacityBar = ({ layout }: any) => {
 
 // ── Screens ──────────────────────────────────────────────────────────────────
 
-const WardrobeScreen = ({ items, layout, refreshing, onRefresh, onWear }: any) => (
+const WardrobeScreen = ({ items, layout, refreshing, onRefresh, onWear, onSaveNote }: any) => (
   <ScrollView
     style={styles.screen}
     contentContainerStyle={styles.screenContent}
@@ -183,7 +258,7 @@ const WardrobeScreen = ({ items, layout, refreshing, onRefresh, onWear }: any) =
           </View>
           <View style={styles.zoneList}>
             {zoneItems.map((item: any) => (
-              <ItemCard key={itemId(item)} item={item} onWear={onWear} />
+              <ItemCard key={itemId(item)} item={item} onWear={onWear} onSaveNote={onSaveNote} />
             ))}
           </View>
         </View>
@@ -360,6 +435,19 @@ export default function OrganizeScreen() {
     }
   }, [loadData]);
 
+  const handleSaveNote = useCallback(async (item: any, note: string) => {
+    const prevNote = item.note ?? '';
+    // optimistic: patch the local copy so the card updates instantly
+    setItems(prev => prev.map(i => (itemId(i) === itemId(item) ? { ...i, note } : i)));
+    try {
+      await saveItemNote(itemId(item), note);
+      loadData();
+    } catch (e) {
+      setItems(prev => prev.map(i => (itemId(i) === itemId(item) ? { ...i, note: prevNote } : i)));
+      throw e;
+    }
+  }, [loadData]);
+
   if (loading) {
     return (
       <View style={styles.loadingScreen}>
@@ -398,7 +486,7 @@ export default function OrganizeScreen() {
           <WardrobeScreen
             items={items} layout={wardrobeLayout}
             refreshing={refreshing} onRefresh={onRefresh}
-            onWear={handleWear}
+            onWear={handleWear} onSaveNote={handleSaveNote}
           />
         )}
         {activeTab === 1 && (
@@ -478,6 +566,24 @@ const styles = StyleSheet.create({
   positionText:   { fontSize: 12, fontWeight: '800' },
   positionSub:    { fontSize: 11, marginTop: 2, opacity: 0.85 },
   tapHint:        { fontSize: 11, color: COLORS.textMuted, marginTop: 10, textAlign: 'center', fontStyle: 'italic' },
+
+  noteSection:    { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: COLORS.divider },
+  noteLabel:      { fontSize: 10, fontWeight: '800', color: COLORS.primary, letterSpacing: 1, marginBottom: 6 },
+  noteText:       { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19, backgroundColor: '#F5F3FF', borderRadius: 10, padding: 10 },
+  noteInput: {
+    fontSize: 13, color: COLORS.textPrimary, minHeight: 60, textAlignVertical: 'top',
+    backgroundColor: '#F5F3FF', borderRadius: 10, borderWidth: 1, borderColor: COLORS.border, padding: 10,
+  },
+  noteBtnRow:        { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 },
+  noteBtn:           { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 8, backgroundColor: '#F1F5F9' },
+  noteBtnPrimary:    { backgroundColor: COLORS.primary },
+  noteBtnDanger:     { backgroundColor: COLORS.dirty },
+  noteBtnDisabled:   { opacity: 0.5 },
+  noteBtnText:       { fontSize: 12, fontWeight: '700', color: COLORS.textSecondary },
+  noteBtnTextPrimary:{ color: '#FFFFFF' },
+  noteBtnTextDanger: { color: COLORS.dirtyText },
+  noteAddBtn:        { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border, backgroundColor: '#F5F3FF' },
+  noteAddText:       { fontSize: 12, fontWeight: '700', color: COLORS.primary },
 
   capacityCard: {
     backgroundColor: COLORS.surface, borderRadius: 16, padding: 16,

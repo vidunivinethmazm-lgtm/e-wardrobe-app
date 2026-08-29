@@ -87,6 +87,7 @@ def build_item(prediction: dict, images: dict | None = None,
         "max_wears_before_wash": CATEGORY_MAX_WEARS.get(category, 3),
         "status": "Clean",
         "sustainability_score": 0.5,
+        "note": "",
     }
 
 
@@ -94,7 +95,7 @@ def build_item(prediction: dict, images: dict | None = None,
 EDITABLE_FIELDS = {
     "type", "color", "gender", "season", "material", "fabric",
     "name", "category", "price", "occasion",
-    "max_wears_before_wash", "sustainability_score",
+    "max_wears_before_wash", "sustainability_score", "note",
 }
 
 
