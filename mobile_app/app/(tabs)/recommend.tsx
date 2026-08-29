@@ -189,8 +189,7 @@ export default function HomeScreen() {
           `🧵 Fabric: ${item.fabric}\n` +
           (item.color ? `🎨 Colour: ${item.color}\n` : '') +
           `🎯 ${item.confidence} match for ${eventClass}\n\n` +
-          `💡 ${(item.reason ?? '').split(' · ')[0]}\n` +
-          (item.combination ? `👗 Style tip: ${item.combination}` : ''),
+          `💡 ${(item.reason ?? '').split(' · ')[0]}`,
       });
     } catch { /* user dismissed share sheet */ }
   };
@@ -464,14 +463,6 @@ export default function HomeScreen() {
                         ))}
                     </View>
 
-                    {/* Outfit combination */}
-                    {item.combination && (
-                      <View style={styles.comboBox}>
-                        <Text style={styles.comboTitle}>👗 COMPLETE THE LOOK</Text>
-                        <Text style={styles.comboText}>{item.combination}</Text>
-                      </View>
-                    )}
-
                     {/* Action row */}
                     <View style={styles.actionRow}>
                       <TouchableOpacity
@@ -605,10 +596,6 @@ const styles = StyleSheet.create({
   reasonRow:   { flexDirection: 'row', gap: 6, marginBottom: 5 },
   reasonDot:   { fontSize: 12, color: '#7C3AED', marginTop: 1 },
   reasonText:  { fontSize: 12, color: '#4B5563', lineHeight: 18, flex: 1 },
-
-  comboBox:   { backgroundColor: '#F0FDF4', borderRadius: 16, padding: 14, borderLeftWidth: 3, borderLeftColor: '#10B981', marginBottom: 12 },
-  comboTitle: { fontSize: 10, fontWeight: '800', color: '#065F46', letterSpacing: 1.5, marginBottom: 6 },
-  comboText:  { fontSize: 13, color: '#065F46', lineHeight: 18 },
 
   actionRow:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 },
   actionBtn:       { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F3F4F6', borderRadius: 20, paddingHorizontal: 18, paddingVertical: 10, borderWidth: 1.5, borderColor: 'transparent' },
