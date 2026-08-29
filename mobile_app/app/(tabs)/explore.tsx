@@ -11,6 +11,7 @@ export default function HistoryScreen() {
 
   useEffect(() => {
     setHistory([...wardrobeStore.history]);
+    wardrobeStore.hydrate();               // pull saved history from the backend
     return wardrobeStore.subscribe(() => {
       setHistory([...wardrobeStore.history]);
     });

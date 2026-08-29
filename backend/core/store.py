@@ -31,9 +31,11 @@ _MONGODB_DB = os.getenv("MONGODB_DB", "ewardrobe").strip() or "ewardrobe"
 _lock = RLock()
 _items: dict[str, dict] = {}      # item_id -> item   (in-memory fallback)
 _events: dict[str, dict] = {}     # event_id -> event (in-memory fallback)
+_recs: dict[str, dict] = {}       # rec_id -> saved recommendation search
 
 _items_col = None
 _events_col = None
+_recs_col = None
 
 if _MONGODB_URI:
     from pymongo import MongoClient, DESCENDING
@@ -42,10 +44,13 @@ if _MONGODB_URI:
     _db = _client[_MONGODB_DB]
     _items_col = _db["items"]
     _events_col = _db["events"]
+    _recs_col = _db["recommendations"]
     _items_col.create_index("item_id", unique=True)
     _events_col.create_index("event_id", unique=True)
+    _recs_col.create_index("rec_id", unique=True)
     _items_col.create_index([("created_at", DESCENDING)])
     _events_col.create_index([("created_at", DESCENDING)])
+    _recs_col.create_index([("created_at", DESCENDING)])
 
 
 def _use_mongo() -> bool:
@@ -216,3 +221,94 @@ def delete_event(event_id: str) -> bool:
         return _events_col.delete_one({"event_id": event_id}).deleted_count > 0
     with _lock:
         return _events.pop(event_id, None) is not None
+
+
+# ------------------------------------------- recommendation search history ---
+#
+# One document per "get recommendations" search: the occasion text, the
+# resolved location / weather, the ranked outfit list that was shown, and the
+# user's like / skip / free-text feedback on that result.
+
+def add_recommendation(entry: dict) -> dict:
+    doc = {k: v for k, v in entry.items() if k != "_id"}
+    doc["rec_id"] = f"r_{uuid4().hex[:12]}"
+    doc.setdefault("created_at", _now())
+    doc.setdefault("feedback", {})
+    if _use_mongo():
+        _recs_col.insert_one(dict(doc))
+        return _clean(doc)
+    with _lock:
+        _recs[doc["rec_id"]] = doc
+    return doc
+
+
+def list_recommendations(limit: int = 50) -> list[dict]:
+    limit = max(1, min(limit, 200))
+    if _use_mongo():
+        return [_clean(d) for d in
+                _recs_col.find().sort("created_at", -1).limit(limit)]
+    with _lock:
+        rows = sorted(_recs.values(), key=lambda d: d["created_at"], reverse=True)
+        return rows[:limit]
+
+
+def _save_rec(doc: dict) -> dict:
+    doc["updated_at"] = _now()
+    if _use_mongo():
+        _recs_col.replace_one({"rec_id": doc["rec_id"]}, doc)
+    return _clean(dict(doc))
+
+
+def _get_rec(rec_id: str) -> dict | None:
+    if _use_mongo():
+        return _recs_col.find_one({"rec_id": rec_id})
+    return _recs.get(rec_id)
+
+
+def set_recommendation_feedback(rec_id: str, outfit: str, action: str) -> dict | None:
+    with _lock:
+        doc = _get_rec(rec_id)
+        if doc is None:
+            return None
+        fb = dict(doc.get("feedback") or {})
+        if action in ("liked", "skipped"):
+            fb[outfit] = action
+        else:                                    # "none" / anything else clears
+            fb.pop(outfit, None)
+        doc["feedback"] = fb
+        return _save_rec(doc)
+
+
+def set_recommendation_feedback_map(rec_id: str, feedback: dict) -> dict | None:
+    with _lock:
+        doc = _get_rec(rec_id)
+        if doc is None:
+            return None
+        doc["feedback"] = {k: v for k, v in (feedback or {}).items()
+                           if v in ("liked", "skipped")}
+        return _save_rec(doc)
+
+
+def set_recommendation_note(rec_id: str, note: str) -> dict | None:
+    with _lock:
+        doc = _get_rec(rec_id)
+        if doc is None:
+            return None
+        doc["note"] = (note or "").strip() or None
+        return _save_rec(doc)
+
+
+def delete_recommendation(rec_id: str) -> bool:
+    if _use_mongo():
+        return _recs_col.delete_one({"rec_id": rec_id}).deleted_count > 0
+    with _lock:
+        return _recs.pop(rec_id, None) is not None
+
+
+def clear_recommendations() -> int:
+    if _use_mongo():
+        return _recs_col.delete_many({}).deleted_count
+    with _lock:
+        n = len(_recs)
+        _recs.clear()
+        return n

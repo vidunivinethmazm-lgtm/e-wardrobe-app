@@ -3,8 +3,9 @@ import pickle
 from pathlib import Path
 
 import torch
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from backend.recommendation.gnn_model import (
     StylingGNN,
@@ -406,6 +407,70 @@ async def recommend(
         ),
         'recommendations':   results,
     }
+
+# ── Recommendation search history (persisted via backend.core.store) ─────────
+
+class SavedSearch(BaseModel):
+    occasion: str = ""
+    event_class: str = ""
+    location: str = ""
+    weather: str = ""
+    time: str = ""
+    data: dict = {}
+    feedback: dict = {}
+    note: str | None = None
+
+
+class FeedbackPatch(BaseModel):
+    outfit: str | None = None
+    action: str = "none"                 # liked | skipped | none
+    feedback: dict | None = None         # or replace the whole map at once
+
+
+class NotePatch(BaseModel):
+    note: str = ""
+
+
+@app.get("/history")
+async def get_history(limit: int = 50):
+    return store.list_recommendations(limit)
+
+
+@app.post("/history")
+async def add_history(search: SavedSearch):
+    return store.add_recommendation(search.model_dump())
+
+
+@app.patch("/history/{rec_id}/feedback")
+async def patch_history_feedback(rec_id: str, patch: FeedbackPatch):
+    if patch.feedback is not None:
+        updated = store.set_recommendation_feedback_map(rec_id, patch.feedback)
+    elif patch.outfit is not None:
+        updated = store.set_recommendation_feedback(rec_id, patch.outfit, patch.action)
+    else:
+        raise HTTPException(status_code=422, detail="give 'feedback' map or 'outfit' + 'action'")
+    if updated is None:
+        raise HTTPException(status_code=404, detail="history entry not found")
+    return updated
+
+
+@app.patch("/history/{rec_id}/note")
+async def patch_history_note(rec_id: str, patch: NotePatch):
+    updated = store.set_recommendation_note(rec_id, patch.note)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="history entry not found")
+    return updated
+
+
+@app.delete("/history/{rec_id}")
+async def remove_history(rec_id: str):
+    return {"deleted": store.delete_recommendation(rec_id)}
+
+
+@app.delete("/history")
+async def clear_history():
+    return {"cleared": store.clear_recommendations()}
+
 
 if __name__ == "__main__":
     import uvicorn

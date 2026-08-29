@@ -131,6 +131,9 @@ export default function HomeScreen() {
 
   // Sync with store
   useEffect(() => {
+    setHistory([...wardrobeStore.history]);
+    setFeedback({ ...wardrobeStore.feedback });
+    wardrobeStore.hydrate();               // pull saved history from the backend
     const unsub = wardrobeStore.subscribe(() => {
       setHistory([...wardrobeStore.history]);
       setFeedback({ ...wardrobeStore.feedback });
