@@ -1,6 +1,7 @@
+import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator, ScrollView, StatusBar, StyleSheet, Text,
+  ActivityIndicator, Image, ScrollView, StatusBar, StyleSheet, Text,
   TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,6 +10,10 @@ import { useAuth } from '../auth';
 
 const AVATARS = ['👤', '🧑', '👩', '👨', '🧕', '👳', '🧑‍🎓', '👩‍💼', '👨‍💼', '🦸', '🧑‍🎨', '😎'];
 const STYLES  = ['Casual', 'Smart casual', 'Formal', 'Streetwear', 'Traditional', 'Minimal', 'Bold'];
+
+// A photo avatar is stored inline as a data: URI; an emoji avatar is just text.
+const isPhoto = (a: string) => a.startsWith('data:');
+const MAX_AVATAR_CHARS = 900_000;   // ~650 KB image once base64-encoded
 
 export default function ProfileScreen() {
   const auth = useAuth();
@@ -44,6 +49,30 @@ export default function ProfileScreen() {
     );
   }
 
+  const pickAvatarPhoto = async () => {
+    setMsg(null);
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      setMsg({ kind: 'err', text: 'Allow photo access to use a picture.' });
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      base64: true,
+    });
+    if (result.canceled || !result.assets?.[0]?.base64) return;
+    const a = result.assets[0];
+    const uri = `data:${a.mimeType ?? 'image/jpeg'};base64,${a.base64}`;
+    if (uri.length > MAX_AVATAR_CHARS) {
+      setMsg({ kind: 'err', text: 'That image is too large — pick a smaller one.' });
+      return;
+    }
+    setAvatar(uri);
+  };
+
   const save = async () => {
     setMsg(null);
     const ageNum = age.trim() ? Number(age) : null;
@@ -76,14 +105,28 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
 
         <View style={styles.header}>
-          <Text style={styles.headerAvatar}>{avatar}</Text>
+          {isPhoto(avatar)
+            ? <Image source={{ uri: avatar }} style={styles.headerAvatarImg} />
+            : <Text style={styles.headerAvatar}>{avatar}</Text>}
           <Text style={styles.headerName}>{name || user.email.split('@')[0]}</Text>
           <Text style={styles.headerEmail}>{user.email}</Text>
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.section}>AVATAR</Text>
+          <Text style={styles.section}>PROFILE PICTURE</Text>
           <View style={styles.avatarGrid}>
+            <TouchableOpacity
+              style={[styles.uploadChip, isPhoto(avatar) && styles.avatarChipOn]}
+              onPress={pickAvatarPhoto}
+            >
+              {isPhoto(avatar)
+                ? <Image source={{ uri: avatar }} style={styles.uploadPreview} />
+                : <>
+                    <Text style={styles.uploadIcon}>📷</Text>
+                    <Text style={styles.uploadText}>Upload</Text>
+                  </>}
+            </TouchableOpacity>
+
             {AVATARS.map(a => (
               <TouchableOpacity
                 key={a}
@@ -94,6 +137,11 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             ))}
           </View>
+          {isPhoto(avatar) && (
+            <TouchableOpacity onPress={() => setAvatar('👤')}>
+              <Text style={styles.removePhoto}>Remove photo</Text>
+            </TouchableOpacity>
+          )}
 
           <Text style={styles.label}>NAME</Text>
           <TextInput style={styles.input} value={name} onChangeText={setName}
@@ -162,9 +210,10 @@ const styles = StyleSheet.create({
   safe:   { flex: 1, backgroundColor: '#2D1B69' },
   scroll: { backgroundColor: '#F3F0FF', paddingBottom: 24 },
 
-  header:       { backgroundColor: '#2D1B69', alignItems: 'center', paddingTop: 12, paddingBottom: 28 },
-  headerAvatar: { fontSize: 60 },
-  headerName:   { color: '#FFFFFF', fontSize: 22, fontWeight: '800', marginTop: 6 },
+  header:          { backgroundColor: '#2D1B69', alignItems: 'center', paddingTop: 12, paddingBottom: 28 },
+  headerAvatar:    { fontSize: 60 },
+  headerAvatarImg: { width: 76, height: 76, borderRadius: 38, borderWidth: 2, borderColor: '#C4B5FD', backgroundColor: '#EDE9FE' },
+  headerName:      { color: '#FFFFFF', fontSize: 22, fontWeight: '800', marginTop: 6 },
   headerEmail:  { color: '#C4B5FD', fontSize: 13, marginTop: 4 },
 
   card: {
@@ -191,6 +240,16 @@ const styles = StyleSheet.create({
   },
   avatarChipOn: { borderColor: '#7C3AED', backgroundColor: '#EDE9FE' },
   avatarEmoji:  { fontSize: 24 },
+
+  uploadChip: {
+    width: 46, height: 46, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#EDE9FE', borderWidth: 2, borderColor: '#C4B5FD', borderStyle: 'dashed',
+    overflow: 'hidden',
+  },
+  uploadIcon:    { fontSize: 16 },
+  uploadText:    { fontSize: 7, fontWeight: '800', color: '#7C3AED', letterSpacing: 0.5 },
+  uploadPreview: { width: '100%', height: '100%' },
+  removePhoto:   { marginTop: 10, fontSize: 12, fontWeight: '700', color: '#B91C1C' },
 
   chipWrap:    { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip:        { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, backgroundColor: '#F3F0FF', borderWidth: 1, borderColor: '#EDE9FE' },

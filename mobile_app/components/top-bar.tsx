@@ -1,5 +1,5 @@
 import { useRouter, useSegments } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/app/auth';
@@ -22,7 +22,9 @@ export function TopBar() {
   return (
     <View style={[styles.bar, { paddingTop: insets.top + 8 }]}>
       <Pressable style={styles.brand} onPress={() => router.push('/(tabs)/profile')} hitSlop={8}>
-        <Text style={styles.avatar}>{avatar}</Text>
+        {avatar.startsWith('data:')
+          ? <Image source={{ uri: avatar }} style={styles.avatarImg} />
+          : <Text style={styles.avatar}>{avatar}</Text>}
         <View>
           <Text style={styles.hi}>Hi, {firstName}</Text>
           <Text style={styles.appName}>E-Wardrobe AI</Text>
@@ -51,8 +53,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  brand:  { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  avatar: { fontSize: 26 },
+  brand:     { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  avatar:    { fontSize: 26 },
+  avatarImg: { width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(196,181,253,0.5)' },
   hi:     { color: '#C4B5FD', fontSize: 11, fontWeight: '600' },
   appName:{ color: '#FFFFFF', fontSize: 16, fontWeight: '800', letterSpacing: -0.3 },
 

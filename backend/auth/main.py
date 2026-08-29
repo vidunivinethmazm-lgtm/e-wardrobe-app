@@ -139,8 +139,14 @@ def me(user: dict = Depends(current_user)):
     return {"user": _public_user(user)}
 
 
+_MAX_AVATAR_CHARS = 1_000_000        # ~700 KB image once base64-encoded
+
+
 @app.patch("/profile")
 def update_profile(body: ProfileBody, user: dict = Depends(current_user)):
+    # avatar is either an emoji or an inline data: URI (uploaded photo)
+    if body.avatar and body.avatar.startswith("data:") and len(body.avatar) > _MAX_AVATAR_CHARS:
+        raise HTTPException(status_code=413, detail="Profile picture is too large")
     updated = store.update_user_profile(user["user_id"], body.model_dump(exclude_none=True))
     if updated is None:
         raise HTTPException(status_code=404, detail="Account not found")
