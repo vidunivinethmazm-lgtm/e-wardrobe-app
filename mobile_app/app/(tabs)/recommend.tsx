@@ -188,7 +188,6 @@ export default function HomeScreen() {
           `✨ ${item.outfit}\n` +
           `🧵 Fabric: ${item.fabric}\n` +
           (item.color ? `🎨 Colour: ${item.color}\n` : '') +
-          (item.price ? `💰 Price: Rs. ${item.price.toLocaleString()}\n` : '') +
           `🎯 ${item.confidence} match for ${eventClass}\n\n` +
           `💡 ${(item.reason ?? '').split(' · ')[0]}\n` +
           (item.combination ? `👗 Style tip: ${item.combination}` : ''),
@@ -451,11 +450,6 @@ export default function HomeScreen() {
                           <Text style={styles.colorTagText}>{item.color}</Text>
                         </View>
                       )}
-                      {item.price !== undefined && (
-                        <View style={styles.priceTag}>
-                          <Text style={styles.priceTagText}>Rs. {item.price.toLocaleString()}</Text>
-                        </View>
-                      )}
                     </View>
 
                     {/* Why this suits you */}
@@ -605,8 +599,6 @@ const styles = StyleSheet.create({
   colorTag:     { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#F9FAFB', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: '#E5E7EB' },
   colorDot:     { width: 12, height: 12, borderRadius: 6, borderWidth: 1, borderColor: 'rgba(0,0,0,0.1)' },
   colorTagText: { fontSize: 12, color: '#374151', fontWeight: '600' },
-  priceTag:     { backgroundColor: '#FEF3C7', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
-  priceTagText: { fontSize: 12, color: '#92400E', fontWeight: '700' },
 
   reasonBox:   { backgroundColor: '#FAFAFA', borderRadius: 16, padding: 14, borderLeftWidth: 3, borderLeftColor: '#7C3AED', marginBottom: 12 },
   reasonTitle: { fontSize: 10, fontWeight: '800', color: '#7C3AED', letterSpacing: 1.5, marginBottom: 10 },
