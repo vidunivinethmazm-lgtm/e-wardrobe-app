@@ -8,6 +8,7 @@ import { wardrobeStore, HistoryEntry } from '../store';
 export default function HistoryScreen() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [draftErrors, setDraftErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setHistory([...wardrobeStore.history]);
@@ -149,17 +150,28 @@ export default function HistoryScreen() {
                   ) : (
                     <>
                       <TextInput
-                        style={styles.noteInput}
+                        style={[styles.noteInput, draftErrors[entry.id] && styles.noteInputError]}
                         placeholder="Type your thoughts on these picks…"
                         placeholderTextColor="#9CA3AF"
                         multiline
                         value={drafts[entry.id] ?? ''}
-                        onChangeText={t => setDrafts(d => ({ ...d, [entry.id]: t }))}
+                        onChangeText={t => {
+                          setDrafts(d => ({ ...d, [entry.id]: t }));
+                          if (draftErrors[entry.id]) {
+                            setDraftErrors(e => { const n = { ...e }; delete n[entry.id]; return n; });
+                          }
+                        }}
                       />
+                      {draftErrors[entry.id] && (
+                        <Text style={styles.noteErrorText}>{draftErrors[entry.id]}</Text>
+                      )}
                       <TouchableOpacity
-                        style={[styles.noteBtn, !(drafts[entry.id] ?? '').trim() && styles.noteBtnDisabled]}
-                        disabled={!(drafts[entry.id] ?? '').trim()}
+                        style={styles.noteBtn}
                         onPress={() => {
+                          if (!(drafts[entry.id] ?? '').trim()) {
+                            setDraftErrors(e => ({ ...e, [entry.id]: 'Feedback is empty — type something before adding.' }));
+                            return;
+                          }
                           wardrobeStore.setHistoryNote(entry.id, drafts[entry.id] ?? '');
                           setDrafts(d => {
                             const next = { ...d };
@@ -235,11 +247,12 @@ const styles = StyleSheet.create({
     padding: 10, fontSize: 13, color: '#374151', backgroundColor: '#FFF',
     textAlignVertical: 'top',
   },
+  noteInputError: { borderColor: '#EF4444', backgroundColor: '#FEF2F2' },
+  noteErrorText:  { marginTop: 6, fontSize: 12, color: '#B91C1C', fontWeight: '600' },
   noteBtn: {
     marginTop: 8, alignSelf: 'flex-start', backgroundColor: '#7C3AED',
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10,
   },
-  noteBtnDisabled: { backgroundColor: '#C4B5FD' },
   noteBtnText:     { color: '#FFF', fontSize: 13, fontWeight: '700' },
 
   noteSaved:        { backgroundColor: '#F5F3FF', borderRadius: 12, padding: 10, borderLeftWidth: 3, borderLeftColor: '#7C3AED' },
