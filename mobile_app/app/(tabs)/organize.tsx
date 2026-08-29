@@ -98,6 +98,14 @@ const ItemCard = ({ item, onWear, onSaveNote }: any) => {
     }
   };
 
+  const handleSave = () => {
+    if (!draft.trim()) {
+      Alert.alert('Note is empty', 'Please type something before saving.');
+      return;
+    }
+    commit(draft.trim());
+  };
+
   return (
     <TouchableOpacity
       style={[styles.card, item.status === 'Dirty' && styles.dirtyCard]}
@@ -155,9 +163,9 @@ const ItemCard = ({ item, onWear, onSaveNote }: any) => {
                 <Text style={styles.noteBtnText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.noteBtn, styles.noteBtnPrimary, !draft.trim() && styles.noteBtnDisabled]}
-                onPress={() => commit(draft.trim())}
-                disabled={saving || !draft.trim()}
+                style={[styles.noteBtn, styles.noteBtnPrimary, saving && styles.noteBtnDisabled]}
+                onPress={handleSave}
+                disabled={saving}
               >
                 <Text style={[styles.noteBtnText, styles.noteBtnTextPrimary]}>{saving ? 'Saving…' : 'Save'}</Text>
               </TouchableOpacity>
