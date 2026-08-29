@@ -62,6 +62,18 @@ class WardrobeStore {
     }
   }
 
+  // Toggle like / skip on a single outfit inside a specific history entry.
+  setHistoryFeedback(entryId: string, outfit: string, action: 'liked' | 'skipped') {
+    this.history = this.history.map(h => {
+      if (h.id !== entryId) return h;
+      const fb: FeedbackMap = { ...(h.feedback ?? {}) };
+      if (fb[outfit] === action) delete fb[outfit];
+      else fb[outfit] = action;
+      return { ...h, feedback: fb };
+    });
+    this.notify();
+  }
+
   clearHistory() {
     this.history = [];
     this.feedback = {};

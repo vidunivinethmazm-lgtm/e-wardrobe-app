@@ -97,16 +97,27 @@ export default function HistoryScreen() {
 
                 {entry.data.recommendations.length > 0 && (
                   <View style={styles.historyRecs}>
-                    <Text style={styles.historyRecsLabel}>Top picks:</Text>
+                    <Text style={styles.historyRecsLabel}>Top picks — rate them:</Text>
                     {entry.data.recommendations.slice(0, 3).map((r, i) => {
                       const fb = entry.feedback?.[r.outfit];
                       return (
                         <View key={i} style={styles.historyRecRow}>
                           <Text style={styles.historyRecNum}>{i + 1}.</Text>
                           <Text style={styles.historyRecName}>{r.outfit}</Text>
-                          {fb && (
-                            <Text style={styles.historyRecFb}>{fb === 'liked' ? '👍' : '👎'}</Text>
-                          )}
+                          <View style={styles.historyFbBtns}>
+                            <TouchableOpacity
+                              onPress={() => wardrobeStore.setHistoryFeedback(entry.id, r.outfit, 'liked')}
+                              style={[styles.fbBtn, fb === 'liked' && styles.fbBtnLikedActive]}
+                            >
+                              <Text style={styles.fbBtnIcon}>👍</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => wardrobeStore.setHistoryFeedback(entry.id, r.outfit, 'skipped')}
+                              style={[styles.fbBtn, fb === 'skipped' && styles.fbBtnSkippedActive]}
+                            >
+                              <Text style={styles.fbBtnIcon}>👎</Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
                       );
                     })}
@@ -158,8 +169,12 @@ const styles = StyleSheet.create({
 
   historyRecs:      { backgroundColor: '#F9FAFB', borderRadius: 12, padding: 12 },
   historyRecsLabel: { fontSize: 10, fontWeight: '700', color: '#7C3AED', letterSpacing: 1, marginBottom: 8 },
-  historyRecRow:    { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
+  historyRecRow:    { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 },
   historyRecNum:    { fontSize: 12, color: '#9CA3AF', width: 16 },
   historyRecName:   { fontSize: 13, color: '#374151', flex: 1, fontWeight: '500' },
-  historyRecFb:     { fontSize: 14 },
+  historyFbBtns:    { flexDirection: 'row', gap: 4 },
+  fbBtn:            { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 8, backgroundColor: '#F3F4F6' },
+  fbBtnLikedActive:   { backgroundColor: '#DCFCE7', borderWidth: 1, borderColor: '#16A34A' },
+  fbBtnSkippedActive: { backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#EF4444' },
+  fbBtnIcon:        { fontSize: 13 },
 });
