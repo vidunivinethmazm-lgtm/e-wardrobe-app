@@ -51,3 +51,8 @@ data/splits/
 
 # SQLite
 *.db
+
+# local backend run logs
+backend.log
+backend.out.log
+backend.err.log
