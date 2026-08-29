@@ -104,9 +104,6 @@ export default function HistoryScreen() {
                         <View key={i} style={styles.historyRecRow}>
                           <Text style={styles.historyRecNum}>{i + 1}.</Text>
                           <Text style={styles.historyRecName}>{r.outfit}</Text>
-                          {r.price !== undefined && (
-                            <Text style={styles.historyRecPrice}>Rs. {r.price.toLocaleString()}</Text>
-                          )}
                           {fb && (
                             <Text style={styles.historyRecFb}>{fb === 'liked' ? '👍' : '👎'}</Text>
                           )}
@@ -164,6 +161,5 @@ const styles = StyleSheet.create({
   historyRecRow:    { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 4 },
   historyRecNum:    { fontSize: 12, color: '#9CA3AF', width: 16 },
   historyRecName:   { fontSize: 13, color: '#374151', flex: 1, fontWeight: '500' },
-  historyRecPrice:  { fontSize: 12, color: '#92400E', fontWeight: '600' },
   historyRecFb:     { fontSize: 14 },
 });
