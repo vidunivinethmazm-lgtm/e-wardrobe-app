@@ -70,7 +70,7 @@ const PICKER_OPTIONS: Partial<ImagePicker.ImagePickerOptions> = {
 };
 
 export function WardrobeScreen({ route }: Props) {
-  const { avatar, avatarConfig, remoteAvatarUrl, remoteTextureUrl } = route.params;
+  const { avatar, avatarConfig, remoteAvatarUrl, remoteTextureUrl, presetGarment } = route.params;
 
   // `remoteAvatarUrl` is only ever set when the server actually built a real
   // personalized mesh for THIS avatar (male, guided face-capture completed —
@@ -85,7 +85,7 @@ export function WardrobeScreen({ route }: Props) {
   // cards), never touching the server's mesh at all.
   const isLocalOnly = !remoteAvatarUrl;
 
-  const [garmentType, setGarmentType] = useState<GarmentFitType>('upper_body');
+  const [garmentType, setGarmentType] = useState<GarmentFitType>(presetGarment?.garmentType ?? 'upper_body');
   const [catalog, setCatalog] = useState<GarmentCatalogItem[]>([]);
 
   // The avatar's own mesh/texture, evolving as wearPhoto/removePhoto paint
@@ -111,8 +111,17 @@ export function WardrobeScreen({ route }: Props) {
   const [localTopTextureUri, setLocalTopTextureUri] = useState<string | null>(null);
   const [localBottomTextureUri, setLocalBottomTextureUri] = useState<string | null>(null);
 
-  const [frontPhoto, setFrontPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null);
-  const [backPhoto, setBackPhoto] = useState<ImagePicker.ImagePickerAsset | null>(null);
+  // "Try this on your avatar" bridge from the team's `/recommendation`
+  // feature (see `PresetGarment` in navigation/types.ts) — pre-fills the
+  // garment Front/Back photos from a recommended item's `image_url` (its
+  // Back is the same photo too, since the recommender only has one image
+  // per item; swap in a real back photo before fitting for a better result).
+  const [frontPhoto, setFrontPhoto] = useState<ImagePicker.ImagePickerAsset | null>(
+    presetGarment ? urlToPseudoAsset(presetGarment.frontUrl) : null
+  );
+  const [backPhoto, setBackPhoto] = useState<ImagePicker.ImagePickerAsset | null>(
+    presetGarment ? urlToPseudoAsset(presetGarment.backUrl ?? presetGarment.frontUrl) : null
+  );
   // "Advanced: automatic garment fitting"'s OWN garment-type choice — a
   // dress (the Front/Back pair above), or a separate top + bottom outfit
   // (4 photos). Entirely separate from the "Garment type" pills above
@@ -522,6 +531,16 @@ export function WardrobeScreen({ route }: Props) {
           against a plain background, front and back.
         </Text>
 
+        {presetGarment && (
+          <Card style={styles.previewCard}>
+            <Ionicons name="sparkles-outline" size={20} color={colors.primary} />
+            <Text style={styles.previewText}>
+              Pre-filled from your recommended outfit — swap in the garment's own back photo below for a better
+              result (its front photo was reused as a stand-in).
+            </Text>
+          </Card>
+        )}
+
         <View style={styles.garmentModeRow}>
           <TouchableOpacity
             activeOpacity={0.85}
@@ -669,6 +688,14 @@ export function WardrobeScreen({ route }: Props) {
       )}
     </ScreenContainer>
   );
+}
+
+/** Wraps a remote image URL (e.g. a `RecommendationItem.image_url`) as a
+ * minimal `ImagePicker.ImagePickerAsset` stand-in — just enough for
+ * `<Image source={{uri}}/>` previews and `toPickedPhoto`'s `.uri`/
+ * `.fileName`/`.mimeType` reads; never actually came from the picker. */
+function urlToPseudoAsset(uri: string): ImagePicker.ImagePickerAsset {
+  return { uri, fileName: 'recommended-garment.jpg', mimeType: 'image/jpeg' } as ImagePicker.ImagePickerAsset;
 }
 
 function PhotoPicker({

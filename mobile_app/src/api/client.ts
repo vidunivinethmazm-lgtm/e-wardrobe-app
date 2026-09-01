@@ -13,6 +13,7 @@ import type {
   Measurements,
   PickedPhoto,
   PipelineMode,
+  RecommendationResponse,
   WearGarmentResponse,
 } from '../types';
 
@@ -40,6 +41,56 @@ function resolveApiBaseUrl(): string {
 }
 
 export const API_BASE_URL = resolveApiBaseUrl();
+
+/**
+ * Resolves the team's parent FastAPI app's base URL (`backend/main.py`,
+ * `uvicorn backend.main:app`, mounting `/auth`, `/wardrobe`,
+ * `/recommendation`, `/organization`, `/classification`, and this app's own
+ * Flask API under `/visualization` — see `backend/visualization/main.py`).
+ * Separate from `API_BASE_URL` (this app's own Flask dev server, :5000)
+ * since the two can run as independent processes during development;
+ * `EXPO_PUBLIC_RECOMMENDATION_API_URL` overrides it (e.g. once everything
+ * is deployed behind one origin, point both at the same host).
+ */
+function resolveRecommendationApiBaseUrl(): string {
+  const envUrl = process.env.EXPO_PUBLIC_RECOMMENDATION_API_URL;
+  if (envUrl) return envUrl.replace(/\/$/, '');
+
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    const host = hostUri.split(':')[0];
+    if (host) return `http://${host}:8000`;
+  }
+
+  return Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
+}
+
+export const RECOMMENDATION_API_BASE_URL = resolveRecommendationApiBaseUrl();
+
+/**
+ * Ranked wardrobe items for an occasion, from the team's `/recommendation`
+ * feature (GNN + NLP outfit ranking over the shared wardrobe store — see
+ * `backend/recommendation/main.py`). Requires a signed-in account's bearer
+ * token (`backend.core.auth_dep.current_user_id`) — this app doesn't yet
+ * have its own sign-in flow, so callers must supply one from wherever the
+ * team's `/auth` feature's token ends up being stored once that flow
+ * exists here.
+ */
+export async function getRecommendations(
+  authToken: string,
+  params: { userInput: string; city?: string; weather?: string; humidity?: number; temperature?: number }
+): Promise<RecommendationResponse> {
+  const query = new URLSearchParams({ user_input: params.userInput });
+  if (params.city) query.set('city', params.city);
+  if (params.weather) query.set('weather', params.weather);
+  if (params.humidity != null) query.set('humidity', String(params.humidity));
+  if (params.temperature != null) query.set('temperature', String(params.temperature));
+
+  const res = await fetch(`${RECOMMENDATION_API_BASE_URL}/recommendation/recommend?${query.toString()}`, {
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  return handleResponse<RecommendationResponse>(res);
+}
 
 export class ApiError extends Error {
   status: number;

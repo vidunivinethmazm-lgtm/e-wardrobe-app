@@ -1,4 +1,4 @@
-# Flask API dependencies (server/app.py).
+# Flask API dependencies (backend/app.py, the "visualization" feature).
 #
 # This is enough to run the backend in mock mode
 # (AVATAR_PIPELINE_MOCK=1, the default) on a machine without TensorFlow.
@@ -25,3 +25,20 @@ python-dotenv
 # (VIRTUAL_TRYON_PROVIDER=idm_vton, FULL_AVATAR_3D_PROVIDER=unique3d — both
 # call free public HuggingFace Spaces) — see docs/multiview_tryon_setup.md.
 gradio_client
+
+# ── Team integration (backend/main.py mounts every feature) ────────────────
+# `backend/visualization/main.py` bridges the Flask app above into the
+# FastAPI parent app via asgiref — every other feature below is FastAPI
+# native. See backend/main.py's FEATURES dict.
+asgiref
+fastapi
+uvicorn
+python-multipart
+
+# auth + wardrobe store (backend/core, backend/auth)
+pymongo
+
+# recommendation (backend/recommendation) — GNN + NLP outfit ranking
+torch
+torch-geometric
+scikit-learn

@@ -100,6 +100,38 @@ export interface WearGarmentResponse {
  * `avatar_pipeline/model7_garment_fitting`. */
 export type GarmentFitType = 'dress' | 'upper_body' | 'lower_body';
 
+/** One ranked wardrobe item from the team's `/recommendation/recommend`
+ * feature (GNN + NLP outfit ranking, see `backend/recommendation/main.py`,
+ * mounted by `backend/main.py` alongside this app's own `/visualization`
+ * feature). `image_url` is what "Try this on your avatar" feeds into
+ * `fitGarment` as `garmentFront`/`garmentBack` — see
+ * `WardrobeScreen`'s `route.params.presetGarment`. */
+export interface RecommendationItem {
+  outfit: string;
+  item_id: string | number | null;
+  fabric: string;
+  color: string;
+  price: number;
+  category: string;
+  image_url: string | null;
+  confidence: string;
+  reason: string;
+  combination: string;
+  score: number;
+}
+
+export interface RecommendationResponse {
+  event_class: string;
+  location_detected: string;
+  weather: string;
+  temperature: number;
+  humidity: number;
+  wardrobe_source: string;
+  items_considered: number;
+  logic_summary: string;
+  recommendations: RecommendationItem[];
+}
+
 /** Normalized (dimensionless) garment proportions extracted from the
  * uploaded front/back photos — fractions of the garment's own bounding
  * silhouette, never a claimed centimetre measurement. See
