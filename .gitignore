@@ -21,6 +21,3 @@ mobile/.expo/
 
 # Editor
 .vscode/
-
-# Secrets
-.env
