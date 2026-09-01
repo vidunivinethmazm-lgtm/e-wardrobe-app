@@ -8,16 +8,21 @@ venv/
 # Avatar pipeline runtime artifacts
 saved_models/
 output/
-server/sessions/
-server/ai_sessions/
-server/garment_fits/
+backend/sessions/
+backend/ai_sessions/
+backend/garment_fits/
 
 # Codex tool cache / generated data
 .codex/
 
 # React Native
-mobile/node_modules/
-mobile/.expo/
+mobile_app/node_modules/
+mobile_app/.expo/
 
 # Editor
 .vscode/
+
+# Local AI-assistant tool config (not part of the app)
+.claude/
+CLAUDE.md
+**/CLAUDE.md
