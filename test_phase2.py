@@ -1,7 +1,7 @@
 """Test Phase 2 implementation"""
 import numpy as np
-from avatar_pipeline.model6_body3d.avatar_builder import AvatarBuilder
-from avatar_pipeline.model6_body3d.asset_loader import AvatarAssetManager, select_hairstyle_for_facial_analysis
+from backend.avatar_pipeline.model6_body3d.avatar_builder import AvatarBuilder
+from backend.avatar_pipeline.model6_body3d.asset_loader import AvatarAssetManager, select_hairstyle_for_facial_analysis
 
 print('=== Phase 2 Implementation Test ===\n')
 

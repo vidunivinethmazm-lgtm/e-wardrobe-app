@@ -1,0 +1,96 @@
+{
+  "body_shape": "InvertedTriangle",
+  "body_shape_confidence": 1.0,
+  "keypoints_dict": {
+    "left_shoulder": [
+      0.4,
+      0.28
+    ],
+    "right_shoulder": [
+      0.6,
+      0.28
+    ],
+    "left_elbow": [
+      0.32,
+      0.45
+    ],
+    "right_elbow": [
+      0.68,
+      0.45
+    ],
+    "left_wrist": [
+      0.28,
+      0.62
+    ],
+    "right_wrist": [
+      0.72,
+      0.62
+    ],
+    "left_hip": [
+      0.43,
+      0.55
+    ],
+    "right_hip": [
+      0.57,
+      0.55
+    ],
+    "left_knee": [
+      0.42,
+      0.75
+    ],
+    "right_knee": [
+      0.58,
+      0.75
+    ],
+    "left_ankle": [
+      0.41,
+      0.95
+    ],
+    "right_ankle": [
+      0.59,
+      0.95
+    ]
+  },
+  "skin_tone_result": {
+    "label": "MST-5",
+    "hex": "#d7bd96",
+    "lab": [
+      185.432373046875,
+      133.8142852783203,
+      133.72547912597656
+    ],
+    "distance": 22.14519691467285,
+    "confidence": 0.04320550709962845,
+    "avatar_render": {
+      "base_color": "#d7bd96",
+      "shadow_color": "#a79375",
+      "highlight_color": "#f7d9ac"
+    }
+  },
+  "body3d_params": {
+    "head_radius": 0.13198042397835724,
+    "neck_radius": 0.04519151557446672,
+    "shoulder_width": 0.20541597988393961,
+    "chest_width": 0.18340712489637465,
+    "chest_depth": 0.11371241743575228,
+    "waist_width": 0.15915494309189535,
+    "waist_depth": 0.10822536130248885,
+    "hip_width": 0.16,
+    "hip_depth": 0.0992,
+    "upper_arm_radius": 0.04034956747720242,
+    "forearm_radius": 0.029345139983419945,
+    "thigh_radius": 0.0512,
+    "calf_radius": 0.035
+  },
+  "gender": "neutral",
+  "facial_analysis": {
+    "gender": "neutral",
+    "age_group": "teen",
+    "hair_color": "gray",
+    "hair_style": "straight",
+    "facial_hair": "beard",
+    "eye_color": "hazel",
+    "face_shape": "oval",
+    "confidence": 0.7
+  }
+}

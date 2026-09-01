@@ -13,23 +13,23 @@ import numpy as np
 import pytest
 from PIL import Image, ImageDraw
 
-from avatar_pipeline.model6_body3d.params import default_params_from_measurements
-from avatar_pipeline.model7_garment_fitting.fitting_types import (
+from backend.avatar_pipeline.model6_body3d.params import default_params_from_measurements
+from backend.avatar_pipeline.model7_garment_fitting.fitting_types import (
     FEATURE_NAMES, GarmentFittingError, RegionScales,
 )
-from avatar_pipeline.model7_garment_fitting.garment_features import compute_normalized_features
-from avatar_pipeline.model7_garment_fitting.garment_fit_runner import MockGarmentFitRunner
-from avatar_pipeline.model7_garment_fitting.garment_keypoints import extract_keypoints
-from avatar_pipeline.model7_garment_fitting.garment_mesh_generation import (
+from backend.avatar_pipeline.model7_garment_fitting.garment_features import compute_normalized_features
+from backend.avatar_pipeline.model7_garment_fitting.garment_fit_runner import MockGarmentFitRunner
+from backend.avatar_pipeline.model7_garment_fitting.garment_keypoints import extract_keypoints
+from backend.avatar_pipeline.model7_garment_fitting.garment_mesh_generation import (
     GeneratedGarmentMesh, MockGarmentMeshProvider, Unique3DGarmentMeshProvider,
     fuse_front_back_meshes, project_front_back_texture, validate_garment_mesh,
 )
-from avatar_pipeline.model7_garment_fitting.garment_region_fitting import (
+from backend.avatar_pipeline.model7_garment_fitting.garment_region_fitting import (
     compute_region_fit_ratios, extract_avatar_region_landmarks,
 )
-from avatar_pipeline.model7_garment_fitting.garment_segmentation import segment_garment
-from avatar_pipeline.model7_garment_fitting.garment_template import REFERENCE_BODY_PARAMS, get_template_features
-from avatar_pipeline.model7_garment_fitting.region_scaling import compute_region_scales
+from backend.avatar_pipeline.model7_garment_fitting.garment_segmentation import segment_garment
+from backend.avatar_pipeline.model7_garment_fitting.garment_template import REFERENCE_BODY_PARAMS, get_template_features
+from backend.avatar_pipeline.model7_garment_fitting.region_scaling import compute_region_scales
 
 
 # ── Synthetic garment image generator ───────────────────────────────────
@@ -161,7 +161,7 @@ def test_region_scales_increase_with_wider_garment_and_body(body3d_params):
 
 
 def test_region_scales_are_clamped_to_safe_range():
-    from avatar_pipeline.model7_garment_fitting.fitting_types import NormalizedGarmentFeatures
+    from backend.avatar_pipeline.model7_garment_fitting.fitting_types import NormalizedGarmentFeatures
 
     extreme_features = NormalizedGarmentFeatures(
         shoulder_width=1.5, chest_width=1.5, waist_width=1.5, hip_width=1.5,
@@ -218,14 +218,14 @@ def test_mock_garment_mesh_provider_rejects_unknown_garment_type():
 
 
 def test_unique3d_provider_returns_none_when_disabled(monkeypatch):
-    monkeypatch.setattr("avatar_pipeline.model7_garment_fitting.garment_mesh_generation.UNIQUE3D_ENABLED", False)
+    monkeypatch.setattr("backend.avatar_pipeline.model7_garment_fitting.garment_mesh_generation.UNIQUE3D_ENABLED", False)
     provider = Unique3DGarmentMeshProvider(endpoint="http://example.invalid/generate")
     result = provider.generate(_tshirt_silhouette(), _tshirt_silhouette(), "upper_body")
     assert result is None
 
 
 def test_unique3d_provider_returns_none_without_endpoint(monkeypatch):
-    monkeypatch.setattr("avatar_pipeline.model7_garment_fitting.garment_mesh_generation.UNIQUE3D_ENABLED", True)
+    monkeypatch.setattr("backend.avatar_pipeline.model7_garment_fitting.garment_mesh_generation.UNIQUE3D_ENABLED", True)
     provider = Unique3DGarmentMeshProvider(endpoint=None)
     result = provider.generate(_tshirt_silhouette(), _tshirt_silhouette(), "upper_body")
     assert result is None
@@ -384,7 +384,7 @@ def test_mock_garment_fit_runner_deforms_toward_avatar_region_ratios(body3d_para
 
 @pytest.fixture
 def client():
-    from server.app import app
+    from backend.app import app
     return app.test_client()
 
 
@@ -483,7 +483,7 @@ def test_fit_garment_returns_clear_error_when_mesh_generation_unavailable(client
     """When the configured provider can't produce a mesh at all (`generate()`
     returns None — e.g. Unique3D enabled but genuinely unreachable), the
     route must return a clear error, never silently substitute a mock."""
-    from avatar_pipeline.model7_garment_fitting import pipeline as pipeline_module
+    from backend.avatar_pipeline.model7_garment_fitting import pipeline as pipeline_module
 
     class _UnavailableProvider:
         def generate(self, *args, **kwargs):

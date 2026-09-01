@@ -22,7 +22,7 @@ import numpy as np
 import trimesh
 from pygltflib import GLTF2
 
-from avatar_pipeline.model6_body3d.avatar_builder import create_avatar_builder
+from backend.avatar_pipeline.model6_body3d.avatar_builder import create_avatar_builder
 
 
 def main():

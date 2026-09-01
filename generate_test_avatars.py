@@ -466,14 +466,14 @@ def main():
         save_glb(hair, base_dir / "hair" / "female" / f"{style}.glb")
 
     print("\nMobile assets:")
-    mobile_avatars = Path("mobile/assets/avatars")
+    mobile_avatars = Path("mobile_app/assets/avatars")
     mobile_avatars.mkdir(parents=True, exist_ok=True)
     shutil.copy(base_dir / "avatars" / "male" / "base.glb", mobile_avatars / "male.glb")
     print(f"Created: {mobile_avatars / 'male.glb'}")
     shutil.copy(base_dir / "avatars" / "female" / "base.glb", mobile_avatars / "female.glb")
     print(f"Created: {mobile_avatars / 'female.glb'}")
 
-    mobile_hair = Path("mobile/assets/hair")
+    mobile_hair = Path("mobile_app/assets/hair")
     mobile_hair.mkdir(parents=True, exist_ok=True)
     # mobile/src/types.ts's HairAssetKey -> source GLB generated above.
     hair_map = {

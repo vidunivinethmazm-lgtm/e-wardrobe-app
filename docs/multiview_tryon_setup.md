@@ -2,7 +2,7 @@
 
 This document covers the **experimental research pipeline** added alongside
 the existing, production `adaptive_template` garment-fitting pipeline (Model
-7, `avatar_pipeline/model7_garment_fitting/`). It is **not required** to run
+7, `backend/avatar_pipeline/model7_garment_fitting/`). It is **not required** to run
 the app: every provider defaults to a mock implementation, so
 `POST /api/avatars/<id>/fit-garment` with `pipeline_mode=multiview_tryon`
 works end to end with no external services or model installs. This doc
@@ -14,7 +14,7 @@ explains what to set up if you want the real backends.
 avatar directly from the virtual-try-on images and uses that mesh as the
 avatar going forward** — it no longer fits an isolated garment mesh onto
 the pre-existing MakeHuman avatar. This was an explicit, deliberate
-decision (see `avatar_pipeline/model7_garment_fitting/multiview/
+decision (see `backend/avatar_pipeline/model7_garment_fitting/multiview/
 avatar3d_providers.py`'s module docstring) that intentionally departs from
 "existing avatar stays unchanged." The response's `is_full_avatar_replacement`
 field is always `true` for this mode; `region_scales` is no longer computed
@@ -77,7 +77,7 @@ reported via `virtual_tryon_provider: "mock"` in the API response.
 
 ### Alternative: Gemini (`VIRTUAL_TRYON_PROVIDER=gemini`)
 
-Reuses the **existing** `server/ai_tryon/gemini_client.py` (already used by
+Reuses the **existing** `backend/ai_tryon/gemini_client.py` (already used by
 the older `/api/ai-tryon` endpoint) — a pragmatic fallback when IDM-VTON's
 free Space is unavailable or its ZeroGPU quota is exhausted. Requires:
 

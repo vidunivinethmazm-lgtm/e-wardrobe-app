@@ -8,8 +8,8 @@ import io
 import pytest
 from PIL import Image
 
-from server.ai_tryon import image_to_3d
-from server.app import app
+from backend.ai_tryon import image_to_3d
+from backend.app import app
 
 
 @pytest.fixture

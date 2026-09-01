@@ -3,14 +3,14 @@
 A photo + body measurements in, a stylized dressed avatar out. This repo has
 two layers:
 
-1. **`avatar_pipeline/`** — six TensorFlow/Keras models (body shape, pose,
+1. **`backend/avatar_pipeline/`** — six TensorFlow/Keras models (body shape, pose,
    skin tone, avatar generation, virtual try-on, 3D body reconstruction)
    plus the integration glue (`controller.py`, `pipeline_types.py`). See
-   [avatar_pipeline/README.md](avatar_pipeline/README.md) for the model
+   [backend/avatar_pipeline/README.md](backend/avatar_pipeline/README.md) for the model
    architectures, data-flow diagram, and training/inference details. **This
    layer requires TensorFlow and trained model artifacts in `saved_models/`,
    and is intended to run on Colab/cloud GPU.**
-2. **`server/` + `mobile/`** — a Flask API and an Expo (React Native +
+2. **`backend/` + `mobile_app/`** — a Flask API and an Expo (React Native +
    TypeScript) mobile app that consume the pipeline. This is the "product"
    layer covered by this document.
 
@@ -18,15 +18,15 @@ two layers:
 
 The avatar pipeline is TF/Keras (Python). Re-implementing six trained
 models in Node/Express isn't practical, so the API layer is a thin Flask
-wrapper around `avatar_pipeline.controller` / `pipeline_types`. The frontend
+wrapper around `backend.avatar_pipeline.controller` / `pipeline_types`. The frontend
 is an Expo (React Native) app so the same TypeScript codebase runs on iOS,
 Android, and web from one `npx expo start`.
 
 ## Mock mode vs. real mode
 
 Running the real pipeline requires TensorFlow + trained weights in
-`saved_models/` (see [avatar_pipeline/README.md §4](avatar_pipeline/README.md#4-recommended-end-to-end-folder-structure)).
-For local development without either, `server/app.py` has a **mock mode**
+`saved_models/` (see [backend/avatar_pipeline/README.md §4](backend/avatar_pipeline/README.md#4-recommended-end-to-end-folder-structure)).
+For local development without either, `backend/app.py` has a **mock mode**
 (default, `AVATAR_PIPELINE_MOCK=1`):
 
 | | Mock mode (default) | Real mode (`AVATAR_PIPELINE_MOCK=0`) |
@@ -47,8 +47,8 @@ so avatars genuinely vary with the user's photo and measurements.
 ### 1. Backend (Flask)
 
 ```bash
-pip install -r server/requirements.txt
-python -m server.app                # mock mode -> http://localhost:5000
+pip install -r backend/requirements.txt
+python -m backend.app                # mock mode -> http://localhost:5000
 ```
 
 To run against the real trained models instead:
@@ -57,7 +57,7 @@ To run against the real trained models instead:
 pip install -r requirements.txt              # adds TensorFlow etc.
 set AVATAR_PIPELINE_MOCK=0                    # PowerShell: $env:AVATAR_PIPELINE_MOCK=0
 set AVATAR_SAVED_MODELS_DIR=saved_models      # optional, this is the default
-python -m server.app
+python -m backend.app
 ```
 
 Check it's up: `GET http://localhost:5000/api/health` -> `{"status": "ok", "mock": true}`.
@@ -73,11 +73,11 @@ Set the environment variable before running the server:
 ```bash
 # PowerShell (Windows)
 $env:AVATAR_USE_REALISTIC=1
-python -m server.app
+python -m backend.app
 
 # Bash/Linux
 export AVATAR_USE_REALISTIC=1
-python -m server.app
+python -m backend.app
 ```
 
 ### Phase 2 Requirements
@@ -118,7 +118,7 @@ Phase 1 recommended for development. Phase 2 for production with photorealistic 
 ### 2. Demo wardrobe assets (one-time)
 
 The mobile app ships with three sample garments used for the try-on demo.
-They're already generated and committed under `mobile/assets/clothing/`, but
+They're already generated and committed under `mobile_app/assets/clothing/`, but
 if you ever need to regenerate them:
 
 ```bash
@@ -126,12 +126,12 @@ python -m scripts.generate_sample_clothing
 ```
 
 This writes `tshirt_red.png`, `jeans_blue.png`, and `dress_green.png`
-(256x256 RGBA, transparent background) to `mobile/assets/clothing/`.
+(256x256 RGBA, transparent background) to `mobile_app/assets/clothing/`.
 
 ### 3. Mobile app (Expo)
 
 ```bash
-cd mobile
+cd mobile_app
 npm install
 npx expo start --web      # or: npm run android / npm run ios
 ```
@@ -146,7 +146,7 @@ The app needs to reach the Flask backend:
   your LAN (it binds `0.0.0.0` by default) and your firewall allows
   port 5000.
 - **Android emulator**: falls back to `http://10.0.2.2:5000` automatically.
-- **Override**: set `EXPO_PUBLIC_API_URL` (e.g. in `mobile/.env`) to point
+- **Override**: set `EXPO_PUBLIC_API_URL` (e.g. in `mobile_app/.env`) to point
   at any backend, e.g. a deployed instance:
   ```
   EXPO_PUBLIC_API_URL=https://your-deployed-backend.example.com
@@ -166,7 +166,7 @@ The app needs to reach the Flask backend:
 
 ## API reference
 
-All endpoints are implemented in [server/app.py](server/app.py).
+All endpoints are implemented in [backend/app.py](backend/app.py).
 
 | Method & path | Body | Returns |
 |---|---|---|
@@ -181,13 +181,13 @@ to drop straight into an `<Image source={{ uri }} />`. `avatar_mesh_url` is a
 path (e.g. `/api/avatars/<id>/mesh.glb`) — resolve it against the API base
 URL and load it with a glTF loader (see the mobile app's `AvatarViewer3D`).
 `body3d_params` is a dict of 13 floats (fractions of `height`) keyed by
-`avatar_pipeline.model6_body3d.params.PARAM_NAMES`. The mesh's head is
+`backend.avatar_pipeline.model6_body3d.params.PARAM_NAMES`. The mesh's head is
 textured with a crop of the user's own face (detected via OpenCV from
 `photo`, falling back to a flat skin-color texture if no face is found) and
 its hair/eyebrows use a hair color sampled from the photo (falling back to
-`avatar_pipeline.model6_body3d.face_features.DEFAULT_HAIR_RGB`).
+`backend.avatar_pipeline.model6_body3d.face_features.DEFAULT_HAIR_RGB`).
 
-Each created avatar is persisted under `server/sessions/<avatar_id>/`
+Each created avatar is persisted under `backend/sessions/<avatar_id>/`
 (`avatar.png` + `avatar_mesh.glb` + `avatar_meta.json`, via
 `pipeline_types.save_avatar_result` / `load_avatar_result`) so try-on and
 mesh requests can run later without recomputing Phase A.
@@ -198,17 +198,17 @@ mesh requests can run later without recomputing Phase A.
 New avatar/                          (project root)
 ├── README.md                        <- this file (full-stack overview)
 ├── requirements.txt                 <- TensorFlow pipeline deps (real mode)
-├── avatar_pipeline/                 <- Models 1-6 + controller (see its README)
 ├── data/                            <- training data per model
 ├── scripts/
-│   └── generate_sample_clothing.py  <- generates mobile/assets/clothing/*.png
-├── server/                          <- Flask API
+│   └── generate_sample_clothing.py  <- generates mobile_app/assets/clothing/*.png
+├── backend/                         <- Flask API
+│   ├── avatar_pipeline/             <- Models 1-6 + controller (see its README)
 │   ├── requirements.txt             <- Flask + mock-mode deps (no TF)
 │   ├── app.py                       <- routes (see API reference above)
 │   ├── mock_pipeline.py             <- TF-free Phase A
 │   ├── storage.py                   <- per-avatar session persistence
 │   └── sessions/                    <- created avatars (gitignored)
-└── mobile/                          <- Expo (React Native + TypeScript) app
+└── mobile_app/                          <- Expo (React Native + TypeScript) app
     ├── App.tsx                      <- navigation stack
     ├── src/
     │   ├── api/client.ts            <- Flask API client

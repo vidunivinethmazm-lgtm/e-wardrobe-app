@@ -9,7 +9,7 @@ import io
 import pytest
 from PIL import Image
 
-from server.ai_tryon import gemini_client
+from backend.ai_tryon import gemini_client
 
 
 def _png_bytes():

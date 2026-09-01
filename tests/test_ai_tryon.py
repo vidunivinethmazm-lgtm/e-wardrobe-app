@@ -11,7 +11,7 @@ import io
 import pytest
 from PIL import Image
 
-from server.app import app
+from backend.app import app
 
 
 @pytest.fixture

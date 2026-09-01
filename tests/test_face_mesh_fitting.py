@@ -16,22 +16,22 @@ import copy
 import numpy as np
 import pytest
 
-from avatar_pipeline.model6_body3d.face_fit_runner import MockFaceFitRunner
-from avatar_pipeline.model6_body3d.face_fitting_pipeline import run_face_fitting
-from avatar_pipeline.model6_body3d.face_mesh_fitting import (
+from backend.avatar_pipeline.model6_body3d.face_fit_runner import MockFaceFitRunner
+from backend.avatar_pipeline.model6_body3d.face_fitting_pipeline import run_face_fitting
+from backend.avatar_pipeline.model6_body3d.face_mesh_fitting import (
     FaceLandmarks,
     align_face_mesh,
     compute_scale_ratios,
     extract_avatar_head_landmarks,
     landmarks_from_dict,
 )
-from avatar_pipeline.model6_body3d.face_mesh_generation import (
+from backend.avatar_pipeline.model6_body3d.face_mesh_generation import (
     GeneratedFaceMesh,
     LANDMARK_NAMES,
     MockFaceMeshProvider,
     Unique3DFaceMeshProvider,
 )
-from avatar_pipeline.model6_body3d.params import default_params_from_measurements
+from backend.avatar_pipeline.model6_body3d.params import default_params_from_measurements
 
 HEIGHT_CM = 165.0
 
@@ -43,7 +43,7 @@ def body3d_params():
 
 @pytest.fixture
 def avatar_result(body3d_params):
-    from server.mock_pipeline import build_avatar
+    from backend.mock_pipeline import build_avatar
 
     photo = np.full((96, 96, 3), 200, dtype=np.uint8)
     return build_avatar(photo, bust=92, waist=70, hips=98, height=HEIGHT_CM)

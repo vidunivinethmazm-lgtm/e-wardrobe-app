@@ -1,0 +1,96 @@
+{
+  "body_shape": "Pear",
+  "body_shape_confidence": 1.0,
+  "keypoints_dict": {
+    "left_shoulder": [
+      0.4,
+      0.28
+    ],
+    "right_shoulder": [
+      0.6,
+      0.28
+    ],
+    "left_elbow": [
+      0.32,
+      0.45
+    ],
+    "right_elbow": [
+      0.68,
+      0.45
+    ],
+    "left_wrist": [
+      0.28,
+      0.62
+    ],
+    "right_wrist": [
+      0.72,
+      0.62
+    ],
+    "left_hip": [
+      0.43,
+      0.55
+    ],
+    "right_hip": [
+      0.57,
+      0.55
+    ],
+    "left_knee": [
+      0.42,
+      0.75
+    ],
+    "right_knee": [
+      0.58,
+      0.75
+    ],
+    "left_ankle": [
+      0.41,
+      0.95
+    ],
+    "right_ankle": [
+      0.59,
+      0.95
+    ]
+  },
+  "skin_tone_result": {
+    "label": "MST-6",
+    "hex": "#a07e56",
+    "lab": [
+      160.287109375,
+      142.64698791503906,
+      138.68284606933594
+    ],
+    "distance": 26.12325668334961,
+    "confidence": 0.03686872869729996,
+    "avatar_render": {
+      "base_color": "#a07e56",
+      "shadow_color": "#7c6243",
+      "highlight_color": "#b89062"
+    }
+  },
+  "body3d_params": {
+    "head_radius": 0.14185803208316813,
+    "neck_radius": 0.04,
+    "shoulder_width": 0.18,
+    "chest_width": 0.16631691553103062,
+    "chest_depth": 0.10311648762923899,
+    "waist_width": 0.1928223348997963,
+    "waist_depth": 0.1337415714864987,
+    "hip_width": 0.22373104102743777,
+    "hip_depth": 0.1387132454370114,
+    "upper_arm_radius": 0.0336625437034806,
+    "forearm_radius": 0.025,
+    "thigh_radius": 0.06801423647234107,
+    "calf_radius": 0.04250889779521318
+  },
+  "gender": "female",
+  "facial_analysis": {
+    "gender": "female",
+    "age_group": "20s",
+    "hair_color": "brown",
+    "hair_style": "wavy",
+    "facial_hair": "beard",
+    "eye_color": "brown",
+    "face_shape": "oval",
+    "confidence": 0.7
+  }
+}

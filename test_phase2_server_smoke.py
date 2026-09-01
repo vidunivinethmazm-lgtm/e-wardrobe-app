@@ -18,8 +18,8 @@ import numpy as np
 from PIL import Image
 from pygltflib import GLTF2
 
-from avatar_pipeline.model6_body3d.face_features import extract_face_features
-from server.app import app
+from backend.avatar_pipeline.model6_body3d.face_features import extract_face_features
+from backend.app import app
 
 
 def main():

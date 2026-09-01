@@ -11,7 +11,7 @@ import os
 os.environ.pop("AVATAR_USE_REALISTIC", None)
 os.environ.setdefault("AVATAR_PIPELINE_MOCK", "1")
 
-from server.app import app
+from backend.app import app
 
 
 def main():

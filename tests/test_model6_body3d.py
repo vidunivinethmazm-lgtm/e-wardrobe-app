@@ -16,10 +16,10 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from avatar_pipeline.model6_body3d.face_features import DEFAULT_HAIR_RGB, extract_face_features
-from avatar_pipeline.model6_body3d.glb_export import mesh_to_glb_bytes
-from avatar_pipeline.model6_body3d.mesh_builder import build_avatar_mesh
-from avatar_pipeline.model6_body3d.params import (
+from backend.avatar_pipeline.model6_body3d.face_features import DEFAULT_HAIR_RGB, extract_face_features
+from backend.avatar_pipeline.model6_body3d.glb_export import mesh_to_glb_bytes
+from backend.avatar_pipeline.model6_body3d.mesh_builder import build_avatar_mesh
+from backend.avatar_pipeline.model6_body3d.params import (
     PARAM_NAMES,
     default_params_from_measurements,
 )
@@ -194,7 +194,7 @@ def test_mesh_to_glb_bytes_header_and_structure(sample_mesh):
 
 
 def test_mock_pipeline_build_avatar_includes_body3d():
-    from server.mock_pipeline import build_avatar
+    from backend.mock_pipeline import build_avatar
 
     photo = np.full((96, 96, 3), 200, dtype=np.uint8)
     result = build_avatar(photo, bust=92, waist=70, hips=98, height=165)
@@ -208,8 +208,8 @@ def test_mock_pipeline_build_avatar_includes_body3d():
 
 
 def test_save_and_load_avatar_result_round_trip(tmp_path):
-    from server.mock_pipeline import build_avatar
-    from avatar_pipeline.pipeline_types import load_avatar_result, save_avatar_result
+    from backend.mock_pipeline import build_avatar
+    from backend.avatar_pipeline.pipeline_types import load_avatar_result, save_avatar_result
 
     photo = np.full((96, 96, 3), 200, dtype=np.uint8)
     result = build_avatar(photo, bust=92, waist=70, hips=98, height=165)

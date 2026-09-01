@@ -2,7 +2,7 @@
 import os
 os.environ['AVATAR_USE_REALISTIC'] = '1'
 
-from avatar_pipeline.model6_body3d.avatar_builder import create_avatar_builder
+from backend.avatar_pipeline.model6_body3d.avatar_builder import create_avatar_builder
 
 print('=== Testing Phase 2 with Generated Models ===\n')
 

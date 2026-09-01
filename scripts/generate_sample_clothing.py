@@ -109,6 +109,6 @@ def main(output_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--output_dir", default="mobile/assets/clothing")
+    parser.add_argument("--output_dir", default="mobile_app/assets/clothing")
     args = parser.parse_args()
     main(args.output_dir)

@@ -16,26 +16,26 @@ import numpy as np
 import pytest
 from PIL import Image, ImageDraw
 
-from avatar_pipeline.model7_garment_fitting.fitting_types import (
+from backend.avatar_pipeline.model7_garment_fitting.fitting_types import (
     GARMENT_PIPELINE_MODE, PIPELINE_MODES, GarmentFittingError,
 )
-from avatar_pipeline.model7_garment_fitting.garment_mesh_generation import (
+from backend.avatar_pipeline.model7_garment_fitting.garment_mesh_generation import (
     LANDMARK_NAMES, GeneratedGarmentMesh, MockGarmentMeshProvider,
 )
-from avatar_pipeline.model7_garment_fitting.multiview.avatar3d_providers import (
+from backend.avatar_pipeline.model7_garment_fitting.multiview.avatar3d_providers import (
     MockFullAvatarImageTo3DProvider, Unique3DAvatarProvider, get_full_avatar_provider,
 )
-from avatar_pipeline.model7_garment_fitting.multiview.garment_isolation import isolate_garment_geometry
-from avatar_pipeline.model7_garment_fitting.multiview.mesh3d_providers import (
+from backend.avatar_pipeline.model7_garment_fitting.multiview.garment_isolation import isolate_garment_geometry
+from backend.avatar_pipeline.model7_garment_fitting.multiview.mesh3d_providers import (
     Hunyuan3D2MVProvider, MockMultiViewImageTo3DProvider, get_multiview_mesh_provider,
 )
-from avatar_pipeline.model7_garment_fitting.multiview.texture_providers import (
+from backend.avatar_pipeline.model7_garment_fitting.multiview.texture_providers import (
     Hunyuan3DPaintProvider, MockTextureGenerationProvider, get_texture_provider,
 )
-from avatar_pipeline.model7_garment_fitting.multiview.tryon_providers import (
+from backend.avatar_pipeline.model7_garment_fitting.multiview.tryon_providers import (
     GeminiVirtualTryOnProvider, IDMVTonProvider, MockVirtualTryOnProvider, get_virtual_tryon_provider,
 )
-from avatar_pipeline.model7_garment_fitting.multiview import (
+from backend.avatar_pipeline.model7_garment_fitting.multiview import (
     avatar3d_providers, tryon_providers, mesh3d_providers, texture_providers,
 )
 
@@ -107,7 +107,7 @@ def test_gemini_tryon_provider_returns_none_when_ai_tryon_mock_left_on(monkeypat
     """Even with a GEMINI_API_KEY set, gemini_client's own AI_TRYON_MOCK
     defaults to on — this provider must report itself unconfigured rather
     than silently echo the person photos as if a real try-on happened."""
-    from server.ai_tryon import gemini_client
+    from backend.ai_tryon import gemini_client
 
     monkeypatch.setattr(gemini_client, "MOCK", True)
     monkeypatch.setattr(gemini_client, "GEMINI_API_KEY", "fake-key")
@@ -120,7 +120,7 @@ def test_gemini_tryon_provider_returns_none_when_ai_tryon_mock_left_on(monkeypat
 
 
 def test_gemini_tryon_provider_returns_none_without_api_key(monkeypatch):
-    from server.ai_tryon import gemini_client
+    from backend.ai_tryon import gemini_client
 
     monkeypatch.setattr(gemini_client, "MOCK", False)
     monkeypatch.setattr(gemini_client, "GEMINI_API_KEY", None)
@@ -133,7 +133,7 @@ def test_gemini_tryon_provider_returns_none_without_api_key(monkeypatch):
 
 
 def test_gemini_tryon_provider_calls_gemini_client_when_configured(monkeypatch):
-    from server.ai_tryon import gemini_client
+    from backend.ai_tryon import gemini_client
 
     monkeypatch.setattr(gemini_client, "MOCK", False)
     monkeypatch.setattr(gemini_client, "GEMINI_API_KEY", "fake-key")
@@ -154,7 +154,7 @@ def test_gemini_tryon_provider_calls_gemini_client_when_configured(monkeypatch):
 
 
 def test_gemini_tryon_provider_raises_on_request_failure(monkeypatch):
-    from server.ai_tryon import gemini_client
+    from backend.ai_tryon import gemini_client
 
     monkeypatch.setattr(gemini_client, "MOCK", False)
     monkeypatch.setattr(gemini_client, "GEMINI_API_KEY", "fake-key")
@@ -353,7 +353,7 @@ def test_unique3d_avatar_provider_hf_space_raises_when_client_unreachable(monkey
 
 
 def test_unique3d_avatar_provider_hf_space_parses_predict_result(monkeypatch, tmp_path):
-    from avatar_pipeline.model7_garment_fitting.glb_writer import write_mesh_glb
+    from backend.avatar_pipeline.model7_garment_fitting.glb_writer import write_mesh_glb
 
     mesh = MockFullAvatarImageTo3DProvider().generate(_person_silhouette(), _person_silhouette())
     glb_bytes = write_mesh_glb(mesh.vertices, mesh.faces, mesh.uvs, mesh.texture_png)
@@ -468,7 +468,7 @@ def test_isolate_garment_geometry_rejects_empty_result():
 
 @pytest.fixture
 def client():
-    from server.app import app
+    from backend.app import app
     return app.test_client()
 
 

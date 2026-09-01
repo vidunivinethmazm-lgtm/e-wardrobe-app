@@ -47,11 +47,11 @@ Mobile App → AvatarViewer3D renders the GLB
 
 ### Entry Point
 ```
-server/app.py → controller.build_avatar()
+backend/app.py → controller.build_avatar()
 ```
 
 ### Step 1: Body + Face Prediction
-**File**: `avatar_pipeline/model6_body3d/predict.py` — `predict_body3d()`
+**File**: `backend/avatar_pipeline/model6_body3d/predict.py` — `predict_body3d()`
 
 ```python
 # 1. Extract face features with MediaPipe landmarks
@@ -75,7 +75,7 @@ mesh = build_avatar_mesh(
 ```
 
 ### Step 2: Procedural Mesh Warp Path
-**File**: `avatar_pipeline/model6_body3d/mesh_builder.py` — `_build_head_texture()`
+**File**: `backend/avatar_pipeline/model6_body3d/mesh_builder.py` — `_build_head_texture()`
 
 ```
 _build_head_texture(skin_rgb, face_crop, selfie_rgb, landmarks_2d)
@@ -109,7 +109,7 @@ _build_head_texture(skin_rgb, face_crop, selfie_rgb, landmarks_2d)
 - Front of face at `u=0.5`
 
 ### Step 3: Realistic MakeHuman Avatar (Optional)
-**File**: `avatar_pipeline/controller.py` — `build_avatar()`
+**File**: `backend/avatar_pipeline/controller.py` — `build_avatar()`
 
 ```python
 # After procedural mesh is built, also try realistic avatar
@@ -130,7 +130,7 @@ if avatar_builder:
         mesh_glb = realistic_glb  # ← replaces procedural mesh!
 ```
 
-**File**: `avatar_pipeline/model6_body3d/avatar_builder.py` — `_apply_face_texture()`
+**File**: `backend/avatar_pipeline/model6_body3d/avatar_builder.py` — `_apply_face_texture()`
 
 ```
 _apply_face_texture(glb, face_crop, skin_rgb, selfie_rgb, landmarks_2d)
@@ -153,11 +153,11 @@ _apply_face_texture(glb, face_crop, skin_rgb, selfie_rgb, landmarks_2d)
 
 ### Entry Point
 ```
-server/app.py → customize_face()
+backend/app.py → customize_face()
 ```
 
 ### Step 1: Decode Client Request
-**File**: `server/app.py`
+**File**: `backend/app.py`
 
 ```python
 features = request.get_json()
@@ -177,7 +177,7 @@ landmarks_2d = estimate_face_landmarks(selfie_rgb)
 ```
 
 ### Step 2: Apply Customization
-**File**: `avatar_pipeline/model6_body3d/face_customization.py`
+**File**: `backend/avatar_pipeline/model6_body3d/face_customization.py`
 
 ```python
 apply_face_customization(avatar_result, features,
@@ -203,7 +203,7 @@ apply_face_customization(avatar_result, features,
 ```
 
 ### Step 3: MakeHuman Mesh with Head Scaling
-**File**: `avatar_pipeline/model6_body3d/makehuman_mesh.py` — `build_personalized_glb()`
+**File**: `backend/avatar_pipeline/model6_body3d/makehuman_mesh.py` — `build_personalized_glb()`
 
 ```
 # 1. Compute 6 morph weights from body3d_params
@@ -233,7 +233,7 @@ texture_png = _build_texture(skin_rgb, face_crop,
 ```
 
 ### Step 4: MakeHuman Texture with Delaunay Warp
-**File**: `avatar_pipeline/model6_body3d/makehuman_mesh.py` — `_build_texture()`
+**File**: `backend/avatar_pipeline/model6_body3d/makehuman_mesh.py` — `_build_texture()`
 
 ```
 _build_texture(skin_rgb, face_crop, selfie_rgb, landmarks_2d, face_width, face_height)
@@ -297,7 +297,7 @@ v_mh = 0.5 - asin(y) / π
 ## Mobile App: How the GLB Reaches the User
 
 ### AvatarViewer3D Component
-**File**: `mobile/src/components/AvatarViewer3D.tsx`
+**File**: `mobile_app/src/components/AvatarViewer3D.tsx`
 
 ```typescript
 <AvatarViewer3D
@@ -318,7 +318,7 @@ The component:
    - Otherwise → flat skin tint
 
 ### Face Texture URL Server Endpoint
-**File**: `server/app.py` — `GET /api/avatars/<id>/face-texture.png`
+**File**: `backend/app.py` — `GET /api/avatars/<id>/face-texture.png`
 
 Extracts the embedded PNG texture from the GLB's binary blob and returns it
 as a standalone PNG file. This allows the mobile app to load the
@@ -331,8 +331,8 @@ decode embedded bufferView images on React Native.
 
 | File | Purpose |
 |------|---------|
-| `server/app.py` | HTTP endpoints: create avatar, customize face, serve mesh/texture |
-| `avatar_pipeline/controller.py` | Phase 1 orchestrator: calls models 1-6 |
+| `backend/app.py` | HTTP endpoints: create avatar, customize face, serve mesh/texture |
+| `backend/avatar_pipeline/controller.py` | Phase 1 orchestrator: calls models 1-6 |
 | `model6_body3d/predict.py` | Face extraction + mesh building entry point |
 | `model6_body3d/mesh_builder.py` | Procedural avatar mesh + head texture builder |
 | `model6_body3d/makehuman_mesh.py` | MakeHuman-based avatar mesh with head scaling + texture |
@@ -340,9 +340,9 @@ decode embedded bufferView images on React Native.
 | `model6_body3d/face_features.py` | MediaPipe face detection + feature extraction |
 | `model6_body3d/face_texture_builder.py` | Delaunay warp engine + UV anchors (procedural + MakeHuman) |
 | `model6_body3d/avatar_builder.py` | Realistic avatar builder (trimesh + pygltflib) |
-| `mobile/src/components/AvatarViewer3D.tsx` | Mobile 3D rendering with texture support |
-| `mobile/src/services/faceAnalysis.ts` | Mobile-side face analysis |
-| `mobile/src/screens/FacePreviewScreen.tsx` | Face preview + customize-face call |
+| `mobile_app/src/components/AvatarViewer3D.tsx` | Mobile 3D rendering with texture support |
+| `mobile_app/src/services/faceAnalysis.ts` | Mobile-side face analysis |
+| `mobile_app/src/screens/FacePreviewScreen.tsx` | Face preview + customize-face call |
 | `scripts/compute_mh_uv_anchors.py` | MakeHuman UV anchor generator |
 | `scripts/bake_makehuman_morphs.py` | MakeHuman base mesh UV layout definition |
 
