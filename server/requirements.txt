@@ -1,0 +1,27 @@
+# Flask API dependencies (server/app.py).
+#
+# This is enough to run the backend in mock mode
+# (AVATAR_PIPELINE_MOCK=1, the default) on a machine without TensorFlow.
+#
+# For real mode (AVATAR_PIPELINE_MOCK=0), also install the project root's
+# requirements.txt (TensorFlow + friends).
+#
+# NOTE: install opencv-contrib-python, never opencv-python alongside it —
+# both packages ship a `cv2` module and installing both corrupts the
+# bundled Haar cascade data files (cv2.CascadeClassifier ends up empty).
+# mediapipe already depends on opencv-contrib-python, and 5.x versions of
+# it stopped bundling the cascade XMLs at all, so pin a known-good 4.x.
+
+flask>=3.0
+numpy
+pandas
+pillow
+opencv-contrib-python==4.11.0.86
+pygltflib
+requests
+python-dotenv
+
+# Only needed for the EXPERIMENTAL multiview_tryon pipeline's real backends
+# (VIRTUAL_TRYON_PROVIDER=idm_vton, FULL_AVATAR_3D_PROVIDER=unique3d — both
+# call free public HuggingFace Spaces) — see docs/multiview_tryon_setup.md.
+gradio_client

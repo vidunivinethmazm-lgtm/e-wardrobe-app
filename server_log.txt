@@ -1,0 +1,1653 @@
+ * Serving Flask app 'app'
+ * Debug mode: on
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.8.159:5000
+Press CTRL+C to quit
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+127.0.0.1 - - [22/Jun/2026 10:44:23] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:44:23] "POST /api/ai-tryon HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:44:24] "GET /api/ai-tryon/98fdb5ffcdc34590a7ed6c9e7da8396a/image.png?v=1782105263917 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:44:29] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:44:29] "POST /api/ai-tryon/98fdb5ffcdc34590a7ed6c9e7da8396a/avatar3d HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:44:29] "GET /api/ai-tryon/98fdb5ffcdc34590a7ed6c9e7da8396a/avatar.glb?v=1782105269454 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:45:01] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:45:02] "POST /api/ai-tryon HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:45:02] "GET /api/ai-tryon/35dd4804a7df4cae8438c677f08b33e7/image.png?v=1782105302207 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:45:10] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:45:10] "POST /api/ai-tryon/35dd4804a7df4cae8438c677f08b33e7/avatar3d HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 10:45:10] "GET /api/ai-tryon/35dd4804a7df4cae8438c677f08b33e7/avatar.glb?v=1782105310418 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 15:57:33] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 15:57:34] "POST /api/ai-tryon HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 15:57:34] "GET /api/ai-tryon/598e66c1f34840e8b3f4ae23487ba507/image.png?v=1782124054145 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 15:57:36] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 15:57:36] "POST /api/ai-tryon/598e66c1f34840e8b3f4ae23487ba507/avatar3d HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 15:57:37] "GET /api/ai-tryon/598e66c1f34840e8b3f4ae23487ba507/avatar.glb?v=1782124056963 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:23:37] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:23:37] "POST /api/ai-tryon HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:23:38] "GET /api/ai-tryon/3700566cd7d1442fa18f3b2990d9b8d5/image.png?v=1782125617841 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:23:41] "GET /api/ai-tryon/config HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:23:41] "POST /api/ai-tryon/3700566cd7d1442fa18f3b2990d9b8d5/avatar3d HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:23:41] "GET /api/ai-tryon/3700566cd7d1442fa18f3b2990d9b8d5/avatar.glb?v=1782125621499 HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:53:19] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:53:19] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782127401.173675   11936 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782127407.612587   11936 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1782127411.793180   11936 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [22/Jun/2026 16:53:32] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:53:40] "OPTIONS /api/avatars/484dec15b99b4e29905158531ae1cf32/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:53:40] "POST /api/avatars/484dec15b99b4e29905158531ae1cf32/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:53:56] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 16:53:57] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 20:54:01] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 20:54:01] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 20:54:02] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 20:54:06] "OPTIONS /api/avatars/11c2ce165d18476b990532c478a4fbc1/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 20:54:06] "POST /api/avatars/11c2ce165d18476b990532c478a4fbc1/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 20:54:19] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [22/Jun/2026 20:54:19] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 00:13:47] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 00:13:47] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 00:13:47] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 00:13:48] "OPTIONS /api/avatars/34bb482f3c4f4b4abe8d2338b7369bbd/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 00:13:49] "POST /api/avatars/34bb482f3c4f4b4abe8d2338b7369bbd/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 00:14:03] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 00:14:03] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 01:32:42] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 01:32:42] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 01:32:43] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 01:32:51] "OPTIONS /api/avatars/91167cbe0d9244a8bd0c04a4d452924e/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 01:32:52] "POST /api/avatars/91167cbe0d9244a8bd0c04a4d452924e/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 01:33:10] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 01:33:11] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [23/Jun/2026 02:18:51] "POST /api/avatars/91167cbe0d9244a8bd0c04a4d452924e/tryon HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_customization.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\server\\mock_pipeline.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\avatar_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\avatar_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\predict.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\server\\app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+127.0.0.1 - - [24/Jun/2026 10:47:39] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 10:47:39] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782278260.600888    8024 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782278264.458165    8024 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1782278267.326271    8024 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [24/Jun/2026 10:47:47] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 10:47:56] "OPTIONS /api/avatars/34d1c692a4514a3c97172178bd3362a2/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 10:47:56] "POST /api/avatars/34d1c692a4514a3c97172178bd3362a2/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 10:48:07] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 10:48:07] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 10:48:29] "POST /api/avatars/34d1c692a4514a3c97172178bd3362a2/tryon HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\server\\app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\venv\\Lib\\site-packages\\cv2\\__init__.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782279779.546509   36320 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782279781.636381   36320 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782279790.417918   25724 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782279790.432548    2692 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782279790.445753    2692 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [24/Jun/2026 11:13:10] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:13:10] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782279791.085840   29328 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [24/Jun/2026 11:13:11] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:13:19] "OPTIONS /api/avatars/25e9c41bf5af43f09859aec5a1684d9c/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:13:20] "POST /api/avatars/25e9c41bf5af43f09859aec5a1684d9c/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:14:25] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:14:25] "POST /api/users/email HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\glb_export.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782281045.383293   33052 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782281049.710937   33052 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782281060.421633    8440 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782281060.485617   36320 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782281060.502265   17632 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [24/Jun/2026 11:34:20] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:34:20] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782281061.432880   29432 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [24/Jun/2026 11:34:22] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:34:30] "OPTIONS /api/avatars/34210372ee334d84a20d56843be9180c/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:34:30] "POST /api/avatars/34210372ee334d84a20d56843be9180c/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:34:55] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 11:34:55] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:32:55] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:32:55] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:32:56] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:33:04] "OPTIONS /api/avatars/e096f4f986224ff0a452e7610d1bdeb2/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:33:05] "POST /api/avatars/e096f4f986224ff0a452e7610d1bdeb2/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:33:49] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:33:50] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:55:55] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:55:55] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:55:55] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:03] "OPTIONS /api/avatars/84b4dcc2ef9041b3bf01a650c54f75c9/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:04] "POST /api/avatars/84b4dcc2ef9041b3bf01a650c54f75c9/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:42] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:42] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:43] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:51] "OPTIONS /api/avatars/305f7c7cde0f40779ba5ffb1318cb18f/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:51] "POST /api/avatars/305f7c7cde0f40779ba5ffb1318cb18f/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:59] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 12:56:59] "POST /api/users/email HTTP/1.1" 200 -
+E0000 00:00:1782286060.602924    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286120.624537    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286180.627438    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286240.632448    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286300.639112    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286360.647242    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286420.648833    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286480.650980    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286540.659750    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286600.660367    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286660.666957    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286720.682119    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286780.693956    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782286840.706814    8252 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T07:41:40.545832+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+127.0.0.1 - - [24/Jun/2026 14:25:08] "GET /api/avatars/305f7c7cde0f40779ba5f5fb1318cb18f/mesh.glb HTTP/1.1" 404 -
+127.0.0.1 - - [24/Jun/2026 14:25:09] "GET /favicon.ico HTTP/1.1" 404 -
+ * Detected change in 'D:\\New avatar\\server\\app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782297979.557961   36856 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782297986.504711   36856 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782297998.389137   25088 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782297998.438739   28148 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782297998.449017   28148 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [24/Jun/2026 16:16:38] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:16:38] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782297999.492624   27280 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [24/Jun/2026 16:16:40] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:16:48] "OPTIONS /api/avatars/368931bfbf2740f184795459bef206ad/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:16:48] "POST /api/avatars/368931bfbf2740f184795459bef206ad/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+127.0.0.1 - - [24/Jun/2026 16:19:45] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:19:45] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:20:21] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:20:21] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:20:22] "POST /api/predict-body-shape HTTP/1.1" 200 -
+E0000 00:00:1782298231.829195   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [24/Jun/2026 16:20:53] "OPTIONS /api/avatars/4b9c7b2c83604bd5b25e35b6bda6fb93/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 16:20:53] "POST /api/avatars/4b9c7b2c83604bd5b25e35b6bda6fb93/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+E0000 00:00:1782298291.837167   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298351.846920   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298411.861204   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298471.863127   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298531.875504   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298591.883849   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298651.899281   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298711.906071   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298771.907177   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298831.910014   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782298891.923082   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:02:31.81295+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [24/Jun/2026 17:04:24] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:04:24] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:04:25] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:04:33] "OPTIONS /api/avatars/790e9cabfe534e65b0a3997ec6240752/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:04:33] "POST /api/avatars/790e9cabfe534e65b0a3997ec6240752/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+127.0.0.1 - - [24/Jun/2026 17:06:02] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:06:02] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:08:02] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:08:02] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:08:02] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:08:04] "OPTIONS /api/avatars/cb384064099a40698a8d55a9456b3cfc/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:08:05] "POST /api/avatars/cb384064099a40698a8d55a9456b3cfc/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+127.0.0.1 - - [24/Jun/2026 17:08:17] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [24/Jun/2026 17:08:17] "POST /api/users/email HTTP/1.1" 200 -
+E0000 00:00:1782301116.069238   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:49:36.04362+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782301176.079501   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-24T11:49:36.04362+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [25/Jun/2026 18:56:41] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 18:56:41] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 18:56:42] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 18:56:50] "OPTIONS /api/avatars/cd006c426d41449d8c5403190af2c4a2/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 18:56:50] "POST /api/avatars/cd006c426d41449d8c5403190af2c4a2/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+127.0.0.1 - - [25/Jun/2026 18:57:02] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 18:57:02] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:19:38] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:19:38] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:19:38] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:19:46] "OPTIONS /api/avatars/8b1fbd23b1bc42b899ed1fab5ca1a22a/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:19:47] "POST /api/avatars/8b1fbd23b1bc42b899ed1fab5ca1a22a/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+127.0.0.1 - - [25/Jun/2026 19:19:58] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:19:58] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:27:37] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:27:37] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:27:37] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:27:45] "OPTIONS /api/avatars/5a71a687a7d04cf48b8de82621af0bdc/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:27:45] "POST /api/avatars/5a71a687a7d04cf48b8de82621af0bdc/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+E0000 00:00:1782395876.395441   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-25T14:04:56.332532+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [25/Jun/2026 19:28:09] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [25/Jun/2026 19:28:09] "POST /api/users/email HTTP/1.1" 200 -
+E0000 00:00:1782395936.418301   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-25T14:04:56.332532+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782395996.420268   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-25T14:04:56.332532+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782396056.434761   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-25T14:04:56.332532+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782396116.436715   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-25T14:04:56.332532+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782396176.439979   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-25T14:04:56.332532+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782396236.443492   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-25T14:04:56.332532+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [26/Jun/2026 09:26:12] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 09:26:12] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 09:26:13] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 09:26:22] "OPTIONS /api/avatars/a5a2e5dd10eb4d10bd37542d0007d2c4/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 09:26:22] "POST /api/avatars/a5a2e5dd10eb4d10bd37542d0007d2c4/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+127.0.0.1 - - [26/Jun/2026 09:26:38] "OPTIONS /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 09:26:38] "POST /api/users/email HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:08:19] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:08:19] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:08:21] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:08:29] "OPTIONS /api/avatars/3f212385c6fa44568aca7b71c7b3f4f4/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:08:30] "POST /api/avatars/3f212385c6fa44568aca7b71c7b3f4f4/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+127.0.0.1 - - [26/Jun/2026 14:13:34] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:13:34] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:13:35] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:13:51] "OPTIONS /api/avatars/863cce6dad1d46f8904938f91a7c7ab0/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:13:51] "POST /api/avatars/863cce6dad1d46f8904938f91a7c7ab0/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+E0000 00:00:1782463456.410101   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463516.420721   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463576.436174   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463636.441757   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463696.451429   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463756.466614   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463816.476967   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463876.486045   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463936.489611   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782463996.504438   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T08:54:16.354876+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [26/Jun/2026 14:36:51] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:36:51] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:36:52] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:36:55] "OPTIONS /api/avatars/15d5e6b722a243df8a331e84515c0121/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [26/Jun/2026 14:36:56] "POST /api/avatars/15d5e6b722a243df8a331e84515c0121/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+E0000 00:00:1782464863.619100   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T09:09:16.868196+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782464923.632814   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-26T09:09:16.868196+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [27/Jun/2026 12:39:37] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 12:39:37] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 12:39:38] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 12:39:59] "GET /api/avatars/305f7c7cde0f40779ba5f5fb1318cb18f/mesh.glb HTTP/1.1" 404 -
+127.0.0.1 - - [27/Jun/2026 12:40:28] "OPTIONS /api/avatars/f953a8339dc44ef4aa145cdaa438a936/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 12:40:29] "POST /api/avatars/f953a8339dc44ef4aa145cdaa438a936/customize-face HTTP/1.1" 500 -
+Traceback (most recent call last):
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1536, in __call__
+    return self.wsgi_app(environ, start_response)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1514, in wsgi_app
+    response = self.handle_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\New avatar\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "D:\New avatar\server\app.py", line 295, in customize_face
+    print(f"\U0001f50d UPDATED AVATAR MESH GLB: {updated.avatar_mesh_glb is not None}")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Vinethmamsi\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f50d' in position 0: character maps to <undefined>
+E0000 00:00:1782544260.179839   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544320.194733   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544380.194745   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544440.198435   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544500.212340   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544560.227038   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544620.241455   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544680.244043   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544740.252104   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544800.256206   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544860.266810   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544920.274345   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782544980.288271   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782545040.294974   24344 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T07:25:00.123165+00:00
+=== Source Location Trace: ===
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+ * Detected change in 'D:\\New avatar\\server\\app.py', reloading
+Exception in thread Thread-1 (serve_forever):
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782546836.228353   11272 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782546842.157193   11272 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782546852.889714   31316 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782546852.933945   33372 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782546852.944771   37436 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [27/Jun/2026 13:24:13] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:24:13] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782546853.984541    8816 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [27/Jun/2026 13:24:14] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:24:16] "OPTIONS /api/avatars/4fafea61b0c04a76ae272f8c81a7e02e/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:24:17] "POST /api/avatars/4fafea61b0c04a76ae272f8c81a7e02e/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:24:20] "GET /api/avatars/4fafea61b0c04a76ae272f8c81a7e02e/mesh.glb?v=1782546857089 HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:27:45] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:27:45] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:27:45] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:27:48] "OPTIONS /api/avatars/353520cd7c7f4c0b83b662449500e583/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:27:48] "POST /api/avatars/353520cd7c7f4c0b83b662449500e583/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [27/Jun/2026 13:27:52] "GET /api/avatars/353520cd7c7f4c0b83b662449500e583/mesh.glb?v=1782547068778 HTTP/1.1" 200 -
+E0000 00:00:1782547086.323330    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547146.333476    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547206.341762    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547266.354816    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547326.365433    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547386.373948    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547446.386666    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547506.391722    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547566.393282    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547626.403350    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547686.415812    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782547746.417927    4928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-27T08:10:06.287279+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782646891.254021   13672 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782646897.532535   13672 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782646909.247246   10660 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782646909.285246   33228 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782646909.300673   27068 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [28/Jun/2026 17:11:49] "POST /api/avatars HTTP/1.1" 422 -
+127.0.0.1 - - [28/Jun/2026 17:12:02] "POST /api/avatars HTTP/1.1" 422 -
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_customization.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782647055.111182   38064 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782647057.048881   38064 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782647065.988061   16676 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782647066.000590   41428 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782647066.011177   41428 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [28/Jun/2026 17:14:26] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [28/Jun/2026 17:14:26] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782647067.618341   17272 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [28/Jun/2026 17:14:28] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [28/Jun/2026 17:14:30] "OPTIONS /api/avatars/dc50cb15dae1466c81f75173e87e3074/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [28/Jun/2026 17:14:30] "POST /api/avatars/dc50cb15dae1466c81f75173e87e3074/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [28/Jun/2026 17:14:35] "GET /api/avatars/dc50cb15dae1466c81f75173e87e3074/mesh.glb?v=1782647070706 HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782792428.735052   10984 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782792439.954338   10984 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782792457.175846   37296 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782792457.263757   38916 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782792457.300780   38916 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 09:37:37] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 09:37:38] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782792458.920534   28592 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 09:37:41] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 09:38:32] "OPTIONS /api/avatars/5285d6b9a23440808629a46004503bbc/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 09:38:33] "POST /api/avatars/5285d6b9a23440808629a46004503bbc/customize-face HTTP/1.1" 200 -
+E0000 00:00:1782792570.839142   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [30/Jun/2026 09:40:13] "GET /api/avatars/5285d6b9a23440808629a46004503bbc/mesh.glb?v=1782792513488 HTTP/1.1" 200 -
+E0000 00:00:1782792630.852269   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782792690.867124   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782792750.881779   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782792810.888102   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782792870.896494   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782792930.900515   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782792990.912529   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782793050.918991   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782793110.931994   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782793170.944804   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782793230.948265   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782793290.963102   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782793350.976475   15792 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T04:23:30.828812+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[_build_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_texture] no proper landmarks - using legacy centre-paste fallback
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782808329.632099   41572 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782808334.532366   41572 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782808346.136460   25288 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782808346.159526   35432 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782808346.168175   35432 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 14:02:26] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:02:26] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782808347.392328   38568 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 14:02:27] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:02:31] "OPTIONS /api/avatars/8a52f426f0ec47779d71bfbdd70d4deb/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:02:32] "POST /api/avatars/8a52f426f0ec47779d71bfbdd70d4deb/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:02:38] "GET /api/avatars/8a52f426f0ec47779d71bfbdd70d4deb/mesh.glb?v=1782808352109 HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[_build_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_texture] no proper landmarks - using legacy centre-paste fallback
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_features.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_customization.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\predict.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\avatar_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\avatar_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\avatar_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\avatar_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\controller.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\avatar_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782810604.774958   10620 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782810606.800911   10620 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782810615.861585   17296 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782810615.885455   42108 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782810615.893915   42108 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 14:40:16] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:40:16] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782810616.454638   10920 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 14:40:16] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:40:17] "OPTIONS /api/avatars/b7da0617fcd149758bc3e645daf94328/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:40:18] "POST /api/avatars/b7da0617fcd149758bc3e645daf94328/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [30/Jun/2026 14:44:14] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:44:14] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:44:14] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:44:14] "OPTIONS /api/avatars/184df8c11d1142b88800ee926ea2e2ba/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 14:44:15] "POST /api/avatars/184df8c11d1142b88800ee926ea2e2ba/customize-face HTTP/1.1" 400 -
+E0000 00:00:1782810909.237707   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782810969.244621   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811029.253435   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811089.255137   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811149.267268   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811209.280055   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811269.287276   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811329.302648   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811389.312438   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811449.314510   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782811509.329595   37928 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T09:26:09.198263+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782815126.946814   10428 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782815129.150005   10428 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782815138.189116    9724 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782815138.238850   20516 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782815138.259307    5000 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 15:55:38] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 15:55:38] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782815138.915719   27628 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 15:55:39] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 15:55:42] "OPTIONS /api/avatars/44aef254e758487cbcfa78677a929f57/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 15:55:42] "POST /api/avatars/44aef254e758487cbcfa78677a929f57/customize-face HTTP/1.1" 400 -
+ * Detected change in 'D:\\New avatar\\server\\app.py', reloading
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_customization.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_customization.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782815706.817036   40924 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782815710.038805   40924 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782815719.885174   17640 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782815719.893712   30356 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782815719.909252   30356 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 16:05:20] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:05:20] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782815720.520785   24676 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 16:05:20] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:05:24] "OPTIONS /api/avatars/0fbb88e165ce4c7495ce38aa6bd147b6/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:05:25] "POST /api/avatars/0fbb88e165ce4c7495ce38aa6bd147b6/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [30/Jun/2026 16:11:50] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:11:50] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:11:50] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:11:53] "OPTIONS /api/avatars/672cb7c179584478b9a5a66ca39a9710/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:11:53] "POST /api/avatars/672cb7c179584478b9a5a66ca39a9710/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [30/Jun/2026 16:12:04] "OPTIONS /api/avatars/672cb7c179584478b9a5a66ca39a9710/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:12:04] "POST /api/avatars/672cb7c179584478b9a5a66ca39a9710/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:12:04] "GET /api/avatars/672cb7c179584478b9a5a66ca39a9710/mesh.glb?v=1782816124638 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:12:07] "GET /api/avatars/672cb7c179584478b9a5a66ca39a9710/mesh.glb?v=1782816124638 HTTP/1.1" 200 -
+E0000 00:00:1782816133.093566   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816193.102170   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816253.109258   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816313.114793   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816373.122878   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816433.138684   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816493.149412   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816553.157591   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782816613.163047   25668 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T10:51:13.046593+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+[_build_texture] use_warp=False (selfie_rgb=None, landmarks_2d=None)
+[_build_texture] no proper landmarks - using legacy centre-paste fallback
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\predict.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\predict.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782816951.829411    6348 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782816956.066257    6348 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782816966.488369   39316 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782816966.566271    2064 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782816966.607427   31888 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 16:26:07] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:26:07] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782816967.651447   21624 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 16:26:08] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:26:12] "OPTIONS /api/avatars/f1cf9fafcdec48d298a288bfff0c02d0/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:26:13] "POST /api/avatars/f1cf9fafcdec48d298a288bfff0c02d0/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [30/Jun/2026 16:26:18] "OPTIONS /api/avatars/f1cf9fafcdec48d298a288bfff0c02d0/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:26:18] "POST /api/avatars/f1cf9fafcdec48d298a288bfff0c02d0/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:26:18] "GET /api/avatars/f1cf9fafcdec48d298a288bfff0c02d0/mesh.glb?v=1782816978585 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 16:26:21] "GET /api/avatars/f1cf9fafcdec48d298a288bfff0c02d0/mesh.glb?v=1782816978585 HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+[_build_texture] use_warp=False (selfie_rgb=None, landmarks_2d=None)
+[_build_texture] no proper landmarks - using legacy centre-paste fallback
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_customization.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782824691.623643   22772 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782824697.162763   22772 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782824707.934363    9288 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782824708.039403   11196 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782824708.079357   20340 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 18:35:08] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:08] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782824709.212095   10576 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 18:35:10] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:33] "OPTIONS /api/avatars/eb0add938c154b95bb838e0d5262aab8/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:34] "POST /api/avatars/eb0add938c154b95bb838e0d5262aab8/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [30/Jun/2026 18:35:42] "OPTIONS /api/avatars/eb0add938c154b95bb838e0d5262aab8/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:42] "POST /api/avatars/eb0add938c154b95bb838e0d5262aab8/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:43] "GET /api/avatars/eb0add938c154b95bb838e0d5262aab8/mesh.glb?v=1782824742998 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:45] "GET /api/avatars/eb0add938c154b95bb838e0d5262aab8/mesh.glb?v=1782824742998 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:51] "OPTIONS /api/avatars/eb0add938c154b95bb838e0d5262aab8/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:51] "POST /api/avatars/eb0add938c154b95bb838e0d5262aab8/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 18:35:51] "GET /api/avatars/eb0add938c154b95bb838e0d5262aab8/mesh.glb?v=1782824751404 HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\mesh_builder.py', reloading
+Exception in thread Thread-1 (serve_forever):
+[_build_head_texture] use_warp=False (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] no proper landmarks - using legacy centre-paste fallback
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\face_texture_builder.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782840601.704693   34116 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782840605.593482   34116 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782840616.374891   40360 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782840616.453622   14132 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782840616.477927   12720 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [30/Jun/2026 23:00:16] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 23:00:16] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782840617.267785    9320 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [30/Jun/2026 23:00:17] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 23:00:18] "OPTIONS /api/avatars/b82163ee942e41b5953fe058ed4b460d/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 23:00:19] "POST /api/avatars/b82163ee942e41b5953fe058ed4b460d/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [30/Jun/2026 23:00:25] "OPTIONS /api/avatars/b82163ee942e41b5953fe058ed4b460d/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 23:00:25] "POST /api/avatars/b82163ee942e41b5953fe058ed4b460d/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 23:00:25] "GET /api/avatars/b82163ee942e41b5953fe058ed4b460d/mesh.glb?v=1782840625730 HTTP/1.1" 200 -
+127.0.0.1 - - [30/Jun/2026 23:00:28] "GET /api/avatars/b82163ee942e41b5953fe058ed4b460d/mesh.glb?v=1782840625730 HTTP/1.1" 200 -
+ * Detected change in 'D:\\New avatar\\scripts\\diagnose_glb_uv.py', reloading
+[_build_head_texture] use_warp=True (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] Delaunay warp path used (33144 bytes)
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\avatar_pipeline\\model6_body3d\\makehuman_mesh.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782849349.293184   33600 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782849361.287323   33600 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782849378.266964   13948 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782849378.347269   30232 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782849378.381764   13248 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [01/Jul/2026 01:26:18] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:26:18] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782849380.241608   23048 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [01/Jul/2026 01:26:21] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:26:40] "OPTIONS /api/avatars/618461c932654423b154c11e24bb2cf7/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:26:41] "POST /api/avatars/618461c932654423b154c11e24bb2cf7/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 01:26:46] "OPTIONS /api/avatars/618461c932654423b154c11e24bb2cf7/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:26:46] "POST /api/avatars/618461c932654423b154c11e24bb2cf7/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:26:46] "GET /api/avatars/618461c932654423b154c11e24bb2cf7/mesh.glb?v=1782849406434 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:26:51] "GET /api/avatars/618461c932654423b154c11e24bb2cf7/mesh.glb?v=1782849406434 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:34] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:34] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:34] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:37] "OPTIONS /api/avatars/96b6a29c3148471e8ffab0d6db704a15/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:37] "POST /api/avatars/96b6a29c3148471e8ffab0d6db704a15/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 01:35:56] "OPTIONS /api/avatars/96b6a29c3148471e8ffab0d6db704a15/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:56] "POST /api/avatars/96b6a29c3148471e8ffab0d6db704a15/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:56] "GET /api/avatars/96b6a29c3148471e8ffab0d6db704a15/mesh.glb?v=1782849956513 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:35:59] "GET /api/avatars/96b6a29c3148471e8ffab0d6db704a15/mesh.glb?v=1782849956513 HTTP/1.1" 200 -
+E0000 00:00:1782849971.837905   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:12:11.747163+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850031.847552   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:12:11.747163+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850091.860163   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:12:11.747163+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850151.873004   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:12:11.747163+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850211.886904   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:12:11.747163+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850271.901451   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:12:11.747163+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [01/Jul/2026 01:45:21] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:45:21] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:45:22] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:45:25] "OPTIONS /api/avatars/4914ebeab9224503a6ed070686d9a65d/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:45:25] "POST /api/avatars/4914ebeab9224503a6ed070686d9a65d/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 01:45:31] "OPTIONS /api/avatars/4914ebeab9224503a6ed070686d9a65d/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:45:31] "POST /api/avatars/4914ebeab9224503a6ed070686d9a65d/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:45:32] "GET /api/avatars/4914ebeab9224503a6ed070686d9a65d/mesh.glb?v=1782850531905 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:45:34] "GET /api/avatars/4914ebeab9224503a6ed070686d9a65d/mesh.glb?v=1782850531905 HTTP/1.1" 200 -
+E0000 00:00:1782850572.329557   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850632.339931   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850692.342419   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850752.354354   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850812.355651   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850872.370573   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850932.380601   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782850992.383690   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [01/Jul/2026 01:53:16] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:53:16] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:53:17] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:53:20] "OPTIONS /api/avatars/2384ff50da8f445da78a306bcf76dbce/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:53:20] "POST /api/avatars/2384ff50da8f445da78a306bcf76dbce/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 01:53:29] "OPTIONS /api/avatars/2384ff50da8f445da78a306bcf76dbce/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:53:29] "POST /api/avatars/2384ff50da8f445da78a306bcf76dbce/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:53:30] "GET /api/avatars/2384ff50da8f445da78a306bcf76dbce/mesh.glb?v=1782851009995 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:53:33] "GET /api/avatars/2384ff50da8f445da78a306bcf76dbce/mesh.glb?v=1782851009995 HTTP/1.1" 200 -
+E0000 00:00:1782851052.399702   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851112.413901   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851172.422892   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:27:12.301644+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [01/Jul/2026 01:58:51] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:58:51] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:58:51] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:58:53] "OPTIONS /api/avatars/4d9861bcaa8a4bf3a6b88acd80f0d7ee/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:58:53] "POST /api/avatars/4d9861bcaa8a4bf3a6b88acd80f0d7ee/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 01:58:57] "POST /api/avatars/4d9861bcaa8a4bf3a6b88acd80f0d7ee/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:58:57] "GET /api/avatars/4d9861bcaa8a4bf3a6b88acd80f0d7ee/mesh.glb?v=1782851337005 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 01:58:59] "GET /api/avatars/4d9861bcaa8a4bf3a6b88acd80f0d7ee/mesh.glb?v=1782851337005 HTTP/1.1" 200 -
+E0000 00:00:1782851353.817633   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851413.818873   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851473.820135   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851533.825966   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851593.838419   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851653.843707   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851713.853654   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851773.855823   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851833.860682   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851893.875917   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782851953.889364   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782852013.895774   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782852073.898844   28080 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-06-30T20:42:13.802841+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+ * Detected change in 'D:\\New avatar\\server\\app.py', reloading
+[_build_head_texture] use_warp=True (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] Delaunay warp path used (30096 bytes)
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+[_build_head_texture] use_warp=True (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] Delaunay warp path used (30096 bytes)
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+[_build_head_texture] use_warp=True (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] Delaunay warp path used (30096 bytes)
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+[_build_head_texture] use_warp=True (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] Delaunay warp path used (34509 bytes)
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+[_build_head_texture] use_warp=True (selfie_rgb=set, landmarks_2d=(478, 2))
+[_build_head_texture] Delaunay warp path used (30096 bytes)
+[apply_face_customization] selfie_rgb=set (256, 256, 3), landmarks_2d=(478, 2)
+[apply_face_customization] Face crop size: 256×256 px, aspect=1.000
+[apply_face_customization] selfie_rgb=None, landmarks_2d=None
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+ * Detected change in 'D:\\New avatar\\server\\app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 120-388-126
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782852305.241279   35028 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1782852307.859143   35028 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+W0000 00:00:1782852316.798594   41592 face_landmarker_graph.cc:180] Sets FaceBlendshapesGraph acceleration to xnnpack by default.
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+W0000 00:00:1782852316.821841    2800 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+W0000 00:00:1782852316.831026    2800 inference_feedback_manager.cc:121] Feedback manager requires a model with a single signature inference. Disabling support for feedback tensors.
+127.0.0.1 - - [01/Jul/2026 02:15:16] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 02:15:16] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+I0000 00:00:1782852317.410160   40200 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING:tensorflow:TensorFlow GPU support is not available on native Windows for TensorFlow >= 2.11. Even if CUDA/cuDNN are installed, GPU will not be used. Please use WSL2 or the TensorFlow-DirectML plugin.
+127.0.0.1 - - [01/Jul/2026 02:15:17] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 02:15:19] "OPTIONS /api/avatars/be63416b669142c5b2874564b3187d20/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 02:15:20] "POST /api/avatars/be63416b669142c5b2874564b3187d20/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 02:15:29] "OPTIONS /api/avatars/be63416b669142c5b2874564b3187d20/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 02:15:30] "POST /api/avatars/be63416b669142c5b2874564b3187d20/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 02:15:30] "GET /api/avatars/be63416b669142c5b2874564b3187d20/mesh.glb?v=1782852330142 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 02:15:32] "GET /api/avatars/be63416b669142c5b2874564b3187d20/mesh.glb?v=1782852330142 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:36:46] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:36:46] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:36:46] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:36:49] "OPTIONS /api/avatars/42ed4888dce742fd91deeef8178b06bb/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:36:49] "POST /api/avatars/42ed4888dce742fd91deeef8178b06bb/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 09:37:13] "OPTIONS /api/avatars/42ed4888dce742fd91deeef8178b06bb/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:37:14] "POST /api/avatars/42ed4888dce742fd91deeef8178b06bb/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:37:14] "GET /api/avatars/42ed4888dce742fd91deeef8178b06bb/mesh.glb?v=1782878834293 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:37:19] "OPTIONS /api/avatars/42ed4888dce742fd91deeef8178b06bb/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:37:20] "POST /api/avatars/42ed4888dce742fd91deeef8178b06bb/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:37:20] "GET /api/avatars/42ed4888dce742fd91deeef8178b06bb/mesh.glb?v=1782878840257 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:37:22] "GET /api/avatars/42ed4888dce742fd91deeef8178b06bb/mesh.glb?v=1782878840257 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:51:05] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:51:05] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:51:05] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:51:16] "OPTIONS /api/avatars/65291e4db2734f6582a8c0ac16fa9f09/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:51:17] "POST /api/avatars/65291e4db2734f6582a8c0ac16fa9f09/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 09:51:20] "POST /api/avatars/65291e4db2734f6582a8c0ac16fa9f09/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:51:20] "GET /api/avatars/65291e4db2734f6582a8c0ac16fa9f09/mesh.glb?v=1782879680518 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 09:51:22] "GET /api/avatars/65291e4db2734f6582a8c0ac16fa9f09/mesh.glb?v=1782879680518 HTTP/1.1" 200 -
+E0000 00:00:1782879701.885998   40220 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-07-01T04:22:41.812411+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [01/Jul/2026 10:01:14] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:01:14] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:01:15] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:01:26] "OPTIONS /api/avatars/ba6c7ca692044678b5dd1ecc9e17bfcc/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:01:26] "POST /api/avatars/ba6c7ca692044678b5dd1ecc9e17bfcc/customize-face HTTP/1.1" 400 -
+127.0.0.1 - - [01/Jul/2026 10:01:37] "OPTIONS /api/avatars/ba6c7ca692044678b5dd1ecc9e17bfcc/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:01:37] "POST /api/avatars/ba6c7ca692044678b5dd1ecc9e17bfcc/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:01:38] "GET /api/avatars/ba6c7ca692044678b5dd1ecc9e17bfcc/mesh.glb?v=1782880297958 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:01:40] "GET /api/avatars/ba6c7ca692044678b5dd1ecc9e17bfcc/mesh.glb?v=1782880297958 HTTP/1.1" 200 -
+E0000 00:00:1782880302.664790   40220 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-07-01T04:37:42.591988+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [01/Jul/2026 10:01:45] "GET /api/avatars/ba6c7ca692044678b5dd1ecc9e17bfcc/mesh.glb?v=1782880297958 HTTP/1.1" 200 -
+E0000 00:00:1782880362.677756   40220 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-07-01T04:37:42.591988+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782880422.689820   40220 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-07-01T04:37:42.591988+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+E0000 00:00:1782880482.693677   40220 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-07-01T04:37:42.591988+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [01/Jul/2026 10:05:38] "POST /api/avatars HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:05:38] "OPTIONS /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:05:39] "POST /api/predict-body-shape HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:05:41] "OPTIONS /api/avatars/88693306f5a841e99dda0f54404b8d95/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:05:41] "POST /api/avatars/88693306f5a841e99dda0f54404b8d95/customize-face HTTP/1.1" 400 -
+E0000 00:00:1782880542.701468   40220 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-07-01T04:37:42.591988+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180
+127.0.0.1 - - [01/Jul/2026 10:05:45] "POST /api/avatars/88693306f5a841e99dda0f54404b8d95/customize-face HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:05:46] "GET /api/avatars/88693306f5a841e99dda0f54404b8d95/mesh.glb?v=1782880545757 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:05:49] "GET /api/avatars/88693306f5a841e99dda0f54404b8d95/mesh.glb?v=1782880545757 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:05:52] "GET /api/avatars/88693306f5a841e99dda0f54404b8d95/mesh.glb?v=1782880545757 HTTP/1.1" 200 -
+127.0.0.1 - - [01/Jul/2026 10:06:15] "GET /api/avatars/88693306f5a841e99dda0f54404b8d95/mesh.glb?v=1782880545757 HTTP/1.1" 200 -
+E0000 00:00:1782880602.708203   40220 portable_clearcut_uploader.cc:90] Failed to send to clearcut: FAILED_PRECONDITION: Not valid for uploading until: 2026-07-01T04:37:42.591988+00:00
+=== Source Location Trace: === 
+wireless/android/play/playlog/cplusplus/portable_clearcut_uploader.cc:180

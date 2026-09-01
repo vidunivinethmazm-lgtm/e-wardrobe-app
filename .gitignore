@@ -1,19 +1,26 @@
-node_modules/
+# Python
 __pycache__/
 *.pyc
-*.db
-*.pth
-*.pkl
-memory/
-project/
-vineths_wardrobe/vineths_wardrobe/
-vineths_wardrobe/settings.json
-vineths_wardrobe/settings.local.json
-vineths_wardrobe/frontend/static_docs/
-.claude/
+.venv/
+venv/
+.pytest_cache/
 
-ewardrobe-app/.expo/
+# Avatar pipeline runtime artifacts
+saved_models/
+output/
+server/sessions/
+server/ai_sessions/
+server/garment_fits/
 
-ewardrobe-app/.expo/
+# Codex tool cache / generated data
+.codex/
 
-training.csv
+# React Native
+mobile/node_modules/
+mobile/.expo/
+
+# Editor
+.vscode/
+
+# Secrets
+.env

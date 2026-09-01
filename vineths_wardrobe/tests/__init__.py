@@ -1,1 +1,0 @@
-# eWardrobeAI test suite

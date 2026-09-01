@@ -1,0 +1,12 @@
+tensorflow>=2.15
+tensorflow-hub
+numpy
+pandas
+scikit-learn
+matplotlib
+pillow
+opencv-contrib-python==4.11.0.86
+joblib
+requests
+scipy>=1.9
+mediapipe>=0.10.0
